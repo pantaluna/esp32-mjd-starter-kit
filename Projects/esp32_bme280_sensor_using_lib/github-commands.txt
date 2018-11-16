@@ -1,0 +1,51 @@
+https://github.com/pantaluna/esp32_bme280_sensor_using_lib
+
+C:\myiot\esp\esp32_bme280_sensor_using_lib
+
+
+SOP Upload new repo to GitHub
+-----------------------------
+
+1. BROWSER: create GitHub public repo at Github.com
+
+2 MSYS2: git
+```
+DIR_REPO_NAME=esp32_bme280_sensor_using_lib
+cd  /c/myiot/esp/${DIR_REPO_NAME}
+pwd
+git init
+git add .
+git commit -m "First commit"
+git remote add origin https://github.com/pantaluna/${DIR_REPO_NAME}.git
+
+git push --set-upstream origin master
+
+git remote show origin
+
+git tag --annotate v0.80 --message "First tag"
+git push origin --tags
+
+git describe --tags --dirt
+git rev-parse --short HEAD
+git rev-parse HEAD
+git status
+```
+
+SOP Upload source updates to GitHub
+-----------------------------------
+```
+DIR_REPO_NAME=esp32_bme280_sensor_using_lib
+cd  /c/myiot/esp/${DIR_REPO_NAME}
+git add .
+git commit -m "Updated"
+
+git push --set-upstream origin master
+
+git tag --annotate v0.81 --message "First tag"
+git push origin --tags
+
+git describe --tags --dirt
+git rev-parse --short HEAD
+git rev-parse HEAD
+git status
+```

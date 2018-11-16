@@ -1,0 +1,32 @@
+menu "Adafruit HUZZAH32"
+
+config MJD_HUZZAH32_REFERENCE_VOLTAGE_MV
+    int "Voltage Reference in mV [default 1100] mjd_huzzah32_get_battery_voltage()"
+    default 1100
+
+choice MJD_HUZZAH32_VOLTAGE_REGULATOR_ENABLED
+    prompt "Voltage Regulator enabled? [default yes] mjd_huzzah32_get_battery_voltage()"
+    default MJD_HUZZAH32_VOLTAGE_REGULATOR_ENABLED_YES
+    help
+        Is the Voltage Regulator enabled (default)? Without extra wiring the VR is enabled.
+        This impacts the calculation of the battery voltage.
+            If enabled Then no extra calculation is needed.
+            If disabled Then the func multiplies the computed battery voltage with a correction factor to obtain the correct battery voltage level.
+        Disabling the VR can be done by wiring the pin "EN" to "GND" to conserve power when in LiFePO4 battery mode.
+        Warning: only disable the VR when using 3.3V batteries such as LifePO4 ones 
+                 that are connected to the pin "3.3V" (not to the LiPO battery connector).
+config MJD_HUZZAH32_VOLTAGE_REGULATOR_ENABLED_YES
+    bool "Yes"
+config MJD_HUZZAH32_VOLTAGE_REGULATOR_ENABLED_NO
+    bool "No"
+endchoice
+config MJD_HUZZAH32_VOLTAGE_REGULATOR_ENABLED
+    int
+    default 1 if MJD_HUZZAH32_VOLTAGE_REGULATOR_ENABLED_YES
+    default 0 if MJD_HUZZAH32_VOLTAGE_REGULATOR_ENABLED_NO
+
+config MJD_HUZZAH32_ROUTE_VREF_TO_GPIO_NUM
+    int "Route the Voltage Reference to this GPIO NUM [default 26] mjd_huzzah32_route_vref_to_gpio()"
+    default 26
+
+endmenu

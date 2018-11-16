@@ -1,0 +1,70 @@
+# V.A.
+_tmp/
+tmp/
+*.diff
+*.err
+*.log
+*.orig
+*.rej
+*.swo
+*.swp
+picasa.ini
+Thumbs.db
+
+# Editors / emacs
+.dir-locals.el
+*~
+.#*
+\#*#
+*.bak
+*.vi
+
+# MacOS directory files
+.DS_Store/
+
+# SCSS-Lint
+scss-lint-report.xml
+
+# grunt-contrib-sass cache
+.sass-cache/
+
+# Package Folders
+bower_components/
+node_modules/
+
+# Eclipse CDT C C++ / OS
+.cache/
+.idea/
+.settings/
+.cproject
+.project
+.tmproj
+*.esproj
+
+# GCC gcov coverage reports
+*.gcda
+*.gcno
+coverage.info
+coverage_report
+
+# ESP-IDF
+.settings
+.config
+*.o
+*.pyc
+*.d
+*.old
+build/
+cmake-build-debug/
+test/xtensa-esp32-elf
+test/esp-idf
+test/build
+sdkconfig
+sdkconfig.old
+
+# MJD Special
+*.ai
+deploy.cmd
+Aliexpress*.*
+Antratek*.*
+Banggood*.*

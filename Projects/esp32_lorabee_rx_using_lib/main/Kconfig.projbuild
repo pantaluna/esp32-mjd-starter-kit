@@ -1,0 +1,58 @@
+menu "MY PROJECT configuration"
+
+
+choice MY_LED_ON_DEVBOARD_GPIO_NUM
+    prompt "On-board LED GPIO#"
+    default MY_LED_ON_DEVBOARD_GPIO_NUM_HUZZAH32_13
+    help
+        The on-board LED GPIO# to be used.
+config MY_LED_ON_DEVBOARD_GPIO_NUM_HUZZAH32_13
+    bool "HUZZAH32_13"
+config MY_LED_ON_DEVBOARD_GPIO_NUM_LOLIN32LITE_22
+    bool "LOLIN32LITE_22"
+config MY_LED_ON_DEVBOARD_GPIO_NUM_OTHER
+    bool "Other GPIO#"
+endchoice
+config MY_LED_ON_DEVBOARD_GPIO_NUM_OTHER_VAL
+    int "Other On-board LED GPIO#" if MY_LED_ON_DEVBOARD_GPIO_NUM_OTHER
+    default 99
+config MY_LED_ON_DEVBOARD_GPIO_NUM
+    int
+    default 13 if MY_LED_ON_DEVBOARD_GPIO_NUM_HUZZAH32_13
+    default 22 if MY_LED_ON_DEVBOARD_GPIO_NUM_LOLIN32LITE_22
+    default MY_LED_ON_DEVBOARD_GPIO_NUM_OTHER_VAL if MY_LED_ON_DEVBOARD_GPIO_NUM_OTHER
+
+
+choice MY_LED_ON_DEVBOARD_WIRING_TYPE
+    prompt "LED on-board wiring type"
+    default MY_LED_ON_DEVBOARD_WIRING_TYPE_HUZZAH32_GND_1
+    help
+        The LED on-board wiring type to be used.
+config MY_LED_ON_DEVBOARD_WIRING_TYPE_HUZZAH32_GND_1
+    bool "HUZZAH32_GND_1"
+config MY_LED_ON_DEVBOARD_WIRING_TYPE_LOLIN32LITE_VCC_2
+    bool "LOLIN32LITE_VCC_2"
+endchoice
+config MY_LED_ON_DEVBOARD_WIRING_TYPE
+    int
+    default 1 if MY_LED_ON_DEVBOARD_WIRING_TYPE_HUZZAH32_GND_1
+    default 2 if MY_LED_ON_DEVBOARD_WIRING_TYPE_LOLIN32LITE_VCC_2
+
+
+config MY_LORABEE_UART_PORT_NUM
+    int "MY_LORABEE_UART_PORT_NUM (1,2)"
+    default 1
+
+config MY_LORABEE_UART_TX_GPIO_NUM
+    int "MY_LORABEE_UART_TX_GPIO_NUM ((Huzzah32 pin 22 @ bottomright-1))"
+    default 22
+
+config MY_LORABEE_UART_RX_GPIO_NUM
+    int "MY_LORABEE_UART_RX_GPIO_NUM ((Huzzah32 pin 23 @ bottomright))"
+    default 23
+
+config MY_LORABEE_RESET_GPIO_NUM
+    int "MY_LORABEE_RESET_GPIO_NUM"
+    default 14
+
+endmenu

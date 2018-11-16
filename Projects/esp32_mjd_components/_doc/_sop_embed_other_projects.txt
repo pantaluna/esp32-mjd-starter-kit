@@ -1,0 +1,144 @@
+###
+### SETUP 
+###
+
+COMPONENT mjd_bme280 => bosch_bme280 V3.3.4
+===========================================
+@source Apr2018 Git REPO https://github.com/BoschSensortec/BME280_driver
+
+##
+## INITIAL CLONE & Customization
+
+#MINGW>>
+mkdir --parents /c/myiot/esp/esp32_mjd_components/components/mjd_bme280
+cd              /c/myiot/esp/esp32_mjd_components/components/mjd_bme280
+git clone --recursive https://github.com/BoschSensortec/BME280_driver bosch_bme280
+cd bosch_bme280
+
+# Checkout release tag bme280_v3.3.4 of Feb2018 [STABLE]
+git tag --list
+git checkout tags/bme280_v3.3.4
+git describe --tags
+git submodule update --init --recursive
+git status
+
+rm --verbose --recursive .git
+
+
+COMPONENT mjd_bmp280 => bosch_bmp280 V2.5.0
+===========================================
+@source Mar2018 Git REPO https://github.com/BoschSensortec/BMP280_driver
+
+##
+## INITIAL CLONE & Customization
+
+#MINGW>>
+mkdir --parents /c/myiot/esp/esp32_mjd_components/components/mjd_bmp280
+cd              /c/myiot/esp/esp32_mjd_components/components/mjd_bmp280
+git clone --recursive https://github.com/BoschSensortec/BMP280_driver bosch_bmp280
+cd bosch_bmp280
+
+# Checkout release tag bmp280_v2.0.5 of Mar2018 [STABLE]
+git tag --list
+git checkout tags/bmp280_v2.0.5
+git describe --tags
+git submodule update --init --recursive
+git status
+
+rm --verbose --recursive .git
+
+mkdir example
+mv --verbose bmp280_support.c example
+
+
+COMPONENT esp-mqtt v0.6.1
+=========================
+@source Feb2018 Git REPO https://github.com/256dpi/esp-mqtt.git
+
+##
+## INITIAL CLONE
+
+#MINGW>>
+mkdir --parents /c/myiot/esp/esp32_mjd_components/components
+cd              /c/myiot/esp/esp32_mjd_components/components
+
+git clone --recursive https://github.com/256dpi/esp-mqtt.git
+cd esp-mqtt
+git status
+
+##
+## ***OK Mar2018*** Checkout tag v0.4.4 for ESP-IDF V2
+cd /c/myiot/esp/esp32_mjd_components/components/esp-mqtt
+git tag --list
+git checkout tags/v0.4.4
+git describe --tags
+git submodule update --init --recursive
+git status
+rm --verbose --recursive .git
+
+##
+## ***OK Jun2018*** Checkout tag v0.6.0 (supports ESP-IDF V3)
+cd /c/myiot/esp/esp32_mjd_components/components/esp-mqtt
+git tag --list
+git checkout tags/v0.6.0
+git describe --tags
+git submodule update --init --recursive
+git status
+rm --verbose --recursive .git
+
+##
+## ***OK Jun2018*** Checkout tag v0.6.1 (supports ESP-IDF V3)
+cd /c/myiot/esp/esp32_mjd_components/components/esp-mqtt
+git tag --list
+git checkout tags/v0.6.1
+git describe --tags
+git submodule update --init --recursive
+git status
+rm --verbose --recursive .git
+
+##
+## GIT PULL UPDATES
+
+#MINGW>>
+cd /c/myiot/esp/esp32_mjd_components/components/esp-mqtt
+git pull
+git submodule update --init --recursive
+git status
+
+
+###
+### INFO - MQTT LWIP error codes
+###
+/**
+ * The error type used by all exposed APIs.
+ *
+ * If a function returns an error that operates on a connected client (e.g publish, keep_alive, etc.) the caller should
+ * switch into a disconnected state, close and cleanup the current connection and start over by creating a new
+ * connection.
+ */
+typedef enum {
+  LWMQTT_SUCCESS = 0,
+  LWMQTT_BUFFER_TOO_SHORT = -1,
+  LWMQTT_VARNUM_OVERFLOW = -2,
+  LWMQTT_NETWORK_FAILED_CONNECT = -3,
+  LWMQTT_NETWORK_TIMEOUT = -4,
+  LWMQTT_NETWORK_FAILED_READ = -5,
+  LWMQTT_NETWORK_FAILED_WRITE = -6,
+  LWMQTT_REMAINING_LENGTH_OVERFLOW = -7,
+  LWMQTT_REMAINING_LENGTH_MISMATCH = -8,
+  LWMQTT_MISSING_OR_WRONG_PACKET = -9,
+  LWMQTT_CONNECTION_DENIED = -10,
+  LWMQTT_FAILED_SUBSCRIPTION = -11,
+  LWMQTT_SUBACK_ARRAY_OVERFLOW = -12,
+  LWMQTT_PONG_TIMEOUT = -13,
+} lwmqtt_err_t;
+
+
+###
+### OPERATIONS
+###
+
+REM ##---WINCMD Deploy esp32_mjd_components to all other projects
+cd c:\myiot\esp\esp32_mjd_components
+deploy.cmd
+REM #---

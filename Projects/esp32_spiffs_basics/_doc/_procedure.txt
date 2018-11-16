@@ -1,0 +1,16 @@
+
+###
+### SETUP 
+###
+
+
+###
+### OPERATIONS
+###
+
+cd /c/myiot/esp/esp32_spiffs_basics
+make menuconfig
+
+cd /c/myiot/esp/esp32_spiffs_basics
+make erase_flash partition_table flash monitor
+

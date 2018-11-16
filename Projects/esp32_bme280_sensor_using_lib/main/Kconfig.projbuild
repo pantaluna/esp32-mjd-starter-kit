@@ -1,0 +1,27 @@
+menu "MY PROJECT configuration"
+
+config MY_LED_ON_DEVBOARD_GPIO_NUM
+    int "LED on-board GPIO# (Huzzah32 #13) (Lolin32lite #22)"
+	default 13
+
+config MY_LED_ON_DEVBOARD_WIRING_TYPE
+    int "LED on-board wiring type (Huzzah32 1=GND) (Lolin32lite 2=VCC)"
+	default 1
+
+config MY_TEMPERATURE_SENSOR_I2C_MASTER_NUM
+    int "MY_TEMPERATURE_SENSOR_I2C_MASTER_NUM (0 = I2C_NUM_0 | 1 = I2C_NUM_1)"
+	default 0
+
+config MY_TEMPERATURE_SENSOR_I2C_SLAVE_ADDRESS
+    hex "MY_TEMPERATURE_SENSOR_I2C_SLAVE_ADDRESS (Default 0x76 | 0x77)"
+	default 0x76
+
+config MY_TEMPERATURE_SENSOR_I2C_SCLK_GPIO_NUM
+    int "MY_TEMPERATURE_SENSOR_I2C_SCLK_GPIO_NUM ((Huzzah32 21 bottomleft)(Lolin32lite 13 bottomleft)"
+	default 21
+
+config MY_TEMPERATURE_SENSOR_I2C_SDA_GPIO_NUM
+    int "MY_TEMPERATURE_SENSOR_I2C_SDA_GPIO_NUM ((Huzzah32 17 bottomleft-1)(Lolin32lite 15 bottomleft-1)"
+	default 17
+	
+endmenu

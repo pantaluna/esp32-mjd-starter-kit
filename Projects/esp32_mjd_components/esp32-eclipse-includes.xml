@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cdtprojectproperties>
+<section name="org.eclipse.cdt.internal.ui.wizards.settingswizards.IncludePaths">
+<language name="Assembly Source File">
+
+</language>
+<language name="C++ Source File">
+
+</language>
+<language name="C Source File">
+<includepath>${IDF_PATH}/components/esp_adc_cal/include</includepath>
+<includepath>${IDF_PATH}/components/console</includepath>
+<includepath>${IDF_PATH}/components/driver/include</includepath>
+<includepath>${IDF_PATH}/components/esp-tls</includepath>
+<includepath>${IDF_PATH}/components/esp32/include</includepath>
+<includepath>${IDF_PATH}/components/fatfs/src</includepath>
+<includepath>${IDF_PATH}/components/freertos/include</includepath>
+<includepath>${IDF_PATH}/components/json/cJSON</includepath>
+<includepath>${IDF_PATH}/components/log/include</includepath>
+<includepath>${IDF_PATH}/components/lwip/include/lwip</includepath>
+<includepath>${IDF_PATH}/components/lwip/lwip/src/include</includepath>
+<includepath>${IDF_PATH}/components/mbedtls/mbedtls/include</includepath>
+<includepath>${IDF_PATH}/components/mdns/include</includepath>
+<includepath>${IDF_PATH}/components/newlib/include</includepath>
+<includepath>${IDF_PATH}/components/nvs_flash/include</includepath>
+<includepath>${IDF_PATH}/components/openssl/include</includepath>
+<includepath>${IDF_PATH}/components/soc/include</includepath>
+<includepath>${IDF_PATH}/components/soc/esp32/include</includepath>
+<includepath>${IDF_PATH}/components/spi_flash/include</includepath>
+<includepath>${IDF_PATH}/components/spiffs/include</includepath>
+<includepath>${IDF_PATH}/components/tcpip_adapter/include</includepath>
+<includepath>${IDF_PATH}/components/ulp/include</includepath>
+<includepath>${IDF_PATH}/components/vfs/include</includepath>
+<includepath>${IDF_PATH}/components</includepath>
+<includepath>${ProjDirPath}/build/include</includepath>
+
+</language>
+<language name="Object File">
+
+</language>
+</section>
+<section name="org.eclipse.cdt.internal.ui.wizards.settingswizards.Macros">
+<language name="Assembly Source File">
+
+</language>
+<language name="C++ Source File">
+
+</language>
+<language name="C Source File">
+
+</language>
+<language name="Object File">
+
+</language>
+</section>
+</cdtprojectproperties>

@@ -1,0 +1,16 @@
+I (1356) mjd_huzzah32: REPORT: ADC eFuses availability
+I (1366) mjd_huzzah32:   @doc If both 'eFuse Two Point' and 'eFuse Vref' are not supported then the ADC Calibration 
+logic will use the Voltage Reference that you provided manually.
+I (1376) mjd_huzzah32:   eFuse Two Point: NOT supported
+I (1386) mjd_huzzah32:   eFuse Vref:      NOT supported
+I (6386) myapp: LOOP: battery measurements
+I (6386) myapp:   Note: the HUZZAH32 will trickle-charge the battery when the USB cable is attached
+I (6386) myapp:   Note: when the LiFePO4 battery is full (3.8V) then the measurement might be wrong (4.1V)
+I (6396) myapp: Actual battery voltage (V): 3.426000   [Compare it with the measurement on your multimeter]
+I (11406) myapp: Actual battery voltage (V): 3.420000   [Compare it with the measurement on your multimeter]
+I (16406) myapp: Actual battery voltage (V): 3.420000   [Compare it with the measurement on your multimeter]
+I (21406) myapp: Actual battery voltage (V): 3.426000   [Compare it with the measurement on your multimeter]
+I (26406) myapp: Actual battery voltage (V): 3.426000   [Compare it with the measurement on your multimeter]
+I (31406) myapp: Actual battery voltage (V): 3.420000   [Compare it with the measurement on your multimeter]
+I (36406) myapp: Actual battery voltage (V): 3.426000   [Compare it with the measurement on your multimeter]
+I (41406) myapp: Actual battery voltage (V): 3.420000   [Compare it with the measurement on your multimeter]

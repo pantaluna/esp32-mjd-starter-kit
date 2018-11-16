@@ -1,0 +1,7 @@
+menu "MY PROJECT configuration"
+
+config MY_1WIRE_GPIO_NUM
+    int "MY_1WIRE_GPIO_NUM ((Huzzah32 #14 @ bottomright-2))"
+    default 14
+
+endmenu
