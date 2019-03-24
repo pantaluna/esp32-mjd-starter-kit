@@ -65,6 +65,9 @@ sdkconfig.old
 # MJD Special
 *.ai
 deploy.cmd
+aliexpress*.*
 Aliexpress*.*
+antratek*.*
 Antratek*.*
+banggood*.*
 Banggood*.*

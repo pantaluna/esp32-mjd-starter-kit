@@ -4,7 +4,7 @@ This board is typically used as an RTC Real Time Clock.
 It can also be used as an accurate external crystal oscillator 32Khz for the ESP32.
 
 ## Example ESP-IDF project
-esp32_ds3231_clock_using_lib
+my_ds3231_clock_using_lib
 
 ## Shop Product.
 DS3231 ZS042 RTC Real Time Clock Module
@@ -43,7 +43,7 @@ https://www.maximintegrated.com/en/products/digital/real-time-clocks/DS3231.html
 
 ## FAQ
 - OK 3.3V - 5V.
-- The board requires a CR2032 Lithium battery (non rechargeable).
+- The board requires a CR2032 Lithium battery (non rechargeable!).
 - Crystal oscillator frequency = 32kHz.
 - Accuracy: 1 second.
 - The contents of the time and calendar registers are in *the binary-coded decimal (BCD) format*.

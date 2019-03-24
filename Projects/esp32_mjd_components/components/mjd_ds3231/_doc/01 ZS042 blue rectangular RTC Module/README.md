@@ -43,7 +43,7 @@ https://www.maximintegrated.com/en/products/digital/real-time-clocks/DS3231.html
 
 ## FAQ
 - OK 3.3V - 5V.
-- The board requires a CR2032 Lithium battery (non rechargeable).
+- The board requires a CR2032 Lithium battery (non rechargeable!).
 - Crystal oscillator frequency = 32kHz.
 - Accuracy: 1 second.
 - The contents of the time and calendar registers are in *the binary-coded decimal (BCD) format*.

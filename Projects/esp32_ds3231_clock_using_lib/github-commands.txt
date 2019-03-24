@@ -39,9 +39,10 @@ cd  /c/myiot/esp/${DIR_REPO_NAME}
 git add .
 git commit -m "Updated"
 
+git config credential.helper store
 git push --set-upstream origin master
 
-git tag --annotate v0.81 --message "First tag"
+git tag --annotate v0.82 --message "Second tag"
 git push origin --tags
 
 git describe --tags --dirt

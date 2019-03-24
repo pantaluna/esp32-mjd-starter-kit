@@ -36,10 +36,9 @@ Goto the directory ../../development_boards/ for images with the GPIO PIN layout
 - The Adafruit HUZZAH32 is the most popular made-in-the-USA ESP32 development board. They are more expensive than the Chinese ESP32 development boards but they are worth the money (Adafruit is known for good technical documentation).
 - The HUZZAH32 will trickle-charge the battery when the USB cable is attached and the battery is connected to the LiPO connector.
 
-
-
 ## Issues
 
+None.
 
 ## Reference: the ESP32 MJD Starter Kit SDK
 

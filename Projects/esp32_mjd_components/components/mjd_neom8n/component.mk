@@ -16,5 +16,5 @@ COMPONENT_PRIV_INCLUDEDIRS :=
 
 # ***SPECIAL*** minmea library: 
 #	Some systems lack timegm.
-#	On these systems, you have to build with -Dtimegm=mktime which will work correctly as long the system runs in the default UTC timezone.
+#	On these systems (like Esp32's), you've to build with -Dtimegm=mktime which will work correctly as long the system runs in the default UTC timezone.
 CFLAGS += -Dtimegm=mktime

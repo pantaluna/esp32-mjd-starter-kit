@@ -12,12 +12,14 @@
 <includepath>${IDF_PATH}/components/console</includepath>
 <includepath>${IDF_PATH}/components/driver/include</includepath>
 <includepath>${IDF_PATH}/components/esp-tls</includepath>
+<includepath>${IDF_PATH}/components/esp_http_client/include</includepath>
 <includepath>${IDF_PATH}/components/esp32/include</includepath>
 <includepath>${IDF_PATH}/components/fatfs/src</includepath>
 <includepath>${IDF_PATH}/components/freertos/include</includepath>
 <includepath>${IDF_PATH}/components/json/cJSON</includepath>
 <includepath>${IDF_PATH}/components/log/include</includepath>
 <includepath>${IDF_PATH}/components/lwip/include/lwip</includepath>
+<includepath>${IDF_PATH}/components/lwip/include/lwip/lwip</includepath>
 <includepath>${IDF_PATH}/components/lwip/lwip/src/include</includepath>
 <includepath>${IDF_PATH}/components/mbedtls/mbedtls/include</includepath>
 <includepath>${IDF_PATH}/components/mdns/include</includepath>

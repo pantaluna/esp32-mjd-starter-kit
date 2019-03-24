@@ -37,7 +37,7 @@ static const char *MY_WIFI_PASSWORD = CONFIG_MY_WIFI_PASSWORD;
 /*
  * FreeRTOS settings
  */
-#define MYAPP_RTOS_TASK_STACK_SIZE_8K (8192)
+#define MYAPP_RTOS_TASK_STACK_SIZE_16K (16 * 1024)
 #define MYAPP_RTOS_TASK_PRIORITY_NORMAL (RTOS_TASK_PRIORITY_NORMAL)
 
 /*
@@ -102,26 +102,33 @@ void main_task(void *pvParameter) {
      * MY STANDARD Init
      *
      */
-    mjd_log_memory_statistics();
-
     mjd_log_wakeup_details();
     mjd_increment_mcu_boot_count();
     mjd_log_mcu_boot_count();
+    mjd_log_chip_info();
+    mjd_log_clanguage_details();
+    mjd_log_memory_statistics();
     mjd_set_timezone_utc();
     mjd_log_time();
-    mjd_log_clanguage_details();
-    mjd_log_chip_info();
-
-    ESP_LOGI(TAG, "@doc Wait X seconds after power-on (start logic analyzer, let sensors become active, ...)");
-    vTaskDelay(RTOS_DELAY_1SEC);
+    ESP_LOGI(TAG,
+            "@tip You can also change the log level to DEBUG for more detailed logging and to get insights in what the component is actually doing.");
+    ESP_LOGI(TAG, "@doc Wait 2 seconds after power-on (start logic analyzer, let peripherals become active, ...)");
+    vTaskDelay(RTOS_DELAY_2SEC);
 
     /********************************************************************************
-     * C Language: utilities, stdlib, etc.
+     * C Language: printf formats, utilities, stdlib, etc.
      *
      */
-    ESP_LOGI(TAG, "\n\n***SECTION: C Language: utilities, stdlib, etc.***");
+    ESP_LOGI(TAG, "\n\n***SECTION: C Language: printf formats, utilities, stdlib, etc.***");
 
     mjd_log_memory_statistics();
+
+    /*
+     * printf formats
+     */
+    ESP_LOGI(TAG, "\nprintf size_t values using format specifier %%zu:");
+    uint8_t buf123[123];
+    ESP_LOGI(TAG, "  buf123[123] : sizeof(buf123)=%zu", sizeof(buf123));
 
     /*
      * BYTES and BINARY REPRESENTATION
@@ -238,11 +245,12 @@ void main_task(void *pvParameter) {
     char hex_string[320];
 
     ESP_LOGI(TAG, "mjd_uint8s_to_hexstring():");
-    uint8_t input_uint8s[] = { 0x00, 0x01, 0x0E, 0x0F, 0xF0, 0xF1, 0xFE, 0xFF };
+    uint8_t input_uint8s[] =
+        { 0x00, 0x01, 0x0E, 0x0F, 0xF0, 0xF1, 0xFE, 0xFF };
     strcpy(hex_string, "");
     if (mjd_uint8s_to_hexstring(input_uint8s, ARRAY_SIZE(input_uint8s), hex_string) == ESP_OK) {
         ESP_LOGI(TAG, "    => input_uint8s[%u]:", ARRAY_SIZE(input_uint8s));
-        for (uint32_t i=0; i < ARRAY_SIZE(input_uint8s); ++i) {
+        for (uint32_t i = 0; i < ARRAY_SIZE(input_uint8s); ++i) {
             ESP_LOGI(TAG, "        idx %5i: %3u (0x%02X)", i, input_uint8s[i], input_uint8s[i]);
         }
         ESP_LOGI(TAG, "    <= hex_string: %s", hex_string);
@@ -251,11 +259,12 @@ void main_task(void *pvParameter) {
     }
 
     ESP_LOGI(TAG, "mjd_hexstring_to_uint8s():");
-    uint8_t output_uint8s[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+    uint8_t output_uint8s[] =
+        { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
     if (mjd_hexstring_to_uint8s(hex_string, strlen(hex_string), output_uint8s) == ESP_OK) {
         ESP_LOGI(TAG, "    => hex_string: %s", hex_string);
-        ESP_LOGI(TAG, "    => output_uint8s[%u]:", strlen(hex_string)/2);
-        for (uint32_t i=0; i < strlen(hex_string)/2; ++i) {
+        ESP_LOGI(TAG, "    => output_uint8s[%u]:", strlen(hex_string) / 2);
+        for (uint32_t i = 0; i < strlen(hex_string) / 2; ++i) {
             ESP_LOGI(TAG, "        idx %5i: %3u (0x%02X)", i, output_uint8s[i], output_uint8s[i]);
         }
     } else {
@@ -460,7 +469,7 @@ void main_task(void *pvParameter) {
 
     /*
      * Optional for Production: dump less messages
-     *  @doc Possible to lower the log level for specific modules (wifi and tcpip_adapter are strong candidates)
+     *  @doc It is possible to lower the log level for specific components (wifi and tcpip_adapter are strong candidates).
      */
     /////esp_log_level_set("wifi", ESP_LOG_WARN); // @important Disable INFO messages which are too detailed for me.
     /////esp_log_level_set("tcpip_adapter", ESP_LOG_WARN); // @important Disable INFO messages which are too detailed for me.
@@ -560,6 +569,7 @@ void main_task(void *pvParameter) {
 
     mjd_log_memory_statistics();
 
+    ESP_LOGI(TAG, "* Example#2: Make JSON using cJSON_CreateObject()");
     /*
      * {"eventType":"logBegin","prop1":"this is prop1 value","prop2":"this is prop2 value"}
      */
@@ -579,6 +589,9 @@ void main_task(void *pvParameter) {
     cJSON_Delete(cjsonRoot);
     ESP_LOGI(TAG, "  ptr_json_string = %s", ptr_json_string);
 
+    mjd_log_memory_statistics();
+
+    ESP_LOGI(TAG, "* Example#2: Make JSON using cJSON_CreateObject()");
     /* {
      *     "eventType": "meteo",
      *     "time": "20181225235959",
@@ -620,6 +633,55 @@ void main_task(void *pvParameter) {
 
     mjd_log_memory_statistics();
 
+    /*
+     * {"service": "http-input-adapter","status": "ok"}
+     *     @important Do not forget to escape the double quotes in the json string, e.g. \"
+     *
+     *     \"status\": \"ok\"}
+     */
+    ESP_LOGI(TAG, "* Example#3: Parse JSON using cJSON_Parse(), [check propStatus equal to ok]");
+    strcpy(ptr_json_string, "{\"service\": \"http-input-adapter\",\"status\": \"ok\"}}");
+
+    const char expected_status_ok[] = "ok";
+
+    cJSON *json_response = cJSON_Parse(ptr_json_string);
+    if (json_response == NULL) {
+        const char *error_ptr = cJSON_GetErrorPtr();
+        if (error_ptr != NULL) {
+            ESP_LOGI(TAG, "Error cJSON_Parse() before: %s", error_ptr);
+        }
+        // GOTO
+        goto example3_cleanup;
+    }
+
+    const cJSON *cjson_status = NULL;
+    cjson_status = cJSON_GetObjectItemCaseSensitive(json_response, "status");
+    if (!cJSON_IsString(cjson_status)) {
+        ESP_LOGE(TAG, "Error cjson_status not data type String (or does not exist)");
+        // GOTO
+        goto example3_cleanup;
+    }
+    if ((cjson_status->valuestring == NULL)) {
+        ESP_LOGE(TAG, "Error cjson_status valueString is NULL");
+        // GOTO
+        goto example3_cleanup;
+    }
+
+    if (strcmp(expected_status_ok, cjson_status->valuestring) != 0) {
+        ESP_LOGE(TAG, "Error status value is not \"ok\" (actual value is \"%s\")", cjson_status->valuestring);
+        // GOTO
+        goto example3_cleanup;
+    }
+
+    ESP_LOGI(TAG, "OK status value is \"ok\"");
+
+    // LABEL
+    example3_cleanup:;
+
+    cJSON_Delete(json_response);
+
+    mjd_log_memory_statistics();
+
     // DEVTEMP: HALT
     /////mjd_rtos_wait_forever();
 
@@ -654,7 +716,7 @@ void main_task(void *pvParameter) {
     if (mbedtls_retval != 0) {
         ESP_LOGE(TAG, "  mbedtls_base64_encode() failed err %i", mbedtls_retval);
     } else
-    ESP_LOGI(TAG, "  ustring_two (len %3u): %s", base64_bytes_written, ustring_two);
+        ESP_LOGI(TAG, "  ustring_two (len %3u): %s", base64_bytes_written, ustring_two);
 
     // DEVTEMP: HALT
     /////mjd_rtos_wait_forever();
@@ -749,10 +811,10 @@ void main_task(void *pvParameter) {
 
         mjd_log_memory_statistics();
 
-        // Helper: Is station connected to an AP?
+        ESP_LOGI(TAG, "Helper: Is station connected to an AP? - mjd_wifi_sta_is_connected()");
         ESP_LOGI(TAG, "  mjd_wifi_sta_is_connected(): "MJDBOOLEANFMT, MJDBOOLEAN2STR(mjd_wifi_sta_is_connected()));
 
-        // Helper: Show IP Address
+        ESP_LOGI(TAG, "Helper: Show IP Address via STA - mjd_net_get_ip_address()");
         char ip_address[32] = "";
         f_retval = mjd_net_get_ip_address(ip_address);
         if (f_retval != ESP_OK) {
@@ -761,18 +823,18 @@ void main_task(void *pvParameter) {
             mjd_led_off(MY_LED_ON_DEVBOARD_GPIO_NUM);
             continue; // CONTINUE
         }
-        ESP_LOGI(TAG, "ip_address = %s", ip_address);
+        ESP_LOGI(TAG, "  ip_address = %s", ip_address);
 
-        // Helper: Log Wifi Station Info
+        ESP_LOGI(TAG, "Helper: Log Wifi Station Info - mjd_wifi_log_sta_info()");
         mjd_wifi_log_sta_info();
 
-        // Helper: Get Station info (Device, connected Access Point)
+        ESP_LOGI(TAG, "Helper: Get Station info (Device, connected Access Point) - mjd_wifi_sta_get_info()");
         //   @purpose Use it in my project meteohub to upload this device data
-        mjd_wifi_sta_info_t mjd_wifi_sta_info =
-            { 0 };
+        mjd_wifi_sta_info_t mjd_wifi_sta_info = { 0 };
         mjd_wifi_sta_get_info(&mjd_wifi_sta_info);
 
-        // Helper: Internet Check
+        //
+        ESP_LOGI(TAG, "Helper: Internet Check - mjd_net_is_internet_reachable");
         f_retval = mjd_net_is_internet_reachable();
         if (f_retval != ESP_OK) {
             ESP_LOGE(TAG, "mjd_net_is_internet_reachable() err %i (%s)", f_retval, esp_err_to_name(f_retval));
@@ -780,9 +842,23 @@ void main_task(void *pvParameter) {
             mjd_led_off(MY_LED_ON_DEVBOARD_GPIO_NUM);
             continue; // CONTINUE
         }
-        ESP_LOGI(TAG, "OK Internet reachable");
+        ESP_LOGI(TAG, "  OK Internet reachable");
+
+        ESP_LOGI(TAG, "Helper: Resolve hostname to its IPv4 address - mjd_net_resolve_hostname_ipv4()");
+        char str_hostname[] = "www.google.com";
+        char str_ip_address[128];
+        f_retval = mjd_net_resolve_hostname_ipv4(str_hostname, str_ip_address);
+        if (f_retval != ESP_OK) {
+            ESP_LOGE(TAG, "Error mjd_net_resolve_hostname_ipv4(): errno %i (%s)", f_retval, esp_err_to_name(f_retval));
+
+            mjd_led_off(MY_LED_ON_DEVBOARD_GPIO_NUM);
+            continue; // CONTINUE
+        }
+        ESP_LOGI(TAG, "  hostname %s => IPv4 address %s", str_hostname, str_ip_address);
+
 
         mjd_log_memory_statistics();
+
 
         // ***Disconnect
         f_retval = mjd_wifi_sta_disconnect_stop();
@@ -991,7 +1067,7 @@ void app_main() {
      * @important For stability (RMT + Wifi): always use xTaskCreatePinnedToCore(APP_CPU_NUM) [Opposed to xTaskCreate()]
      */
     BaseType_t xReturned;
-    xReturned = xTaskCreatePinnedToCore(&main_task, "main_task (name)", MYAPP_RTOS_TASK_STACK_SIZE_8K, NULL,
+    xReturned = xTaskCreatePinnedToCore(&main_task, "main_task (name)", MYAPP_RTOS_TASK_STACK_SIZE_16K, NULL,
     MYAPP_RTOS_TASK_PRIORITY_NORMAL, NULL,
     APP_CPU_NUM);
     if (xReturned == pdPASS) {

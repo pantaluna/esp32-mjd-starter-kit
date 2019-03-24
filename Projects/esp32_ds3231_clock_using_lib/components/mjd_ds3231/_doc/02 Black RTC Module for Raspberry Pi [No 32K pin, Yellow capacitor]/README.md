@@ -8,7 +8,7 @@ Differences with the ZS042 board:
 - It does NOT contain the EEPROM 24C342 memory chip from Atmel (which we do not need).
 
 ## Example ESP-IDF project
-esp32_ds3231_clock_using_lib
+my_ds3231_clock_using_lib
 
 ## Shop Product.
 DS3231 for Raspberry Pi DS3231 RTC Real Time Clock Module

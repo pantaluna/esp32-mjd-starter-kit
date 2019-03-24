@@ -1,0 +1,29 @@
+Duracell Plus Power AA Alkaline 1.5V
+------------------------------------
+Jan2019.
+
+https://www.pololu.com/blog/2/understanding-battery-capacity-ah-is-not-a
+http://www.greenbatteries.com/battery-myths-vs-battery-facts-1/
+
+- Capacity: AA alkaline batteries typically have a capacity rating of +-2500mAh. 
+
+- Combine 3x AA batteries and hook that up to the Adafruit HUZZAH32 development board using .
+
+- @important When multiple cells are used in SERIES, as in a typical 2x 3x battery holder, the voltage goes up 2x 3x and the capacity in amp-hours stays the same!
+- @important When multiple cells are used in PARALLEL, the voltage stays the same and the capacity in amp-hours goes up X times!
+
+- Specs:
+	+ Nominal Voltage: 1.5V
+	+ High Voltage when full: 1.6V (when fully charged).
+	+ Low Voltage: 0.9V (ESP32-Wifi stops working when using 3x AA batteries; 3x is 2.7V and I know it stops there).
+
+- Advantages: 
+	+ Cheap (12 pieces for 10EUR).
+	+ Operating temperature range -20ºC to 54ºC. It can withstand much lower temperatures than Lion batteries!
+	+ Using a battery holder with 3x AA batteries (4.5V) and soldering to a JST-PH2 battery connector (check polarity!) is perfect for powering an ESP32 ! The initial voltage is 4.7V when the batteries are fully loaded (this is safely below the max input voltage of 5V for the voltage regulator).
+
+- Disadvantages:
+	+ When powering an electronic high-power-draining-device like a digital camera, the Lion or NiMH battery types (with same capacity as AA Alkaline) will typically run 3x longer than AA :(
+
+
+

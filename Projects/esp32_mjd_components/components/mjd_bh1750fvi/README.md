@@ -1,4 +1,4 @@
-# ESP-IDF MJD BH1750FVI light sensor component
+# ESP-IDF MJD BH1750FVI light intensity sensor component
 This is component based on ESP-IDF for the ESP32 hardware from Espressif.
 
 
@@ -9,7 +9,7 @@ my_bh1750fvi_lightsensor_using_lib
 
 
 ## Shop Product
-GY-032 BH1750FVI Digital Light Intensity Sensor Module For AVR Arduino 3V-5V
+GY-032 BH1750FVI Digital Light Intensity Sunlight Luminescence Sensor Module For AVR Arduino 3V-5V
 
 
 
@@ -43,25 +43,24 @@ b. Wemos Lolin32 LiteLolin32 Lite
 
 http://www.mouser.com/ds/2/348/bh1750fvi-e-186247.pdf
 
-
+https://www.rohm.com/products/sensors-mems/ambient-light-sensor-ics
 
 
 
 ## Sensor FAQ
 - OK 3.3V
-- Metric unit: LUX.
-- ROHM original chip BH1750FVI.
+- Metric unit: LUX. Darkness is typically less than 10 lux.
+- Chip BH1750FVI from the vendor ROHM.
 - I2C protocol. I2C default device address = 0x23.
-- Maximum I2C SCL Clock Frequency: 400 kHz
+- Maximum I2C SCL Clock Frequency: 400 kHz.
 - The driver uses the default sensitivity of 1.0.
-- Lux unit: darkness is typically less than 10 lux.
 
 
 
 ## Sensor & I2C protocol
 - I2C device slave address: 0x23.
-- It is possible to change the I2C slave-address with PIN 5 ADDR: \
-  ​    Low  (<= 0.3V) = 0x23 0b0100011 ***DEFAULT \
+- It is possible to change the I2C slave-address with PIN 5 ADDR:
+  ​    Low  (<= 0.3V) = 0x23 0b0100011 ***DEFAULT***
   ​    High (>= 0.7V) = 0x5C 0b1011100
 - Sensor supports the I2C Standard Speed 100 Kbit/s and Full Speed 400 Kbit/s; not Fast Speed 1 Mbit/s and High Speed 3.2 Mbit/s.
 - The ESP32 maximum I2C clock speed is 1Mhz.

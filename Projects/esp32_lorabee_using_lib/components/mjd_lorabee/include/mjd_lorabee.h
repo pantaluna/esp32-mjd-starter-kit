@@ -1,4 +1,5 @@
 /*
+ * Goto the README.md for instructions
  *
  */
 #ifndef __MJD_LORABEE_H__

@@ -41,7 +41,7 @@ void app_main() {
     mjd_log_chip_info();
     mjd_log_time();
     mjd_log_memory_statistics();
-    ESP_LOGI(TAG, "@doc Wait 2 seconds after power-on (start logic analyzer, let sensors become active!)");
+    ESP_LOGI(TAG, "@doc Wait 2 seconds after power-on (start logic analyzer, let I2C sensors become active!)");
     vTaskDelay(RTOS_DELAY_2SEC);
 
     /*

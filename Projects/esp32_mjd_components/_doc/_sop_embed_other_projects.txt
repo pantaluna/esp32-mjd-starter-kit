@@ -1,10 +1,15 @@
-###
-### SETUP 
-###
-
-COMPONENT mjd_bme280 => bosch_bme280 V3.3.4
 ===========================================
-@source Apr2018 Git REPO https://github.com/BoschSensortec/BME280_driver
+OPERATIONS
+===========================================
+REM ##---WINCMD Deploy esp32_mjd_components to all other projects
+cd c:\myiot\esp\esp32_mjd_components
+deploy.cmd
+REM #---
+
+===========================================
+COMPONENT mjd_bme280 <= bosch_bme280 V3.3.4
+===========================================
+@source Apr2018 Github Repo https://github.com/BoschSensortec/BME280_driver
 
 ##
 ## INITIAL CLONE & Customization
@@ -25,7 +30,8 @@ git status
 rm --verbose --recursive .git
 
 
-COMPONENT mjd_bmp280 => bosch_bmp280 V2.5.0
+===========================================
+COMPONENT mjd_bmp280 <= bosch_bmp280 V2.5.0
 ===========================================
 @source Mar2018 Git REPO https://github.com/BoschSensortec/BMP280_driver
 
@@ -51,8 +57,9 @@ mkdir example
 mv --verbose bmp280_support.c example
 
 
+===========================================
 COMPONENT esp-mqtt v0.6.1
-=========================
+===========================================
 @source Feb2018 Git REPO https://github.com/256dpi/esp-mqtt.git
 
 ##
@@ -105,7 +112,6 @@ git pull
 git submodule update --init --recursive
 git status
 
-
 ###
 ### INFO - MQTT LWIP error codes
 ###
@@ -134,11 +140,7 @@ typedef enum {
 } lwmqtt_err_t;
 
 
-###
-### OPERATIONS
-###
-
-REM ##---WINCMD Deploy esp32_mjd_components to all other projects
-cd c:\myiot\esp\esp32_mjd_components
-deploy.cmd
-REM #---
+===========================================
+COMPONENT mjd_nanopb <= Nanopb
+===========================================
+@sop ./README.md

@@ -42,13 +42,13 @@ https://www.mpja.com/download/31227sc.pdf
 
 
 ## Sensor Voltage Levels
-- Operating Voltage: the spec says DC 4.5V-20V but the board also works with DC 3.3V (OK for ESP32 boards).
-- Voltage level on the DATA PIN: DC 3.3V (OK for ESP32 boards).
+- **Operating** Voltage: the spec says DC 4.5V-20V but the board also works with DC 3.3V (OK for ESP32 boards).
+- Voltage level on the **DATA PIN**: DC 3.3V (OK for ESP32 boards).
 
 
 
 ## Data Pin Logic (no protocol)
-- DATA Pin logic: High 3.3V, Low 0V
+- DATA Pin logic: High 3.3V, Low 0V.
 - The pin is HIGH (3.3V) when movement is detected (and stays so for X seconds during the time decay period).
 - The pin is LOW (0V) when no movement is detected.
 - The wiring requires a 10K pullup resistor (DATA->VCC).

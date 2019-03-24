@@ -58,6 +58,7 @@ void sensor_task(void *pvParameter) {
     retval = mjd_bme280_init(&bme280_config);
     if (retval != ESP_OK) {
         ESP_LOGE(TAG, "mjd_bme280_init() err %i %s", retval, esp_err_to_name(retval));
+        mjd_led_mark_error(MY_LED_ON_DEVBOARD_GPIO_NUM);
         // GOTO
         goto cleanup;
     }
@@ -73,6 +74,7 @@ void sensor_task(void *pvParameter) {
     bosch_retval = bme280_get_regs(BME280_CHIP_ID_ADDR, &reg_value, 1, &bme280_config.bme280_device);
     if (bosch_retval != BME280_OK) {
         ESP_LOGE(TAG, "ABORT. bme280_get_regs(-chipid-) failed err %i", bosch_retval);
+        mjd_led_mark_error(MY_LED_ON_DEVBOARD_GPIO_NUM);
         // LABEL
         goto cleanup;
     }
@@ -98,6 +100,7 @@ void sensor_task(void *pvParameter) {
         if (retval != ESP_OK) {
             ++total_nbr_of_error_readings;
             ESP_LOGE(TAG, "BME280 Sensor failure");
+            mjd_led_mark_error(MY_LED_ON_DEVBOARD_GPIO_NUM);
         } else {
             printf(
                     "***BME280 SENSOR READING (I2C addr 0x%x): humidity %.5f %% | pressure %.5f HPa | temperature %.2f *C | count error readings: %u\n",
@@ -107,14 +110,15 @@ void sensor_task(void *pvParameter) {
 
         mjd_led_off(MY_LED_ON_DEVBOARD_GPIO_NUM);
 
-        ESP_LOGD(TAG, "@doc Wait 5sec at the end of the while(1)");
-        vTaskDelay(RTOS_DELAY_5SEC);
+        ESP_LOGD(TAG, "@doc Wait 3sec at the end of the while(1)");
+        vTaskDelay(RTOS_DELAY_3SEC);
     }
 
     // Never gets here by design...
     retval = mjd_bme280_deinit(&bme280_config);
     if (retval != ESP_OK) {
         ESP_LOGE(TAG, "mjd_bme280_deinit() err %i %s", retval, esp_err_to_name(retval));
+        mjd_led_mark_error(MY_LED_ON_DEVBOARD_GPIO_NUM);
         // GOTO
         goto cleanup;
     }
@@ -123,7 +127,6 @@ void sensor_task(void *pvParameter) {
 
     // HALT (end of task)
     mjd_rtos_wait_forever();
-
 }
 
 /*

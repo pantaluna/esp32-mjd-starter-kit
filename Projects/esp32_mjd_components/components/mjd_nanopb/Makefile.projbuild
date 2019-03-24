@@ -1,0 +1,18 @@
+# @doc Makefile.projbuild
+# -----------------------
+# For components that have build requirements that must be evaluated in the top-level project make pass, you can create a file 
+# called Makefile.projbuild in the component directory. This makefile is included when project.mk is evaluated.
+#
+# For example, if your component needs to add to CFLAGS for the entire project (not just for the component's own compilation) 
+# then you can set CFLAGS += in Makefile.projbuild.
+
+# Nanopb PB_FIELD_16BIT http://jpa.kapsi.fi/nanopb/docs/reference.html#compilation-options
+#   The define "PB_FIELD_16BIT" is required for ncliot.proto because it is more complex than average,
+#   else compilation fails with "warning: large integer implicitly truncated to unsigned type".
+#
+#   @important This setting is configured at the project level. It does not work when configured in component.mk because that is only for this component level!
+#   
+#   This define adds support for tag numbers > 255 and fields larger than 255 bytes or 255 array entries.
+#   Increases code size with 3 bytes per each field. A compiler error will tell if you need this.
+#
+CFLAGS += -DPB_FIELD_16BIT

@@ -132,8 +132,11 @@ static void _https() {
     /*esp_http_client_config_t config =
         { .url = "https://www.howsmyssl.com", .event_handler = _http_event_handler, .cert_pem = howsmyssl_com_root_cert_pem_start, };*/
 
+    /*esp_http_client_config_t config =
+        { .url = "http://ipv4.download.thinkbroadband.com/10MB.zip", .event_handler = _http_event_handler };*/
+
     esp_http_client_config_t config =
-        { .url = "http://ipv4.download.thinkbroadband.com/10MB.zip", .event_handler = _http_event_handler };
+        { .url = "http://ipv4.download.thinkbroadband.com/1MB.zip", .event_handler = _http_event_handler };
 
     ESP_LOGI(TAG, "    URL: %s", config.url);
     esp_http_client_handle_t client = esp_http_client_init(&config);
@@ -304,8 +307,8 @@ void main_task(void *pvParameter) {
         _wifi_scanner();
 
         // ***HTTPS/TLS REQUEST 2x times
-        ESP_LOGI(TAG, "HTTPS requests (2x)");
-        for (uint32_t u = 1; u <= 2; u++) {
+        ESP_LOGI(TAG, "HTTPS requests (3x)");
+        for (uint32_t u = 1; u <= 3; u++) {
             ESP_LOGI(TAG, "  START #%u", u);
             _https();
         }

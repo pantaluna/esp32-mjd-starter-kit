@@ -25,7 +25,7 @@ static uint32_t bme280_current_i2c_port;
 
 /*  \Brief : The delay routine
  *  \param : delay in ms
- *  @important ESP32 This does NOT WORK: TaskDelay(millisec / portTICK_PERIOD_MS);
+ *  @important ESP32 The FreeRTOS func does NOT WORK for short delays < 1s: TaskDelay(millisec / portTICK_PERIOD_MS);
  */
 void BME280_delay_millisec(uint32_t millisec) {
     ets_delay_us(millisec * 1000);
@@ -402,11 +402,11 @@ esp_err_t mjd_bme280_read_forced(mjd_bme280_config_t* ptr_param_config, mjd_bme2
     }
 
     /*
-     * IMPORTANT: Add a delay of at least 40millisec AFTER setting forced_mode & BEFORE requesting the sensor readings!
+     * IMPORTANT: Add a delay of at least 100 millisec AFTER setting forced_mode & BEFORE requesting the sensor readings!
+     * @doc This depends on the Oversampling settings in struct bme280_settings
      *
      */
-    vTaskDelay(RTOS_DELAY_50MILLISEC);
-    /////vTaskDelay(RTOS_DELAY_1SEC);   // Does NOT fix it.
+    BME280_delay_millisec(100);
 
     /*
      * DEBUG SENSOR MODE (before reading sensor data).

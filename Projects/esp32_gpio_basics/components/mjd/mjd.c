@@ -380,12 +380,13 @@ void mjd_log_clanguage_details() {
 
 /**********
  * ESP32 SYSTEM & RTOS: Memory
+ *
  */
 esp_err_t mjd_get_memory_statistics(mjd_meminfo_t* data) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     data->free_esp_heap = esp_get_free_heap_size();
-    data->free_rtos_stack = uxTaskGetStackHighWaterMark(NULL) * 4;
+    data->free_rtos_stack = uxTaskGetStackHighWaterMark(NULL); // x*4 is not needed in ESP-IDF!
 
     return ESP_OK;
 }
@@ -395,7 +396,7 @@ esp_err_t mjd_log_memory_statistics() {
 
     mjd_meminfo_t meminfo;
     mjd_get_memory_statistics(&meminfo);
-    ESP_LOGI(TAG, "ESP free HEAP space: %u bytes | FreeRTOS free STACK space (calling task): %u bytes", meminfo.free_esp_heap,
+    ESP_LOGI(TAG, "ESP free HEAP space: %u bytes | FreeRTOS free STACK space (current task): %u bytes", meminfo.free_esp_heap,
             meminfo.free_rtos_stack);
 
     return ESP_OK;

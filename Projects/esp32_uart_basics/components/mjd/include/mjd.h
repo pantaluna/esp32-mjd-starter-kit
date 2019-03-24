@@ -29,10 +29,12 @@
 #include "esp_spi_flash.h"
 #include "esp_system.h"
 
+
 #include "cJSON.h"
 #include "driver/i2c.h"
 #include "driver/rmt.h"
 #include "driver/uart.h"
+#include "esp_http_client.h"
 #include "mbedtls/base64.h"
 #include "nvs_flash.h"
 #include "soc/rmt_reg.h"
@@ -199,11 +201,13 @@ typedef struct {
 /**********
  * ESP32 SYSTEM & RTOS: Memory
  *
- * @doc uxTaskGetStackHighWaterMark(NULL) returns the lowest free stack space there has been since the calling RTOS task started.
- *          Set xTask to NULL to check the stack of the calling RTOS task.
- *          The return value is the nbr of WORDS on this 32 bit machine. So a value of 1 means 4 bytes.
+ * @doc uxTaskGetStackHighWaterMark()
+ *   Set xTask to NULL to check the stack of the calling RTOS task.
+ *   High water mark is the minimum free stack space there has been (***in bytes rather than words as found in vanilla FreeRTOS***)
+ *   since the task started. The smaller the returned number the closer the task has come to overflowing its stack.
+ *
  * @doc esp_get_free_heap_size() returns available heap size, in bytes.
- *          Note that the returned value may be larger than the maximum contiguous block which can be allocated.
+ *   Note that the returned value may be larger than the maximum contiguous block which can be allocated.
  */
 esp_err_t mjd_get_memory_statistics(mjd_meminfo_t* data);
 esp_err_t mjd_log_memory_statistics();
@@ -221,7 +225,7 @@ void mjd_log_wakeup_details();
  */
 /*
  * cJSON_PrintPreallocated(cJSON *item, char *buffer, const int length, const cJSON_bool format)
- *     @note cJSON is not always 100% accurate in estimating how much memory it will use, so to be safe allocate 5 bytes more than you actually need
+ *     @note cJSON is not always 100% accurate in estimating how much memory it will use, so be safe and allocate 5 bytes more than you actually need.
  */
 #define MJD_CJSON_PRINT_FORMATTED true
 #define MJD_CJSON_PRINT_UNFORMATTED false

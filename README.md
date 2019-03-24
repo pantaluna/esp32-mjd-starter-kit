@@ -92,7 +92,8 @@ These projects:
 
 Let's highlight a few projects that demonstrate how to use the core ESP-IDF framework.
 - `esp32_button_basics` How to interface with buttons (switches).
-- `esp32_deep_sleep_wakeup_basics` Demonstrates how to use a switch or a magnetic door/window sensor to wake up an ESP32 from deep sleep. 
+- `esp32_deep_sleep_wakeup_basics` Demonstrates how to use a switch or a magnetic door/window sensor to wake up an ESP32 from deep sleep.
+- ```esp32_http_client``` Demonstrates the basics of using the standard ESP-IDF component "esp32_http_client".
 - `esp32_gpio_basics` How to interact with GPIO pins of the development board.
 - `esp32_gpio_scanner` How to scan all GPIO pins and discover their I/O function.
 - `esp32_i2c_scanner` How to scan all slave devices on the I2C pins, and identify their I2C slave address. This is handy when working with new I2C slave devices.
@@ -103,6 +104,7 @@ Let's highlight a few projects that demonstrate how to use the core ESP-IDF fram
 - `esp32_sw180_tilt_sensor` How to interface with this tilt sensor (no extra components needed).
 - `esp32_timer_basics` How to use the standard ESP-IDF Timer driver.
 - `esp32_uart_basics` How to use the standard ESP-IDF UART driver.
+- ```esp32_udp_client``` Demonstrates the basics of implementing an UDP Client using the ESP-IDF framework.
 
 
 
@@ -115,7 +117,8 @@ The special project `esp32_mjd_components`:
 
 
 Let's highlight a few projects that demonstrate how to use the extra components of the ESP32 Starter Kit.
-- `esp32_am2320_temperature_sensor_using_lib` How to read data from the Aosong AM2320 meteo sensor.
+- ```esp32_ads1115_adc_using_lib``` Demonstrates the basics of using the MJD ESP-IDF component "mjd_ads1115" for the ESP32 and the popular breakout boards of the TI ADS1115 Ultra-Small, Low-Power, I2C-Compatible, 860-SPS, 16-Bit ADCs With Internal Reference, Oscillator, and Programmable Comparator using the I2C Bus.
+- ```esp32_am2320_temperature_sensor_using_lib``` How to read data from the Aosong AM2320 meteo sensor.
 - `esp32_bh1750fvi_lightsensor_using_lib` How to read data from the BH1750 light intensity sensor.
 - `esp32_bme280_sensor_using_lib` How to read data from the Bosch BME280 meteo sensor.
 - `esp32_bmp280_sensor_using_lib` How to read data from the Bosch BMP280 meteo sensor.
@@ -134,6 +137,7 @@ Let's highlight a few projects that demonstrate how to use the extra components 
 - `esp32_lorabee_using_pc_usbuart` This project demonstrates how to issue basic commands to the LoraBee module using a Windows PC and a USB-UART board (such as an FTDI). This is an easy way to get familiar with the features of the LoraBee / Microchip RN2843A board.
 - `esp32_mlx90393_using_lib` How to get magnetic field data using the Melexis MLX90393 magnetic field sensor.
 - `esp32_neom8n_gps_using_lib` How to get GPS data from the GPS Ublox NEO-M8N module.
+- ```esp32_tmp36_sensor_ads1115_adc_using_lib``` This project demonstrates the components mjd_ads1115 and mjd_tmp36. The mjd_ads1115 component for the TI ADS1115 Analog-To-Digital-Convertor is used to read the voltage output of the analog temperature sensor. The mjd_tmp36 component for the TMP36 sensor is used to convert the raw voltage reading of the ADC to the ambient temperature in Degrees Celsius transparently.
 - `esp32_wifi_device_scanner` How to scan all Wifi channels and discover the devices.
 - `esp32_wifi_ssid_cloner` How to clone existing Access Points.
 - `esp32_wifi_ssid_scanner` How to scan all Wifi channels and discover the Access Points.
@@ -165,42 +169,28 @@ The components can roughly be divided in 3 groups:
 
 This is the list of new components:
 - `mjd` The base component which contains general purpose functions.
-
+- ```mjd_ads1115``` Component for the TI ADS1115 Analog-To-Digital-Convertor 16-bit.
 - `mjd_am2320` Component for the Aosong AM2320 meteo sensor.
-
 - `mjd_bh1750fvi` Component for the BH1750 light intensity sensor.
-
 - `mjd_bme280` Component for the Bosch BME280 meteo sensor.
-
 - `mjd_bmp280` Component for the Bosch BMP280 meteo sensor.
-
 - `mjd_dht11` Component for the Aosong DHT11 temperature sensor.
-
 - `mjd_dht22` Component for the Aosong DHT11/AM2302 temperature sensor.
-
+- ```mjd_ds3231``` Component for the DS3231 ZS042 RTC real-time clock board.
 - `mjd_hcsr501` Component for the HC-SR501 PIR human infrared sensor.
-
 - `mjd_huzzah32` Component for the Adafruit HUZZAH32 development board (read battery voltage level).
-
 - `mjd_ky032` Component for the KY-032 infrared obstacle avoidance sensor.
-
-- `mjd_ledrgb` Component for controlling various RGB LED strips (Worldsemi WS28xx chips such as the Adafruit Neopixels product line).
-
+- `mjd_ledrgb` Component for controlling various RGB LED strips (WorldSemi WS28xx chips such as the Adafruit Neopixels product line).
 - `mjd_list` Component that implements the Linked Lists as used in the Linux Kernel.
-
 - `mjd_log` Component to facilitate logging in the app.
-
-- `mjdmlx90393` Component for the Melexis MLX90393 magnetic field sensor (X Y Z axis and Temperature metrics).
-
+- `mjd_lorabee` Component to interact with the SODAQ LoraBee Microchip RN2483A board (contains a Microchip RN2843 868Mhz LoRa chip).
+- `mjd_mlx90393` Component for the Melexis MLX90393 magnetic field sensor (X Y Z axis and Temperature metrics).
 - `mjd_mqtt` Component for interacting with an MQTT server (as an MQTT client).
-
-- `mjd_neom8n` Component for the GPS Ublox NEO-M8N module.
-
+- ```mjd_nanopb``` Component to work with Google Protocol Buffers. It includes the common C files of the Nanopb library v0.3.9.2. It also declares Nanopb specific project-wide compilation directives (-D) in Makefile.projbuild
 - `mjd_net` Component to facilitate various networking features (getting IP address, DNS resolve hostnames, etc.). 
-
+- `mjd_neom8n` Component for the GPS u-blox NEO-M8N module.
+- ```mjd_tmp36``` Component for the TMP36 Analog Temperature Sensor from Analog Devices. To be used together with an ADC.
 - `mjd_wifi` Component to facilitate, as a Wifi Station, a connection to a Wifi Access Point.
-
-- `mjd_ds3231` Component for the DS3231 ZS042 RTC realtime clock board.
 
 
 
@@ -217,6 +207,7 @@ Let's categorize these components in more detail:
 - Deep sleep.
 
 #### ESP32 Networking
+- LoRa.
 - Synchronizing the datetime (SNTP).
 - Resolve hostnames using DNS.
 - Get current IP address.
@@ -233,8 +224,9 @@ Let's categorize these components in more detail:
 - Obtain the Voltage Reference for your device (+-1100mV).
 
 #### ESP32 Peripherals - Devices
-- GPS Ublox NEO-M8N module.
-- ZS-042 DS1302 Real Time Clock.
+- ADC TI ADS1115 16-bit.
+- GPS u-blox NEO-M8N module.
+- Real Time Clock DS1302 ZS-042.
 
 #### ESP32 Peripherals - RGB LED's
 This component supports several RGB LED packages. It comes with the essential documentation such as data sheets, schematics, and instructions on how to wire them to your development board and eventually an extra power supply.
@@ -246,20 +238,14 @@ This component supports several RGB LED packages. It comes with the essential do
 These components come with the essential documentation such as data sheets, schematics, and instructions on how to wire them to your development board.
 
 - AM2320 temperature sensor by Aosong.
-
 - DHT11 temperature sensor by Aosong.
-
 - DHT22/AM2302 temperature sensor by Aosong.
-
 - BH1750FVI light sensor.
-
 - Bosch BME280 meteo sensor.
-
 - Bosch BMP280 meteo sensor.
-
 - HC-SR501 PIR motion sensor.
-
 - KY-032 Infrared obstacle avoidance sensor.
+- Analog Devices TMP36 analog temperature sensor.
 
 
 

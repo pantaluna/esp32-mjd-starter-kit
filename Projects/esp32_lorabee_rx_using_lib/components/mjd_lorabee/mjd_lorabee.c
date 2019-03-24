@@ -120,7 +120,7 @@ static void _uart_events_task(void *pvParameters) {
     uart_event_t event;
     uart_event_t dq_event;
     for (;;) {
-        // Wait for UART event.
+        // Blocking Wait for UART event.
         if (xQueueReceive(_uart_driver_queue, (void * )&event, (portTickType)portMAX_DELAY)) {
             switch (event.type) {
             case UART_DATA:
@@ -143,8 +143,8 @@ static void _uart_events_task(void *pvParameters) {
                 break;
             case UART_FIFO_OVF:
                 // "If fifo overflow happened, you should consider adding flow control for your application."
-                xQueueReset(_uart_driver_queue);
                 ESP_LOGW(EVENT_TASK_TAG, "[EVENT: error hw fifo overflow]");
+                xQueueReset(_uart_driver_queue);
                 break;
             case UART_FRAME_ERR:
                 ESP_LOGW(EVENT_TASK_TAG, "[EVENT: error event RX frame error]");
@@ -200,7 +200,7 @@ static char* _get_next_line_uart(uart_port_t param_uart_port_num) {
     while (1) {
         if (_counter_data_rx <= 0) {
             // Wait for RXDATA event.
-            if (xQueueReceive(_uart_rx_data_queue, (void * )&dq_event, RTOS_DELAY_30SEC) == pdTRUE) { // RTOS_DELAY_30SEC RTOS_DELAY_5MINUTES
+            if (xQueueReceive(_uart_rx_data_queue, (void * )&dq_event, RTOS_DELAY_30SEC) == pdTRUE) { // dev:RTOS_DELAY_30SEC prd: RTOS_DELAY_5MINUTES
                 // Read data from UART1
                 // @important No delay needed because we know via the _uart_rx_data_queue that data is waiting :)
                 _counter_data_rx = uart_read_bytes(param_uart_port_num, _data_rx, dq_event.size, RTOS_DELAY_0);
@@ -362,6 +362,7 @@ esp_err_t mjd_lorabee_cmd(mjd_lorabee_config_t* param_ptr_config, const char* pa
     ESP_LOG_BUFFER_HEXDUMP(TAG, line_uart, len_line_uart, ESP_LOG_DEBUG);
 
     // Save RX response#1
+    // @important COPY the string
     param_ptr_response->data_received = true;
     strcpy(param_ptr_response->response_1, line_uart);
 
@@ -1089,6 +1090,7 @@ esp_err_t mjd_lorabee_radio_tx(mjd_lorabee_config_t* param_ptr_config, uint8_t* 
             ESP_LOG_BUFFER_HEXDUMP(TAG, line_uart, len_line_uart, ESP_LOG_DEBUG);
 
             // Save response#2
+            // @important COPY the string
             response.data_received = true;
             strcpy(response.response_2, line_uart);
 
@@ -1185,6 +1187,7 @@ esp_err_t mjd_lorabee_radio_rx(mjd_lorabee_config_t* param_ptr_config, uint8_t* 
             ESP_LOG_BUFFER_HEXDUMP(TAG, line_uart, len_line_uart, ESP_LOG_DEBUG);
 
             // Response#2 Save
+            // @important COPY the string
             response.data_received = true;
             strcpy(response.response_2, line_uart);
 

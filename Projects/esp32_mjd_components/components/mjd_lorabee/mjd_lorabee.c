@@ -143,8 +143,8 @@ static void _uart_events_task(void *pvParameters) {
                 break;
             case UART_FIFO_OVF:
                 // "If fifo overflow happened, you should consider adding flow control for your application."
-                xQueueReset(_uart_driver_queue);
                 ESP_LOGW(EVENT_TASK_TAG, "[EVENT: error hw fifo overflow]");
+                xQueueReset(_uart_driver_queue);
                 break;
             case UART_FRAME_ERR:
                 ESP_LOGW(EVENT_TASK_TAG, "[EVENT: error event RX frame error]");

@@ -18,6 +18,6 @@ COMPONENT_PRIV_INCLUDEDIRS :=
 #		a. Double precision floating point version
 #		b. Integer version
 #	By default, the integer version is used in the API!
-#	==> If the user needs the floating point version, the user has to uncomment BME280_FLOAT_ENABLE macro in bme280_defs.h file, 
-#	or add that DEFINE to the compiler flags (CFLAGS).
+#	==> If the user needs the floating point version, the user has to uncomment the macro BME280_FLOAT_ENABLE in file bme280_defs.h 
+#	    or add that DEFINE to the compiler flags (CFLAGS).
 CFLAGS += -DBME280_FLOAT_ENABLE

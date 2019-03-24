@@ -3,7 +3,7 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := my_ky032_pir_sensor_using_lib
+PROJECT_NAME := esp32_ky032_obstacle_sensor_using_lib
 
 include $(IDF_PATH)/make/project.mk
 

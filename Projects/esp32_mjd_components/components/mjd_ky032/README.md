@@ -4,7 +4,7 @@ This is component based on ESP-IDF for the ESP32 hardware from Espressif.
 
 
 ## Example ESP-IDF project
-my_ky032_obstacle_sensor_using_lib
+esp32_obstacle_sensor_using_lib
 
 ## Shop Product
 KY-032 Infrared Obstacle Avoidance Sensor For Arduino Smart Car Robot

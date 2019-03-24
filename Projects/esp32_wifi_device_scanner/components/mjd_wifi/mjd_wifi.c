@@ -170,7 +170,7 @@ esp_err_t mjd_wifi_sta_init(const char *param_ssid, const char *param_password) 
 
     esp_err_t f_retval = ESP_OK;
 
-    // CHECK init already doine?
+    // CHECK init already done?
     if (_is_wifi_sta_initialized == true) {
         ESP_LOGW(TAG, "OK. Wifi has already been initialized");
         // GOTO
@@ -179,10 +179,11 @@ esp_err_t mjd_wifi_sta_init(const char *param_ssid, const char *param_password) 
 
     /*
      * Optional for Production: dump less messages
-     *  @doc It is possible to lower the log level for specific modules (wifi and tcpip_adapter are strong candidates)
+     *   @doc It is possible to lower the log level for specific modules (wifi and tcpip_adapter are strong candidates)
      */
     /////esp_log_level_set("wifi", ESP_LOG_WARN); // @important Disable INFO messages which are too detailed for me.
     /////esp_log_level_set("tcpip_adapter", ESP_LOG_WARN); // @important Disable INFO messages which are too detailed for me.
+    /////esp_log_level_set("phy_init", ESP_LOG_WARN); // @important Disable INFO messages which are too detailed for me.
     /**/
 
     _wifi_event_group = xEventGroupCreate();

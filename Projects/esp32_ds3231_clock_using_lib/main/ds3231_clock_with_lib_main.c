@@ -97,7 +97,7 @@ void app_main() {
     ESP_LOGI(TAG, "***** deinit");
     mjd_ds3231_deinit(&config);
 
-    ESP_LOGI(TAG, "==> NEXT STEP: [ower down the ESP32 device briefly and power it up again. Check that the correct datetime was kept alive on the RTC board");
+    ESP_LOGI(TAG, "==> NEXT STEP: power down the ESP32 device briefly and power it up again. Check that the correct datetime was kept alive on the RTC board");
 
     /*
      * END

@@ -635,7 +635,7 @@ esp_err_t mjd_mlx90393_init(mjd_mlx90393_config_t* param_ptr_config) {
         timer_config_t tconfig = {};
         tconfig.divider = 64000; // Let the timer tick on a relative slow pace. 1.25 Khz: esp_clk_apb_freq() / 64000 = 1250 ticks/second
         tconfig.counter_dir = TIMER_COUNT_UP;
-        tconfig.counter_en = TIMER_PAUSE;
+        tconfig.counter_en = TIMER_PAUSE; // Pause when configured (do not start)
         tconfig.alarm_en = TIMER_ALARM_DIS;
         tconfig.auto_reload = false;
         f_retval = timer_init(MJD_MLX90393_TIMER_GROUP_ID, MJD_MLX90393_TIMER_ID, &tconfig);
@@ -674,7 +674,7 @@ esp_err_t mjd_mlx90393_init(mjd_mlx90393_config_t* param_ptr_config) {
     /////mjd_rtos_wait_forever();
 
     /*
-     * Gettting MLX NVRAM param values (some are read-only)
+     * Getting MLX NVRAM param values (some are read-only)
      */
     // SENS_TC_LT
     uint8_t sens_tc_lt;
@@ -2014,9 +2014,8 @@ esp_err_t mjd_mlx90393_cmd_start_measurement(const mjd_mlx90393_config_t* param_
     if (param_ptr_config->int_gpio_num == -1) {
         // @important A LONG SPECIFIC FIXED DELAY.
         _delay_millisec(250);
-
     } else {
-        // WAIT wait for the INT DRDY Data Ready pin value go to 1 XOR timeout from esptimer
+        // WAIT for the INT DRDY Data Ready pin value go to 1 XOR timeout from esptimer
         bool has_timed_out = false;
         const double MLX_TIMEOUT_SECONDS = 2; // FAIL when pin is not high after 2 seconds
         double timer_counter_value_seconds = 0;
@@ -2030,7 +2029,6 @@ esp_err_t mjd_mlx90393_cmd_start_measurement(const mjd_mlx90393_config_t* param_
                 has_timed_out = true;
                 break; // BREAK WHILE
             }
-
             vTaskDelay(RTOS_DELAY_10MILLISEC); // Wait in increments of 10 milliseonds (the lowest possible value for this RTOS func)
         }
 

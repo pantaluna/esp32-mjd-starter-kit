@@ -1,13 +1,17 @@
 # ESP-IDF MJD DHT11 meteo sensor component
 This is component based on ESP-IDF for the ESP32 hardware from Espressif.
 
+
+
 ## Example ESP-IDF project
-esp32_dht11_temperature_sensor_using_lib
+my_dht11_temperature_sensor_using_lib
 
 ## Shop Product
 KY-015 DHT11 Temperature Humidity Sensor Module For Arduino.
 
-## WIRING INSTRUCTIONS
+
+
+## Wiring Instructions
 ### MCU
 a. Adafruit HUZZAH32
 - Pin #13 = Blue LED on the PCB
@@ -28,17 +32,19 @@ b. Wemos Lolin32 Lite
 - Connect pin 1 VCC of the sensor to the MCU pin VCC 3V.
 - Connect pin 2 OUT of the sensor to the MCU pin DATA (whatever pin you selected above).
 - Connect pin 3 GND of the sensor to the MCU pin GND.
-
 - Connect a 5K PULL-UP resistor from the sensor pin 2 OUT to the MCU pin VCC 3.3V  \
   @important You will often get checksum errors without this pullup resistor.
-
 - OPTIONAL: connect a 100nF capacitor between pin 1 VCC and pin 3 GND of each sensor for power filtering. \
-  @doc https://electronics.stackexchange.com/questions/2272/what-is-a-decoupling-capacitor-and-how-do-i-know-if-i-need-one \
+  @doc https://electronics.stackexchange.com/questions/2272/what-is-a-decoupling-capacitor-and-how-do-i-know-if-i-need-one
+
+
 
 ## Data Sheet
 [Go to the _doc directory for more documents and images.]
 
 https://akizukidenshi.com/download/ds/aosong/DHT11.pdf
+
+
 
 ## Sensor FAQ
 - OK 3.3V
@@ -47,7 +53,20 @@ https://akizukidenshi.com/download/ds/aosong/DHT11.pdf
 - The startup time of the sensor after power-on is 1 second.
 - Recommended minimum reading time interval: 1x / minute.
 
-## Sensor known ISSUES
-- Only supports temperatures above 0 degrees Celsius.
+
+
+## Issues
+- **Only supports temperatures above 0 degrees Celsius.**
 - Burden: external pull-up resistors are always required.
 - Burden: does not support the I2C protocol (but the timing sensitive 1-Wire protocol).
+
+
+
+## Reference: the ESP32 MJD Starter Kit SDK
+
+Do you also want to create innovative IoT projects that use the ESP32 chip, or ESP32-based modules, of the popular company Espressif? Well, I did and still do. And I hope you do too.
+
+The objective of this well documented Starter Kit is to accelerate the development of your IoT projects for ESP32 hardware using the ESP-IDF framework from Espressif and get inspired what kind of apps you can build for ESP32 using various hardware modules.
+
+Go to https://github.com/pantaluna/esp32-mjd-starter-kit
+
