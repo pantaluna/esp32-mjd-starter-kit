@@ -5,20 +5,33 @@ C:\myiot\esp32-mjd-starter-kit
 ***SPECIAL*** This is in another parent directory than the usual ESP32 projects!
 --------------------------------------------------------------------------------
 
-***SPECIAL*** Manually copy the artifacts in this super repository
-------------------------------------------------------------------
+***SPECIAL*** SOP: 1. Clean projects.
+-------------------------------------
 @important First clean the Eclipse projects
     #--MSYS Make all projects (helper: clean script can be run separately)
     cd /c/myiot/esp/
     ./clean-all.sh
 
-**SPECIAL*** SOP Remove .git/* from embedded Projects except from the main repository!
---------------------------------------------------------------------------------------
+***SPECIAL*** SOP:  Manually copy the artifacts in this super repository
+----------------------------------------------
+Windows Explorer: copy paste folders.
+
+**SPECIAL*** SOP Remove ./.git/* - ./build/* - ./.settings/* - .gitignore - .cproject - .project - sdkconfig - sdkconfig.old  from embedded Projects except from the main repository!
+------------------------------------------------------------------------------------------------------------
 ##MSYS2
 DIR_REPO_NAME=esp32-mjd-starter-kit
 cd  /c/myiot/${DIR_REPO_NAME}
 pwd
-find . -type d -name '.git' ! -path './.git'  -exec rm -rf {} \;
+#directories
+find . -type d -name '.git'  ! -path './.git'          -exec rm -rf {} \;
+find . -type d -name 'build' ! -path './build'         -exec rm -rf {} \;
+find . -type d -name '.settings' ! -path './.settings' -exec rm -rf {} \;
+#files
+find . -type f -name '.gitignore'    ! -path './.gitignore'    -exec rm -f {} \;
+find . -type f -name '.cproject'     ! -path './.cproject'     -exec rm -f {} \;
+find . -type f -name '.project'      ! -path './.project'      -exec rm -f {} \;
+find . -type f -name 'sdkconfig'     ! -path './sdkconfig'     -exec rm -f {} \;
+find . -type f -name 'sdkconfig.old' ! -path './sdkconfig.old' -exec rm -f {} \;
 
 
 SOP Upload new repo to GitHub
@@ -61,7 +74,7 @@ git commit -m "Updated"
 git config credential.helper store
 git push --set-upstream origin master
 
-git tag --annotate v1.1 --message "Second tag"
+git tag --annotate v1.2 --message "Added SHT3x and TMP36 components and example projects"
 git push origin --tags
 
 git describe --tags --dirt

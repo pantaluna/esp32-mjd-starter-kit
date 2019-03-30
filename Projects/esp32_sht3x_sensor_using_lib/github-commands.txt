@@ -1,6 +1,6 @@
-https://github.com/pantaluna/esp32_mjd_components
+https://github.com/pantaluna/esp32_sht3x_sensor_using_lib
 
-C:\myiot\esp\esp32_mjd_components
+C:\myiot\esp\esp32_sht3x_sensor_using_lib
 
 
 SOP Upload new repo to GitHub
@@ -10,7 +10,7 @@ SOP Upload new repo to GitHub
 
 2 MSYS2: git
 ```
-DIR_REPO_NAME=esp32_mjd_components
+DIR_REPO_NAME=esp32_sht3x_sensor_using_lib
 cd  /c/myiot/esp/${DIR_REPO_NAME}
 pwd
 git init
@@ -23,7 +23,7 @@ git push --set-upstream origin master
 
 git remote show origin
 
-git tag --annotate v0.80 --message "First tag"
+git tag --annotate v1.0 --message "First tag"
 git push origin --tags
 
 git describe --tags --dirt
@@ -32,10 +32,10 @@ git rev-parse HEAD
 git status
 ```
 
-SOP Upload source updates to GitHub
+***NOTUSEDYET*** SOP Upload source updates to GitHub
 -----------------------------------
 ```
-DIR_REPO_NAME=esp32_mjd_components
+DIR_REPO_NAME=esp32_sht3x_sensor_using_lib
 cd  /c/myiot/esp/${DIR_REPO_NAME}
 git add .
 git commit -m "Updated"
@@ -43,7 +43,7 @@ git commit -m "Updated"
 git config credential.helper store
 git push --set-upstream origin master
 
-git tag --annotate v1.3 --message "Added components mjd_sht3x, mjd_tmp36"
+git tag --annotate v1.1 --message "Second tag"
 git push origin --tags
 
 git describe --tags --dirt

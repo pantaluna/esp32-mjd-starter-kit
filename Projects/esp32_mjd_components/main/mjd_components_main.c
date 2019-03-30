@@ -106,7 +106,6 @@ void main_task(void *pvParameter) {
     mjd_increment_mcu_boot_count();
     mjd_log_mcu_boot_count();
     mjd_log_chip_info();
-    mjd_log_clanguage_details();
     mjd_log_memory_statistics();
     mjd_set_timezone_utc();
     mjd_log_time();
@@ -124,6 +123,11 @@ void main_task(void *pvParameter) {
     mjd_log_memory_statistics();
 
     /*
+     * C Language implementation details
+     */
+    mjd_log_clanguage_details();
+
+    /*
      * printf formats
      */
     ESP_LOGI(TAG, "\nprintf size_t values using format specifier %%zu:");
@@ -131,8 +135,16 @@ void main_task(void *pvParameter) {
     ESP_LOGI(TAG, "  buf123[123] : sizeof(buf123)=%zu", sizeof(buf123));
 
     /*
-     * BYTES and BINARY REPRESENTATION
+     * BYTES/WORDS and BINARY REPRESENTATION
      */
+    ESP_LOGI(TAG, "\nMJD_HIBYTE(word) and MJD_LOBYTE(word):");
+    ESP_LOGI(TAG, "  (uint8_t)0xFFFF:  sizeof=%u", sizeof((uint8_t)0xFFFF));
+    ESP_LOGI(TAG, "  (uint16_t)0xFFFF: sizeof=%u", sizeof((uint16_t)0xFFFF));
+    ESP_LOGI(TAG, "  MJD_HIBYTE(0xFFEE): 0x%X (sizeof=%u)", MJD_HIBYTE(0xFFEE), sizeof(MJD_HIBYTE(0xFFEE)));
+    ESP_LOGI(TAG, "  MJD_LOBYTE(0xFFEE): 0x%X (sizeof=%u)", MJD_LOBYTE(0xFFEE), sizeof(MJD_LOBYTE(0xFFEE)));
+    ESP_LOGI(TAG, "  MJD_HIBYTE(0x0000): 0x%X (sizeof=%u)", MJD_HIBYTE(0x0000), sizeof(MJD_HIBYTE(0x0000)));
+    ESP_LOGI(TAG, "  MJD_LOBYTE(0x0000): 0x%X (sizeof=%u)", MJD_LOBYTE(0x0000), sizeof(MJD_LOBYTE(0x0000)));
+
     ESP_LOGI(TAG, "\nmjd_byte_to_binary_string():");
 
     uint8_t input_value_uint8;

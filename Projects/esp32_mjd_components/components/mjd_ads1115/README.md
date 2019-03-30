@@ -37,6 +37,14 @@ The specific wiring instructions are documented in the  ESP-IDF example project(
 
 
 
+## Pullup Pulldown Resistors
+
+The breakout boards mentioned above contain a 10K pullup resistor for these pins: SCL, SDA, ALR. It is not needed to wire external 10K pullup resistors from the device pins SCL and SDA to the MCU pin VCC (3V), or to enable the MCU's internal pullups for those pins. 
+
+The breakout boards mentioned above contain a 10K pulldown resistor for these pins: ADR.
+
+
+
 ### PIN layout Of the breakout boards
 
 [ Goto the _doc folder for photo's.]
@@ -69,14 +77,6 @@ PIN#  PIN NAME	  Description
 - Connect device pin "SCL" to the MCU pin SCL. I use GPIO#21 on the HUZZAH32 dev board.
 - Connect device pin "SDA" to the MCU pin SDA. I use GPIO#17 on the HUZZAH32 dev board)
 - Connect device pin "ALERT/READY" to an MCU input pin. I use GPIO#16 on the HUZZAH32 dev board. The use of this pin is optional.
-
-
-
-## Pullup Pulldown Resistors
-
-The breakout boards mentioned above contain a 10K pullup resistor for these pins: SCL, SDA, ALR. It is not needed to wire external 10K pullup resistors from the device pins SCL and SDA to the MCU pin VCC (3V), or to enable the MCU's internal pullups for those pins. 
-
-The breakout boards mentioned above contain a 10K pulldown resistor for these pins: ADR.
 
 
 

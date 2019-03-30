@@ -1294,9 +1294,9 @@ esp_err_t mjd_ads1115_init(mjd_ads1115_config_t* param_ptr_config) {
      *
      */
     if (param_ptr_config->i2c_scl_gpio_num == -1 || param_ptr_config->i2c_sda_gpio_num == -1) {
+        f_retval = ESP_FAIL;
         ESP_LOGE(TAG, "%s(). ABORT. i2c_scl_gpio_num or i2c_sda_gpio_num is not initialized | err %i (%s)", __FUNCTION__, f_retval,
                 esp_err_to_name(f_retval));
-        f_retval = ESP_FAIL;
         // GOTO
         goto cleanup;
     }

@@ -116,7 +116,7 @@ The special project `esp32_mjd_components`:
 
 
 
-Let's highlight a few projects that demonstrate how to use the extra components of the ESP32 Starter Kit.
+Let's highlight a few projects that demonstrate how to use the extra components of the ESP32 MJD Starter Kit.
 - ```esp32_ads1115_adc_using_lib``` Demonstrates the basics of using the MJD ESP-IDF component "mjd_ads1115" for the ESP32 and the popular breakout boards of the TI ADS1115 Ultra-Small, Low-Power, I2C-Compatible, 860-SPS, 16-Bit ADCs With Internal Reference, Oscillator, and Programmable Comparator using the I2C Bus.
 - ```esp32_am2320_temperature_sensor_using_lib``` How to read data from the Aosong AM2320 meteo sensor.
 - `esp32_bh1750fvi_lightsensor_using_lib` How to read data from the BH1750 light intensity sensor.
@@ -137,6 +137,7 @@ Let's highlight a few projects that demonstrate how to use the extra components 
 - `esp32_lorabee_using_pc_usbuart` This project demonstrates how to issue basic commands to the LoraBee module using a Windows PC and a USB-UART board (such as an FTDI). This is an easy way to get familiar with the features of the LoraBee / Microchip RN2843A board.
 - `esp32_mlx90393_using_lib` How to get magnetic field data using the Melexis MLX90393 magnetic field sensor.
 - `esp32_neom8n_gps_using_lib` How to get GPS data from the GPS Ublox NEO-M8N module.
+- ```esp32_sht3x_sensor_using_lib``` This project demonstrates the components mjd_sht3x. The mjd_sht3x component for the Sensirion SHT3x Digital Humidity and Temperature Sensor is used configure the device and collect its output metrics (temperature C F, relative humidity % and alos the dew point C F.
 - ```esp32_tmp36_sensor_ads1115_adc_using_lib``` This project demonstrates the components mjd_ads1115 and mjd_tmp36. The mjd_ads1115 component for the TI ADS1115 Analog-To-Digital-Convertor is used to read the voltage output of the analog temperature sensor. The mjd_tmp36 component for the TMP36 sensor is used to convert the raw voltage reading of the ADC to the ambient temperature in Degrees Celsius transparently.
 - `esp32_wifi_device_scanner` How to scan all Wifi channels and discover the devices.
 - `esp32_wifi_ssid_cloner` How to clone existing Access Points.
@@ -189,6 +190,7 @@ This is the list of new components:
 - ```mjd_nanopb``` Component to work with Google Protocol Buffers. It includes the common C files of the Nanopb library v0.3.9.2. It also declares Nanopb specific project-wide compilation directives (-D) in Makefile.projbuild
 - `mjd_net` Component to facilitate various networking features (getting IP address, DNS resolve hostnames, etc.). 
 - `mjd_neom8n` Component for the GPS u-blox NEO-M8N module.
+- ```mjd_sht3x``` Component for the Sensirion SHT3x Digital Humidity and Temperature Sensor.
 - ```mjd_tmp36``` Component for the TMP36 Analog Temperature Sensor from Analog Devices. To be used together with an ADC.
 - `mjd_wifi` Component to facilitate, as a Wifi Station, a connection to a Wifi Access Point.
 
@@ -241,11 +243,12 @@ These components come with the essential documentation such as data sheets, sche
 - DHT11 temperature sensor by Aosong.
 - DHT22/AM2302 temperature sensor by Aosong.
 - BH1750FVI light sensor.
-- Bosch BME280 meteo sensor.
-- Bosch BMP280 meteo sensor.
+- BME280 meteo sensor by Bosch.
+- BMP280 meteo sensor by Bosch.
 - HC-SR501 PIR motion sensor.
 - KY-032 Infrared obstacle avoidance sensor.
-- Analog Devices TMP36 analog temperature sensor.
+- SHT3x digital humidity and temperature sensor by Sensirion.
+- TMP36 analog temperature sensor by Analog Devices.
 
 
 
