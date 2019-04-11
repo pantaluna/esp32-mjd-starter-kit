@@ -8,6 +8,31 @@ Use this project to get insights in how to use this component.
 
 Goto the subdirectory "components/mjd_ds3231" for installation/wiring/usage instructions, data sheets, FAQ, photo's, etc. for the hardware and software.
 
+
+
+## What are the HW SW requirements of the ESP32 MJD Starter Kit?
+
+### Hardware
+
+- A decent ESP development board. I suggest to buy a popular development board with good technical documentation and a significant user base. Examples: [Adafruit HUZZAH32](https://www.adafruit.com/product/3405),  [Espressif ESP32-DevKitC](http://espressif.com/en/products/hardware/esp32-devkitc/overview), [Pycom WiPy](https://pycom.io/hardware/), [Wemos D32](https://wiki.wemos.cc/products:d32:d32).
+- The peripherals that are used in the project.
+  @tip The README of each component contains a section "Shop Products".
+  @example A Bosch BME280 meteo sensor breakout board.
+
+### Software: ESP-IDF v3.2
+
+- A working installation of the **Espressif ESP-IDF *V3.2* development framework**** (detailed instructions @ http://esp-idf.readthedocs.io/en/latest/get-started/index.html).
+
+```
+mkdir ~/esp
+cd    ~/esp
+git clone -b v3.3 --recursive https://github.com/espressif/esp-idf.git esp-idf-v3.2
+```
+
+- A C language editor or the Eclipse IDE CDT (instructions also @ http://esp-idf.readthedocs.io/en/latest/get-started/index.html).
+
+
+
 ## Running the example
 ```
 cd ~/esp32_ds3231_clock_using_lib

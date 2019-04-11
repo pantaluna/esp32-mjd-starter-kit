@@ -8,11 +8,11 @@
 
 </language>
 <language name="C Source File">
-<includepath>${IDF_PATH}/components/esp_adc_cal/include</includepath>
 <includepath>${IDF_PATH}/components/console</includepath>
 <includepath>${IDF_PATH}/components/driver/include</includepath>
-<includepath>${IDF_PATH}/components/esp-tls</includepath>
+<includepath>${IDF_PATH}/components/esp_adc_cal/include</includepath>
 <includepath>${IDF_PATH}/components/esp_http_client/include</includepath>
+<includepath>${IDF_PATH}/components/esp-tls</includepath>
 <includepath>${IDF_PATH}/components/esp32/include</includepath>
 <includepath>${IDF_PATH}/components/fatfs/src</includepath>
 <includepath>${IDF_PATH}/components/freertos/include</includepath>

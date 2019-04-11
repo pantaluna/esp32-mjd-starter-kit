@@ -366,8 +366,8 @@ void mjd_log_clanguage_details() {
 
     ESP_LOGI(TAG, "  float");
     ESP_LOGI(TAG, "    Storage size (bytes): %d", sizeof(float));
-    ESP_LOGI(TAG, "    FLT_MIN positive value: %E", FLT_MIN);
-    ESP_LOGI(TAG, "    FLT_MAX maximum positive value: %E", FLT_MAX);
+    ESP_LOGI(TAG, "    FLT_MIN Minimum normalized positive floating-point value:  %E", FLT_MIN);
+    ESP_LOGI(TAG, "    FLT_MAX Maximum representable finite floating-point value: %E", FLT_MAX);
     ESP_LOGI(TAG, "    FLT_DIG precision value: %d", FLT_DIG);
 
     ESP_LOGI(TAG, "  size_t");

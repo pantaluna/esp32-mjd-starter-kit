@@ -80,28 +80,32 @@ static esp_err_t _send_cmd(const mjd_sht3x_config_t* param_ptr_config, mjd_sht3x
 
     f_retval = i2c_master_start(handle);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_start() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_start() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
     }
     f_retval = i2c_master_write_byte(handle, (param_ptr_config->i2c_slave_addr << 1) | I2C_MASTER_WRITE, true);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_write_byte() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_write_byte() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
     }
     f_retval = i2c_master_write_byte(handle, MJD_HIBYTE(param_command), true); // MSByte
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_write_byte() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_write_byte() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
     }
     f_retval = i2c_master_write_byte(handle, MJD_LOBYTE(param_command), true); // LSByte
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_write_byte() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_write_byte() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
@@ -109,7 +113,8 @@ static esp_err_t _send_cmd(const mjd_sht3x_config_t* param_ptr_config, mjd_sht3x
 
     f_retval = i2c_master_stop(handle);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_stop() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_stop() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
@@ -117,7 +122,8 @@ static esp_err_t _send_cmd(const mjd_sht3x_config_t* param_ptr_config, mjd_sht3x
 
     f_retval = i2c_master_cmd_begin(param_ptr_config->i2c_port_num, handle, param_ptr_config->i2c_timeout);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_cmd_begin() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_cmd_begin() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
@@ -140,7 +146,8 @@ static esp_err_t _send_cmd(const mjd_sht3x_config_t* param_ptr_config, mjd_sht3x
  *  @param param_data is a pointer to an unsigned int 16bits (not signed!).
  *
  *********************************************************************************/
-static esp_err_t _read_register(const mjd_sht3x_config_t* param_ptr_config, mjd_sht3x_reg_t param_reg, uint16_t* param_ptr_data) {
+static esp_err_t _read_register(const mjd_sht3x_config_t* param_ptr_config, mjd_sht3x_reg_t param_reg,
+                                uint16_t* param_ptr_data) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
@@ -155,21 +162,24 @@ static esp_err_t _read_register(const mjd_sht3x_config_t* param_ptr_config, mjd_
 
     f_retval = i2c_master_start(handle);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_start() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_start() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
     }
     f_retval = i2c_master_write_byte(handle, (param_ptr_config->i2c_slave_addr << 1) | I2C_MASTER_WRITE, true);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_write_byte() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_write_byte() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
     }
     f_retval = i2c_master_write_byte(handle, param_reg, true);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_write_byte() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_write_byte() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
@@ -177,35 +187,40 @@ static esp_err_t _read_register(const mjd_sht3x_config_t* param_ptr_config, mjd_
 
     f_retval = i2c_master_start(handle);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_start() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_start() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
     }
     f_retval = i2c_master_write_byte(handle, (param_ptr_config->i2c_slave_addr << 1) | I2C_MASTER_READ, true);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_write_byte() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_write_byte() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
     }
     f_retval = i2c_master_read_byte(handle, &msbyte, I2C_MASTER_ACK);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_read_byte() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_read_byte() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
     }
     f_retval = i2c_master_read_byte(handle, &lsbyte, I2C_MASTER_NACK); // last read must be I2C_MASTER_NACK
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_read_byte() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_read_byte() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
     }
     f_retval = i2c_master_stop(handle);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_stop() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_stop() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
@@ -213,7 +228,8 @@ static esp_err_t _read_register(const mjd_sht3x_config_t* param_ptr_config, mjd_
 
     f_retval = i2c_master_cmd_begin(param_ptr_config->i2c_port_num, handle, param_ptr_config->i2c_timeout);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_cmd_begin() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_cmd_begin() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
@@ -287,7 +303,8 @@ static esp_err_t _check_crc(const uint8_t *param_data, int param_len, uint8_t pa
  * @doc mjd_sht3x_defs.h
  *
  *********************************************************************************/
-esp_err_t mjd_sht3x_get_alert_pending_status(const mjd_sht3x_config_t* param_ptr_config, mjd_sht3x_alert_pending_status_t* param_ptr_data) {
+esp_err_t mjd_sht3x_get_alert_pending_status(const mjd_sht3x_config_t* param_ptr_config,
+                                             mjd_sht3x_alert_pending_status_t* param_ptr_data) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
@@ -339,7 +356,8 @@ esp_err_t mjd_sht3x_get_heater_status(mjd_sht3x_config_t* param_ptr_config, mjd_
  * @doc mjd_sht3x_defs.h
  *
  *********************************************************************************/
-esp_err_t mjd_sht3x_get_rh_tracking_alert(mjd_sht3x_config_t* param_ptr_config, mjd_sht3x_rh_tracking_alert_t* param_ptr_data) {
+esp_err_t mjd_sht3x_get_rh_tracking_alert(mjd_sht3x_config_t* param_ptr_config,
+                                          mjd_sht3x_rh_tracking_alert_t* param_ptr_data) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
@@ -365,7 +383,8 @@ esp_err_t mjd_sht3x_get_rh_tracking_alert(mjd_sht3x_config_t* param_ptr_config, 
  * @doc mjd_sht3x_defs.h
  *
  *********************************************************************************/
-esp_err_t mjd_sht3x_get_t_tracking_alert(const mjd_sht3x_config_t* param_ptr_config, mjd_sht3x_t_tracking_alert_t* param_ptr_data) {
+esp_err_t mjd_sht3x_get_t_tracking_alert(const mjd_sht3x_config_t* param_ptr_config,
+                                         mjd_sht3x_t_tracking_alert_t* param_ptr_data) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
@@ -391,7 +410,8 @@ esp_err_t mjd_sht3x_get_t_tracking_alert(const mjd_sht3x_config_t* param_ptr_con
  * @doc mjd_sht3x_defs.h
  *
  *********************************************************************************/
-esp_err_t mjd_sht3x_get_system_reset_detected(mjd_sht3x_config_t* param_ptr_config, mjd_sht3x_system_reset_detected_t* param_ptr_data) {
+esp_err_t mjd_sht3x_get_system_reset_detected(mjd_sht3x_config_t* param_ptr_config,
+                                              mjd_sht3x_system_reset_detected_t* param_ptr_data) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
@@ -419,7 +439,8 @@ esp_err_t mjd_sht3x_get_system_reset_detected(mjd_sht3x_config_t* param_ptr_conf
  * @important Nobody seems to use this feature, so do NOT use it as well to check if Commands have been executed succesfully.
  *
  *********************************************************************************/
-esp_err_t mjd_sht3x_get_last_command_status(const mjd_sht3x_config_t* param_ptr_config, mjd_sht3x_last_command_status_t* param_ptr_data) {
+esp_err_t mjd_sht3x_get_last_command_status(const mjd_sht3x_config_t* param_ptr_config,
+                                            mjd_sht3x_last_command_status_t* param_ptr_data) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
@@ -445,7 +466,8 @@ esp_err_t mjd_sht3x_get_last_command_status(const mjd_sht3x_config_t* param_ptr_
  * @doc mjd_sht3x_defs.h
  *
  *********************************************************************************/
-esp_err_t mjd_sht3x_get_write_data_checksum_status(const mjd_sht3x_config_t* param_ptr_config, mjd_sht3x_write_data_checksum_status_t* param_ptr_data) {
+esp_err_t mjd_sht3x_get_write_data_checksum_status(const mjd_sht3x_config_t* param_ptr_config,
+                                                   mjd_sht3x_write_data_checksum_status_t* param_ptr_data) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
@@ -459,7 +481,8 @@ esp_err_t mjd_sht3x_get_write_data_checksum_status(const mjd_sht3x_config_t* par
     }
 
     // Extract parameter value from register data
-    *param_ptr_data = (reg_data & MJD_SHT3X_WRITE_DATA_CHECKSUM_STATUS_BITMASK) >> MJD_SHT3X_WRITE_DATA_CHECKSUM_STATUS_BITSHIFT;
+    *param_ptr_data = (reg_data & MJD_SHT3X_WRITE_DATA_CHECKSUM_STATUS_BITMASK)
+            >> MJD_SHT3X_WRITE_DATA_CHECKSUM_STATUS_BITSHIFT;
 
     // LABEL
     cleanup: ;
@@ -490,7 +513,8 @@ esp_err_t mjd_sht3x_log_device_parameters(mjd_sht3x_config_t* param_ptr_config) 
     mjd_sht3x_alert_pending_status_t alert_pending_status;
     f_retval = mjd_sht3x_get_alert_pending_status(param_ptr_config, &alert_pending_status);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. mjd_sht3x_get_alert_pending_status() failed | err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. mjd_sht3x_get_alert_pending_status() failed | err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         // GOTO
         goto cleanup;
     }
@@ -499,7 +523,8 @@ esp_err_t mjd_sht3x_log_device_parameters(mjd_sht3x_config_t* param_ptr_config) 
     mjd_sht3x_heater_status_t heater_status;
     f_retval = mjd_sht3x_get_heater_status(param_ptr_config, &heater_status);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. mjd_sht3x_get_heater_status() failed | err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. mjd_sht3x_get_heater_status() failed | err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         // GOTO
         goto cleanup;
     }
@@ -508,7 +533,8 @@ esp_err_t mjd_sht3x_log_device_parameters(mjd_sht3x_config_t* param_ptr_config) 
     mjd_sht3x_rh_tracking_alert_t rh_tracking_alert;
     f_retval = mjd_sht3x_get_rh_tracking_alert(param_ptr_config, &rh_tracking_alert);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. mjd_sht3x_get_rh_tracking_alert() failed | err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. mjd_sht3x_get_rh_tracking_alert() failed | err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         // GOTO
         goto cleanup;
     }
@@ -517,7 +543,8 @@ esp_err_t mjd_sht3x_log_device_parameters(mjd_sht3x_config_t* param_ptr_config) 
     mjd_sht3x_t_tracking_alert_t t_tracking_alert;
     f_retval = mjd_sht3x_get_t_tracking_alert(param_ptr_config, &t_tracking_alert);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. mjd_sht3x_get_t_tracking_alert() failed | err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. mjd_sht3x_get_t_tracking_alert() failed | err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         // GOTO
         goto cleanup;
     }
@@ -526,7 +553,8 @@ esp_err_t mjd_sht3x_log_device_parameters(mjd_sht3x_config_t* param_ptr_config) 
     mjd_sht3x_system_reset_detected_t system_reset_detected;
     f_retval = mjd_sht3x_get_system_reset_detected(param_ptr_config, &system_reset_detected);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. mjd_sht3x_get_system_reset_detected() failed | err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. mjd_sht3x_get_system_reset_detected() failed | err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         // GOTO
         goto cleanup;
     }
@@ -535,7 +563,8 @@ esp_err_t mjd_sht3x_log_device_parameters(mjd_sht3x_config_t* param_ptr_config) 
     mjd_sht3x_last_command_status_t last_command_status;
     f_retval = mjd_sht3x_get_last_command_status(param_ptr_config, &last_command_status);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. mjd_sht3x_get_last_command_status() failed | err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. mjd_sht3x_get_last_command_status() failed | err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         // GOTO
         goto cleanup;
     }
@@ -553,19 +582,24 @@ esp_err_t mjd_sht3x_log_device_parameters(mjd_sht3x_config_t* param_ptr_config) 
     // DUMP
     char binary_output_string8[8 + 1] = "12345678";
     mjd_byte_to_binary_string(alert_pending_status, binary_output_string8);
-    ESP_LOGI(TAG, "  alert_pending_status:       0x%X 0b%s (%u)", alert_pending_status, binary_output_string8, alert_pending_status);
+    ESP_LOGI(TAG, "  alert_pending_status:       0x%X 0b%s (%u)", alert_pending_status, binary_output_string8,
+            alert_pending_status);
     mjd_byte_to_binary_string(heater_status, binary_output_string8);
     ESP_LOGI(TAG, "  heater_status:              0x%X 0b%s (%u)", heater_status, binary_output_string8, heater_status);
     mjd_byte_to_binary_string(rh_tracking_alert, binary_output_string8);
-    ESP_LOGI(TAG, "  rh_tracking_alert:          0x%X 0b%s (%u)", rh_tracking_alert, binary_output_string8, rh_tracking_alert);
+    ESP_LOGI(TAG, "  rh_tracking_alert:          0x%X 0b%s (%u)", rh_tracking_alert, binary_output_string8,
+            rh_tracking_alert);
     mjd_byte_to_binary_string(t_tracking_alert, binary_output_string8);
     ESP_LOGI(TAG, "  t_tracking_alert:           0x%X 0b%s (%u)", t_tracking_alert, binary_output_string8, t_tracking_alert);
     mjd_byte_to_binary_string(system_reset_detected, binary_output_string8);
-    ESP_LOGI(TAG, "  system_reset_detected:      0x%X 0b%s (%u)", system_reset_detected, binary_output_string8, system_reset_detected);
+    ESP_LOGI(TAG, "  system_reset_detected:      0x%X 0b%s (%u)", system_reset_detected, binary_output_string8,
+            system_reset_detected);
     mjd_byte_to_binary_string(last_command_status, binary_output_string8);
-    ESP_LOGI(TAG, "  last_command_status:        0x%X 0b%s (%u)", last_command_status, binary_output_string8, last_command_status);
+    ESP_LOGI(TAG, "  last_command_status:        0x%X 0b%s (%u)", last_command_status, binary_output_string8,
+            last_command_status);
     mjd_byte_to_binary_string(write_data_checksum_status, binary_output_string8);
-    ESP_LOGI(TAG, "  write_data_checksum_status: 0x%X 0b%s (%u)", write_data_checksum_status, binary_output_string8, write_data_checksum_status);
+    ESP_LOGI(TAG, "  write_data_checksum_status: 0x%X 0b%s (%u)", write_data_checksum_status, binary_output_string8,
+            write_data_checksum_status);
 
     // DEVTEMP
     /////mjd_rtos_wait_forever();
@@ -685,7 +719,8 @@ esp_err_t mjd_sht3x_cmd_get_single_measurement(const mjd_sht3x_config_t* param_p
         command = MJD_SHT3X_CMD_START_SINGLE_SHOT_MODE_REPEATABILITY_LOW;
     } else {
         f_retval = ESP_FAIL;
-        ESP_LOGE(TAG, "%s(). ABORT _send_cmd() invalid prop Repeatability | err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT _send_cmd() invalid prop Repeatability | err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         // GOTO
         goto cleanup;
     }
@@ -701,7 +736,7 @@ esp_err_t mjd_sht3x_cmd_get_single_measurement(const mjd_sht3x_config_t* param_p
      * DO DELAY:
      */
     static uint32_t _delay_ms_per_repeatability[MJD_SHT3X_REPEATABILITY_MAX] =
-        { 15, 6, 4 };
+                { 15, 6, 4 };
 
     uint32_t delay = 1 + _delay_ms_per_repeatability[param_ptr_config->repeatability];
     ESP_LOGD(TAG, "%s(). Computed delay (ms): %u", __FUNCTION__, delay);
@@ -723,14 +758,16 @@ esp_err_t mjd_sht3x_cmd_get_single_measurement(const mjd_sht3x_config_t* param_p
 
     f_retval = i2c_master_start(handle);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_start() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_start() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
     }
     f_retval = i2c_master_write_byte(handle, (param_ptr_config->i2c_slave_addr << 1) | I2C_MASTER_READ, true);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_write_byte() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Send request i2c_master_write_byte() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
@@ -739,7 +776,8 @@ esp_err_t mjd_sht3x_cmd_get_single_measurement(const mjd_sht3x_config_t* param_p
     // ---@doc i2c_master_read() param4=I2C_MASTER_LAST_NACK: do ACK for all reads except do NACK for the last read (handy func!)
     f_retval = i2c_master_read(handle, rx_buf, ARRAY_SIZE(rx_buf), I2C_MASTER_LAST_NACK);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_read() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_read() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
@@ -748,7 +786,8 @@ esp_err_t mjd_sht3x_cmd_get_single_measurement(const mjd_sht3x_config_t* param_p
 
     f_retval = i2c_master_stop(handle);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_stop() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_stop() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
@@ -756,7 +795,8 @@ esp_err_t mjd_sht3x_cmd_get_single_measurement(const mjd_sht3x_config_t* param_p
 
     f_retval = i2c_master_cmd_begin(param_ptr_config->i2c_port_num, handle, param_ptr_config->i2c_timeout);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_cmd_begin() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. Receive response i2c_master_cmd_begin() err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         i2c_cmd_link_delete(handle);
         // GOTO
         goto cleanup;
@@ -773,13 +813,15 @@ esp_err_t mjd_sht3x_cmd_get_single_measurement(const mjd_sht3x_config_t* param_p
      */
     f_retval = _check_crc(rx_buf, 2, rx_buf[2]);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. CRC check for temperature failed | err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. CRC check for temperature failed | err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         // GOTO
         goto cleanup;
     }
     f_retval = _check_crc(rx_buf + 3, 2, rx_buf[5]);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "%s(). ABORT. CRC check for relative_humidity failed | err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. CRC check for relative_humidity failed | err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         // GOTO
         goto cleanup;
     }
@@ -838,16 +880,19 @@ esp_err_t mjd_sht3x_init(mjd_sht3x_config_t* param_ptr_config) {
      */
     if (param_ptr_config->i2c_scl_gpio_num == -1 || param_ptr_config->i2c_sda_gpio_num == -1) {
         f_retval = ESP_FAIL;
-        ESP_LOGE(TAG, "%s(). ABORT. i2c_scl_gpio_num or i2c_sda_gpio_num is not initialized | err %i (%s)", __FUNCTION__, f_retval,
+        ESP_LOGE(TAG, "%s(). ABORT. i2c_scl_gpio_num or i2c_sda_gpio_num is not initialized | err %i (%s)", __FUNCTION__,
+                f_retval,
                 esp_err_to_name(f_retval));
         // GOTO
         goto cleanup;
     }
 
-    if (param_ptr_config->repeatability != MJD_SHT3X_REPEATABILITY_HIGH && param_ptr_config->repeatability != MJD_SHT3X_REPEATABILITY_MEDIUM
+    if (param_ptr_config->repeatability != MJD_SHT3X_REPEATABILITY_HIGH
+            && param_ptr_config->repeatability != MJD_SHT3X_REPEATABILITY_MEDIUM
             && param_ptr_config->repeatability != MJD_SHT3X_REPEATABILITY_LOW) {
         f_retval = ESP_FAIL;
-        ESP_LOGE(TAG, "%s(). ABORT. repeatability invalid value | err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). ABORT. repeatability invalid value | err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         // GOTO
         goto cleanup;
     }
@@ -859,7 +904,7 @@ esp_err_t mjd_sht3x_init(mjd_sht3x_config_t* param_ptr_config) {
     if (param_ptr_config->manage_i2c_driver == true) {
         // Config
         i2c_config_t i2c_conf =
-            { 0 };
+                    { 0 };
         i2c_conf.mode = I2C_MODE_MASTER;
         i2c_conf.scl_io_num = param_ptr_config->i2c_scl_gpio_num;
         i2c_conf.sda_io_num = param_ptr_config->i2c_sda_gpio_num;
@@ -869,7 +914,8 @@ esp_err_t mjd_sht3x_init(mjd_sht3x_config_t* param_ptr_config) {
 
         f_retval = i2c_param_config(param_ptr_config->i2c_port_num, &i2c_conf);
         if (f_retval != ESP_OK) {
-            ESP_LOGE(TAG, "%s(). ABORT. i2c_param_config() | err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+            ESP_LOGE(TAG, "%s(). ABORT. i2c_param_config() | err %i (%s)", __FUNCTION__, f_retval,
+                    esp_err_to_name(f_retval));
             // GOTO
             goto cleanup;
         }
@@ -877,7 +923,8 @@ esp_err_t mjd_sht3x_init(mjd_sht3x_config_t* param_ptr_config) {
         f_retval = i2c_driver_install(param_ptr_config->i2c_port_num, I2C_MODE_MASTER, MJD_SHT3X_I2C_MASTER_RX_BUF_DISABLE,
         MJD_SHT3X_I2C_MASTER_TX_BUF_DISABLE, MJD_SHT3X_I2C_MASTER_INTR_FLAG_NONE);
         if (f_retval != ESP_OK) {
-            ESP_LOGE(TAG, "%s(). ABORT. i2c_driver_install() | err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+            ESP_LOGE(TAG, "%s(). ABORT. i2c_driver_install() | err %i (%s)", __FUNCTION__, f_retval,
+                    esp_err_to_name(f_retval));
             // GOTO
             goto cleanup;
         }
@@ -923,7 +970,8 @@ esp_err_t mjd_sht3x_deinit(const mjd_sht3x_config_t* param_ptr_config) {
     if (param_ptr_config->manage_i2c_driver == true) {
         f_retval = i2c_driver_delete(param_ptr_config->i2c_port_num);
         if (f_retval != ESP_OK) {
-            ESP_LOGE(TAG, "%s(). ABORT. i2c_driver_delete() | err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+            ESP_LOGE(TAG, "%s(). ABORT. i2c_driver_delete() | err %i (%s)", __FUNCTION__, f_retval,
+                    esp_err_to_name(f_retval));
             // GOTO
             goto cleanup;
         }

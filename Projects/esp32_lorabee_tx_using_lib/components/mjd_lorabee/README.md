@@ -1,7 +1,7 @@
 # ESP-IDF MJD LoraBee LoRa Board (Microchip RN2843)
 This is a component for the ESP-IDF software framework of the ESP32 hardware from Espressif.
 
-This component is developed for the SODAQ LoraBee Microchip RN2483A board in combination with an ESP32 development board.
+This component is developed for the SODAQ LoraBee Microchip RN2483A board in combination with an ESP32 development board (contains a Microchip RN2843 LoRa chip).
 
 The ESP-IDF component implements all configuration options of the LoraBee board.
 

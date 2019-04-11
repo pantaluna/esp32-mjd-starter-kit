@@ -230,7 +230,7 @@ static char* _get_next_line_uart(uart_port_t param_uart_port_num) {
                 _ptr_data_rx = _data_rx; // reset ptr to the newly read data from uart
             } else {
                 mjd_log_time();
-                ESP_LOGW(TAG, "%s(): xQueueReceive() _uart_rx_data_queue time out (30 sec), continue", __FUNCTION__);
+                ESP_LOGW(TAG, "%s(): xQueueReceive() _uart_rx_data_queue time out, continue", __FUNCTION__);
                 // CONTINUE @important!
                 continue;
             }
@@ -1481,7 +1481,7 @@ esp_err_t mjd_lorabee_init(mjd_lorabee_config_t* param_ptr_config) {
         goto cleanup;
     }
 
-    // MUTEX (for future use)
+    // MUTEX (for future use; TODO Handle conflicts accessing data from multiple tasks)
     if (!_lorabee_service_semaphore) {
         _lorabee_service_semaphore = xSemaphoreCreateMutex();
         if (!_lorabee_service_semaphore) {

@@ -36,7 +36,12 @@ See also the diagram images.
 ## Sensor I2C protocol
 - Sensor acts as a slave.
 
+## SOP: setup the ZS042 board as an external crystal oscillator 32Khz for the ESP32
+
+Goto document "Setup as external oscillator 32Khz for the ESP32.md"
+
 ## Data Sheet
+
 [Go to the _doc directory for more documents.]
 
 https://www.maximintegrated.com/en/products/digital/real-time-clocks/DS3231.html
@@ -71,5 +76,3 @@ https://www.maximintegrated.com/en/products/digital/real-time-clocks/DS3231.html
 ## Known ISSUES
 - The battery charger circuit does not work for 3.3V microcontrollers and LIR2032 batteries.
 
-## SOP: setup the ZS042 board as an external crystal oscillator 32Khz for the ESP32
-Goto "Setup as external crystal oscillator 32Khz for the ESP32.md"

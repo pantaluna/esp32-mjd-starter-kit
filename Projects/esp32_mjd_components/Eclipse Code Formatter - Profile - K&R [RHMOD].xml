@@ -59,7 +59,7 @@
 <setting id="org.eclipse.cdt.core.formatter.insert_space_after_opening_paren_in_for" value="do not insert"/>
 <setting id="org.eclipse.cdt.core.formatter.insert_space_before_closing_paren_in_parenthesized_expression" value="do not insert"/>
 <setting id="org.eclipse.cdt.core.formatter.alignment_for_parameters_in_method_declaration" value="18"/>
-<setting id="org.eclipse.cdt.core.formatter.lineSplit" value="150"/>
+<setting id="org.eclipse.cdt.core.formatter.lineSplit" value="125"/>
 <setting id="org.eclipse.cdt.core.formatter.insert_space_before_colon_in_default" value="do not insert"/>
 <setting id="org.eclipse.cdt.core.formatter.number_of_empty_lines_to_preserve" value="1"/>
 <setting id="org.eclipse.cdt.core.formatter.insert_space_after_comma_in_method_declaration_parameters" value="insert"/>

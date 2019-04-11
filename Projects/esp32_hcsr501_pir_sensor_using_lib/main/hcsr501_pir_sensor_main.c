@@ -86,7 +86,8 @@ void sensor_task(void *pvParameter) {
         goto cleanup;
     }
 
-    // Endless Loop waiting for the semaphore
+    // Waiting for the given semaphore
+    // @important This uses a FreeRTOS Semaphore so the CPU is not being clogged when waiting for a new event.
     while (true) {
         if (xSemaphoreTake(hcsr501_config.gpio_isr_mux, portMAX_DELAY) == pdTRUE) {
             ESP_LOGI(TAG, "Task sensor_task: ***SENSOR: MOTION DETECTED*** (total_nbr_of_detections %i)", ++total_nbr_of_detections);

@@ -1,5 +1,5 @@
-# ESP32 MJD Starter Kit Software
-August 2018.
+# ESP32 MJD Starter Kit for Espressif's ESP-IDF SDK
+April 2019.
 
 ## Introduction
 
@@ -11,35 +11,26 @@ Are you ready to discover how you can get started quickly?
 
 
 
-## Why would you need this ESP32 MJD Starter Kit Software?
-The ESP-IDF framework (and its documentation) is very powerful and extensive.
+## What are the HW SW requirements of the ESP32 MJD Starter Kit?
 
-I found it difficult to get started quickly. I'm just a seasoned full stack developer (backend/frontend) without much experience developing IoT solutions using embedded systems.
+### Hardware
 
-More specifically, I could understand all the features of the ESP-IDF framework but I had a hard time gluing everything together, and quickly develop real projects for real solutions using specific peripherals such as sensors, LoRa boards, GPS boards and LED strips. For example, I wanted to start with projects controlling various sensors in a network and analyzing the data on a central server, and then move on to more complex projects.
+- A decent ESP development board. I suggest to buy a popular development board with good technical documentation and a significant user base. Examples: [Adafruit HUZZAH32](https://www.adafruit.com/product/3405),  [Espressif ESP32-DevKitC](http://espressif.com/en/products/hardware/esp32-devkitc/overview), [Pycom WiPy](https://pycom.io/hardware/), [Wemos D32](https://wiki.wemos.cc/products:d32:d32).
+- The peripherals that are used in the project.
+  @tip The README of each component contains a section "Shop Products".
+  @example A Bosch BME280 meteo sensor breakout board.
 
-Secondly, it was difficult to find good documentation (data sheets, diagrams, photo's of the wiring) of the various peripheral devices such as meteo sensors, GPS boards, RGB LED's, etc. And how to use these devices in combination with an ESP32-based development board.
+### Software: ESP-IDF v3.2
 
-So I developed over time these extra components, good documentation, and many working projects targeting a whole suite of peripherals that are typically used in IoT projects.
+- A working installation of the **Espressif ESP-IDF *V3.2* development framework**** (detailed instructions @ http://esp-idf.readthedocs.io/en/latest/get-started/index.html).
 
-Now is a good time to give something back to the ESP32 community and release everything I learned so far as open source, so everyone can benefit from this work.
+```
+mkdir ~/esp
+cd    ~/esp
+git clone -b v3.3 --recursive https://github.com/espressif/esp-idf.git esp-idf-v3.2
+```
 
-
-
-## Why choose the ESP-IDF framework?
-You have 2 options to start developing for the ESP32 chip:
-
-1. Use "ESP-IDF", the extensible official Espressif IoT Development Framework of Espressif. \
-This is the official development framework for the ESP32 chip. It is targeted for C/C++ applications and it includes a port of the popular Amazon FreeRTOS O.S. This is the most powerful framework of the two and it contains a ton of excellent libraries so you can use all features of the ESP32 environment. It assumes you are at least an intermediate C Developer and it has a stiff learning curve. It is closed to the metal than the Arduino framework for ESP32.
-
-2. Use the official "Arduino Core For ESP32" framework of Espressif for the Arduino IDE. \
-This is a hardware abstraction layer for Arduino IDE so you can target the ESP32 chip. The big advantage is that you can empower your existing knowledge of the Arduino IDE. The downside is that it is not that feature-rich compared to ESP-IDF when it comes to specific ESP32 functionality. And the development pace is slower. And not all features of ESP-IDF have been ported to Arduino.
-
-
-
-It is important to know that both frameworks are stable and usable but they are still under significant development by Espressif, and major new releases are coming out on a regularly basis; I expect this to continue at least until 2018Q4.
-
-After experimenting with both frameworks I decided to go with the ESP-IDF framework, more specifically V3.1 and higher. I always try to release libraries that are compatible with the last stable release.
+- A C language editor or the Eclipse IDE CDT (instructions also @ http://esp-idf.readthedocs.io/en/latest/get-started/index.html).
 
 
 
@@ -61,7 +52,7 @@ This part documents a few products and how to configure them.
 
 
 
-### Batteries Guidelines
+### Battery Guidelines
 
 Rechargeable batteries are often used in IoT projects.
 
@@ -223,7 +214,7 @@ Let's categorize these components in more detail:
 
 #### Adafruit HUZZAH32 (ESP32 development board)
 - Read the battery voltage level.
-- Obtain the Voltage Reference for your device (+-1100mV).
+- Determine the Voltage Reference for your device (+-1100mV).
 
 #### ESP32 Peripherals - Devices
 - ADC TI ADS1115 16-bit.
@@ -249,31 +240,6 @@ These components come with the essential documentation such as data sheets, sche
 - KY-032 Infrared obstacle avoidance sensor.
 - SHT3x digital humidity and temperature sensor by Sensirion.
 - TMP36 analog temperature sensor by Analog Devices.
-
-
-
-## What are the HW SW requirements of the ESP32 MJD Starter Kit?
-
-### Hardware
-
-- A decent ESP development board. I suggest to buy a popular development board with good technical documentation and a significant user base. Examples: [Adafruit HUZZAH32](https://www.adafruit.com/product/3405),  [Espressif ESP32-DevKitC](http://espressif.com/en/products/hardware/esp32-devkitc/overview), [Pycom WiPy](https://pycom.io/hardware/), [Wemos D32](https://wiki.wemos.cc/products:d32:d32).
-
-- The peripherals that are used in the project.
-  @tip The README of each component contains a section "Shop Products".
-  @example A Bosch BME280 meteo sensor.
-
-
-### Software - ESP-IDF v3.1.1
-
-- A working installation of the Espressif ESP-IDF ***V3.1.1*** development framework (detailed instructions @ http://esp-idf.readthedocs.io/en/latest/get-started/index.html).
-
-```
-mkdir ~/esp
-cd    ~/esp
-git clone -b v3.1.1 --recursive https://github.com/espressif/esp-idf.git esp-idf-v3.1
-```
-
-- A C language editor or the Eclipse IDE CDT (instructions also @ http://esp-idf.readthedocs.io/en/latest/get-started/index.html).
 
 
 
@@ -311,7 +277,41 @@ Procedure:
 
 
 
+## FAQ Why would you need this ESP32 MJD Starter Kit Software?
+
+The ESP-IDF framework (and its documentation) is very powerful and extensive.
+
+I found it difficult to get started quickly. I'm just a seasoned full stack developer (backend/frontend) without much experience developing IoT solutions using embedded systems.
+
+More specifically, I could understand all the features of the ESP-IDF framework but I had a hard time gluing everything together, and quickly develop real projects for real solutions using specific peripherals such as sensors, LoRa boards, GPS boards and LED strips. For example, I wanted to start with projects controlling various sensors in a network and analyzing the data on a central server, and then move on to more complex projects.
+
+Secondly, it was difficult to find good documentation (data sheets, diagrams, photo's of the wiring) of the various peripheral devices such as meteo sensors, GPS boards, RGB LED's, etc. And how to use these devices in combination with an ESP32-based development board.
+
+So I developed over time these extra components, good documentation, and many working projects targeting a whole suite of peripherals that are typically used in IoT projects.
+
+Now is a good time to give something back to the ESP32 community and release everything I learned so far as open source, so everyone can benefit from this work.
+
+
+
+## FAQ Why choose the ESP-IDF framework?
+
+You have 2 options to start developing for the ESP32 chip:
+
+1. Use "ESP-IDF", the extensible official Espressif IoT Development Framework of Espressif. \
+   This is the official development framework for the ESP32 chip. It is targeted for C/C++ applications and it includes a port of the popular Amazon FreeRTOS O.S. This is the most powerful framework of the two and it contains a ton of excellent libraries so you can use all features of the ESP32 environment. It assumes you are at least an intermediate C Developer and it has a stiff learning curve. It is closed to the metal than the Arduino framework for ESP32.
+2. Use the official "Arduino Core For ESP32" framework of Espressif for the Arduino IDE. \
+   This is a hardware abstraction layer for Arduino IDE so you can target the ESP32 chip. The big advantage is that you can empower your existing knowledge of the Arduino IDE. The downside is that it is not that feature-rich compared to ESP-IDF when it comes to specific ESP32 functionality. And the development pace is slower. And not all features of ESP-IDF have been ported to Arduino.
+
+
+
+It is important to know that both frameworks are stable and usable but they are still under significant development by Espressif, and major new releases are coming out on a regularly basis; I expect this to continue at least until 2018Q4.
+
+After experimenting with both frameworks I decided to go with the ESP-IDF framework, more specifically V3.1 and higher. I always try to release libraries that are compatible with the last stable release.
+
+
+
 ## FAQ
+
 - The ESP32 Starter Kit gets you started quickly. If you need extra features of an existing component, or you wish to propose a new component, then please submit an issue.
 
 - All the MJD components are centralized in the project ```mjd_components```.
@@ -331,7 +331,7 @@ Check Github.
 
 
 ## What Is Next for me
-- Release extra components for Dust particle sensors, TFT Displays and RGB LED matrixes.
+- Release extra components for gas sensors, dust particle sensors, a 4-20mA Current Loop component, TFT Displays and RGB LED matrixes.
 
 - Release extra projects to demonstrate OTA Updates (upgrade the firmware remotely).
 

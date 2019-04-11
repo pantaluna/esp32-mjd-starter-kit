@@ -39,9 +39,10 @@ cd  /c/myiot/esp/${DIR_REPO_NAME}
 git add .
 git commit -m "Updated"
 
+git config credential.helper store
 git push --set-upstream origin master
 
-git tag --annotate v0.82 --message "Second commit"
+git tag --annotate v1.3 --message "Upgraded for ESP-IDF v3.2 of April 2019"
 git push origin --tags
 
 git describe --tags --dirt

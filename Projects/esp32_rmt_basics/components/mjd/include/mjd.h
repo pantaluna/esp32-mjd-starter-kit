@@ -95,8 +95,13 @@ extern "C" {
 int mjd_compare_ints(const void * a, const void * b);
 
 /**********
- * BYTES and BINARY REPRESENTATION
+ * BYTES/WORDS and BINARY REPRESENTATION
  */
+#define MJD_HIBYTE(x) ((uint8_t)((uint16_t)(x) >> 8))
+#define MJD_LOBYTE(x) ((uint8_t)(x))
+#define MJD_HIWORD(x) ((uint16_t)((uint32_t)(x) >> 16))
+#define MJD_LOWORD(x) ((uint16_t)((uint32_t)(x)))
+
 uint8_t mjd_byte_to_bcd(uint8_t val);
 uint8_t mjd_bcd_to_byte(uint8_t val);
 esp_err_t mjd_byte_to_binary_string(uint8_t input_byte, char * output_string);

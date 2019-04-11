@@ -37,6 +37,14 @@ The specific wiring instructions are documented in the  ESP-IDF example project(
 
 
 
+## Pullup Pulldown Resistors
+
+The breakout boards mentioned above contain a 10K pullup resistor for these pins: SCL, SDA, ALR. It is not needed to wire external 10K pullup resistors from the device pins SCL and SDA to the MCU pin VCC (3V), or to enable the MCU's internal pullups for those pins. 
+
+The breakout boards mentioned above contain a 10K pulldown resistor for these pins: ADR.
+
+
+
 ### PIN layout Of the breakout boards
 
 [ Goto the _doc folder for photo's.]
@@ -72,14 +80,6 @@ PIN#  PIN NAME	  Description
 
 
 
-## Pullup Pulldown Resistors
-
-The breakout boards mentioned above contain a 10K pullup resistor for these pins: SCL, SDA, ALR. It is not needed to wire external 10K pullup resistors from the device pins SCL and SDA to the MCU pin VCC (3V), or to enable the MCU's internal pullups for those pins. 
-
-The breakout boards mentioned above contain a 10K pulldown resistor for these pins: ADR.
-
-
-
 ## Device I2C protocol
 
 - The device acts as a slave.
@@ -95,11 +95,19 @@ The breakout boards mentioned above contain a 10K pulldown resistor for these pi
 
 
 
-### I2C and wire length
+### Wire length on the I2C pins SCL and SDA 
 
-- It is important to have stable I2C connections for a breadboard setup: use **good quality breadboards** (many have bad contacts, especially ones that have been used for a while), use ****short good quality Dupont cables**. In my experience a stock Dupont cable of 30cm is too long when using these modules on a breadboards (especially for the SCL and SDA connections). A 5cm Dupont cable always works.
-- It is better to solder everything together on a PCB as soon as possible and use quality wires and the best connectors.
+- It is important to have stable I2C connections for a breadboard setup: use **good quality breadboards** (many have bad contacts, especially ones that have been used for a while), use ****short good quality Dupont cables. In my experience a stock Dupont cable of 30cm is too long when using these modules on a breadboards (especially for the SCL and SDA connections). **A 5cm Dupont cable always works.**
+- It is better to solder everything on a PCB as soon as possible, use quality wires and the best connectors.
 - Guidelines "Topic: I2C flakiness:  best strategy to identify and fix?" https://forum.arduino.cc/index.php?topic=509323.0
+
+
+
+### Wire length on the Ax analog input pins
+
+- Using **a 5 meter copper wire (22 AWG)** for the analog pin did not affect the voltage readings. Longer wires might.
+- For longer lengths adding a small 750 Ohm resistor in series with the input pin helps to reduce bandwidth noise.
+- For extreme long length it is advised to convert the voltage output of the device to a current output.
 
 
 
@@ -120,9 +128,10 @@ The breakout boards mentioned above contain a 10K pulldown resistor for these pi
 - Check **the data sheet ** for detailed information.
 - Check **the example projects** for practical information.
 - Check **the documented sources of this component** for detailed information.
-- The IC can only process analog input voltages in the range of GND–0.3 V ... VCC + 0.3 V. Note that VCC is 3.3V for an ESP32.
+- The IC can only process **analog input voltages in the range of GND–0.3 V ... VCC + 0.3 V**. Note that VCC is 3.3V for an ESP32. Else you might fry the device.
 - The **sampling frequency** is 250 kHz.
 - The component implements the full range of up to 4 **Single Ended Input Signals**  or up to 2 **Differential Input Signals**. The input multiplexer is used to declare which one, and what type of, input signal you want to process (this settings can be changed anytime). The **default Input Multiplexer in the component** is set to "0_GND" and this means one single-ended input signal on pin A0 which is compared to GND. You can change this when configuring the component. Check out the functions ```mjd_ads1115_init()``` and ```mjd_ads1115_set_mux()```.
+- The device can read bipolar differential signals but it **cannot process negative voltages on either input signal**.
 - The **default Programmable Gain Amplifier** in the component is set to 4.096V and this covers the max voltage of 3.3V (see earlier). You can change this when configuring the component. Check out the functions ```mjd_ads1115_init()``` and ```mjd_ads1115_set_pga()```.
 - The **default Output Data Rate** in the component is set to 8 Samples Per Second (#samples per second range 8 .. 860). You can change this when configuring the component. Check out the functions ```mjd_ads1115_init()``` and ```mjd_ads1115_set_data_rate()```. The **conversion time** is related to the samples per second setting (1/X).  The **amount of noise** is relative to the Output Data Rate setting.
 - The use of **the ALERT/READY pin** is optional. If it is enabled and wired up then that pin is monitored to determine that a measurement is ready to be read. If it is not enabled then the component uses a calculated delay (based on Data Rate Samples Per Second) before reading the measurement.

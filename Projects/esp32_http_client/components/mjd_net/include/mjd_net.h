@@ -16,8 +16,8 @@ extern "C" {
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
 
-#include "apps/sntp/sntp.h"      // ESP-IDF  < V3.2 Component: lwip - App: sntp
-/////#include "lwip/apps/sntp.h" // ESP-IDF >= V3.2 Component: lwip - App: sntp
+////#include "apps/sntp/sntp.h"      // ESP-IDF  < V3.2 Component: lwip - App: sntp
+#include "lwip/apps/sntp.h" // ESP-IDF >= V3.2 Component: lwip - App: sntp
 
 /**********
  * Network helpers

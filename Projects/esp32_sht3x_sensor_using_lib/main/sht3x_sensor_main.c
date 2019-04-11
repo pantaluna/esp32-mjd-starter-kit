@@ -40,7 +40,7 @@ void peripheral_task(void *pvParameter) {
     esp_err_t f_retval;
 
     mjd_led_config_t led_config =
-        { 0 };
+                { 0 };
     led_config.gpio_num = MY_LED_ON_DEVBOARD_GPIO_NUM; // (Huzzah32 #13) (Lolin32lite #22)
     led_config.wiring_type = MY_LED_ON_DEVBOARD_WIRING_TYPE; // (Huzzah32 1=GND) (Lolin32lite 2=VCC)
     mjd_led_config(&led_config);
@@ -51,8 +51,7 @@ void peripheral_task(void *pvParameter) {
     ESP_LOGI(TAG, "do mjd_sht3x_init()");
 
     // @important Do not use ={} or ={0}
-    mjd_sht3x_config_t sht3x_config =
-    MJD_SHT3X_CONFIG_DEFAULT() ;
+    mjd_sht3x_config_t sht3x_config = MJD_SHT3X_CONFIG_DEFAULT();
 
         sht3x_config.i2c_slave_addr = MY_SHT3X_I2C_SLAVE_ADDRESS;
         sht3x_config.i2c_port_num = MY_SHT3X_I2C_MASTER_PORT_NUM;
@@ -76,12 +75,13 @@ void peripheral_task(void *pvParameter) {
             /*
              * LOOP
              */
-            mjd_sht3x_data_t sht3x_data =
-            {   0};
+            mjd_sht3x_data_t sht3x_data = {0};
             uint32_t nbr_of_errors = 0;
-            double sum_rh = 0,
-    min_rh = FLT_MAX, max_rh = FLT_MIN;
-    double sum_tc = 0, min_tc = FLT_MAX, max_tc = FLT_MIN;
+            double sum_rh = 0;
+            double min_rh = FLT_MAX;
+            double max_rh = FLT_MIN;
+            double sum_tc = 0,
+    min_tc = FLT_MAX, max_tc = FLT_MIN;
     double sum_tf = 0, min_tf = FLT_MAX, max_tf = FLT_MIN;
     double sum_dpc = 0, min_dpc = FLT_MAX, max_dpc = FLT_MIN;
     mjd_log_time();
@@ -97,7 +97,8 @@ void peripheral_task(void *pvParameter) {
         if (f_retval != ESP_OK) {
             mjd_led_mark_error(MY_LED_ON_DEVBOARD_GPIO_NUM);
             ++nbr_of_errors;
-            ESP_LOGE(TAG, "%s(). Cannot get single measurement | err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+            ESP_LOGE(TAG, "%s(). Cannot get single measurement | err %i (%s)", __FUNCTION__, f_retval,
+                    esp_err_to_name(f_retval));
             // CONTINUE
             continue;
         }
@@ -199,7 +200,8 @@ void app_main() {
     /*
      * Sensor Task
      */
-    xReturned = xTaskCreatePinnedToCore(&peripheral_task, "peripheral_task (name)", MYAPP_RTOS_TASK_STACK_SIZE_8K, NULL, RTOS_TASK_PRIORITY_NORMAL,
+    xReturned = xTaskCreatePinnedToCore(&peripheral_task, "peripheral_task (name)", MYAPP_RTOS_TASK_STACK_SIZE_8K, NULL,
+    RTOS_TASK_PRIORITY_NORMAL,
     NULL,
     APP_CPU_NUM);
     if (xReturned == pdPASS) {

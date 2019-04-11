@@ -15,14 +15,14 @@ static const char TAG[] = "mjd_hcsr501";
 /*
  * INTERRUPT
  */
-static SemaphoreHandle_t static_hcsr501_config_gpio_isr_mux;
+static SemaphoreHandle_t _hcsr501_config_gpio_isr_mux;
 
 void IRAM_ATTR sensor_gpio_isr_handler(void* arg) {
     // @param pxHigherPriorityTaskWoken to pdTRUE if giving the semaphore caused a task to unblock, and the unblocked task has a priority higher than the currently running task.
     //        If xSemaphoreGiveFromISR() sets this value to pdTRUE then a context switch should be requested before the interrupt is exited.
     //        portYIELD_FROM_ISR() wakes up the imu_task immediately (instead of on next FreeRTOS tick).
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xSemaphoreGiveFromISR(static_hcsr501_config_gpio_isr_mux, &xHigherPriorityTaskWoken);
+    xSemaphoreGiveFromISR(_hcsr501_config_gpio_isr_mux, &xHigherPriorityTaskWoken);
     if (xHigherPriorityTaskWoken == pdTRUE) {
         portYIELD_FROM_ISR();
     }
@@ -46,8 +46,8 @@ esp_err_t mjd_hcsr501_init(mjd_hcsr501_config_t* param_ptr_config) {
         goto cleanup;
     }
 
-    // WAIT 60 seconds so the PIR Sensor can calibrate itself!
-    // @todo Production: increase it to 60 seconds
+    // WAIT 5 seconds so the PIR Sensor can calibrate itself!
+    // todo Production: increase it to 60 seconds
     vTaskDelay(RTOS_DELAY_5SEC);
 
     // Semaphore
@@ -62,13 +62,14 @@ esp_err_t mjd_hcsr501_init(mjd_hcsr501_config_t* param_ptr_config) {
         // GOTO
         goto cleanup;
     }
-    static_hcsr501_config_gpio_isr_mux = param_ptr_config->gpio_isr_mux;
+    _hcsr501_config_gpio_isr_mux = param_ptr_config->gpio_isr_mux;
 
     // GPIO
+    //   @doc GPIO_INTR_POSEDGE = GPIO interrupt type: rising edge (LOW->HIGH)
     gpio_config_t io_conf = { 0 };
     io_conf.pin_bit_mask = (1ULL << param_ptr_config->data_gpio_num);
     io_conf.mode = GPIO_MODE_INPUT;
-    io_conf.pull_up_en = GPIO_PULLUP_ENABLE; // @important
+    io_conf.pull_up_en = GPIO_PULLUP_ENABLE; // @important HC-SR501 data pin
     io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
     io_conf.intr_type = GPIO_INTR_POSEDGE; // @validvalues GPIO_INTR_DISABLE GPIO_INTR_ANYEDGE GPIO_INTR_NEGEDGE GPIO_INTR_POSEDGE
     f_retval = gpio_config(&io_conf);
@@ -126,7 +127,7 @@ esp_err_t mjd_hcsr501_deinit(mjd_hcsr501_config_t* param_ptr_config) {
 
     // SEMAPHORE
     param_ptr_config->gpio_isr_mux = NULL;
-    static_hcsr501_config_gpio_isr_mux = param_ptr_config->gpio_isr_mux;
+    _hcsr501_config_gpio_isr_mux = param_ptr_config->gpio_isr_mux;
 
     // Mark OK
     param_ptr_config->is_init = false;

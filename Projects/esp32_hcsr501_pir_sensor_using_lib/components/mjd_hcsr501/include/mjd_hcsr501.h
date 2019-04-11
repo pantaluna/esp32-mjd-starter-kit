@@ -12,8 +12,8 @@ extern "C" {
  * Data structs
  */
 typedef struct {
-    gpio_num_t data_gpio_num;
     bool is_init;
+    gpio_num_t data_gpio_num;
     SemaphoreHandle_t gpio_isr_mux;
 } mjd_hcsr501_config_t;
 

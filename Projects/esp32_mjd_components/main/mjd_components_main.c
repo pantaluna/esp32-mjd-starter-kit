@@ -131,15 +131,15 @@ void main_task(void *pvParameter) {
      * printf formats
      */
     ESP_LOGI(TAG, "\nprintf size_t values using format specifier %%zu:");
-    uint8_t buf123[123];
-    ESP_LOGI(TAG, "  buf123[123] : sizeof(buf123)=%zu", sizeof(buf123));
+    uint8_t buf_printf[123];
+    ESP_LOGI(TAG, "  uint8_t buf_printf[123] : sizeof(buf_printf)=%zu", sizeof(buf_printf));
 
     /*
      * BYTES/WORDS and BINARY REPRESENTATION
      */
     ESP_LOGI(TAG, "\nMJD_HIBYTE(word) and MJD_LOBYTE(word):");
-    ESP_LOGI(TAG, "  (uint8_t)0xFFFF:  sizeof=%u", sizeof((uint8_t)0xFFFF));
-    ESP_LOGI(TAG, "  (uint16_t)0xFFFF: sizeof=%u", sizeof((uint16_t)0xFFFF));
+    ESP_LOGI(TAG, "  (uint8_t)0xFFFF : sizeof=%u", sizeof((uint8_t )0xFFFF));
+    ESP_LOGI(TAG, "  (uint16_t)0xFFFF: sizeof=%u", sizeof((uint16_t )0xFFFF));
     ESP_LOGI(TAG, "  MJD_HIBYTE(0xFFEE): 0x%X (sizeof=%u)", MJD_HIBYTE(0xFFEE), sizeof(MJD_HIBYTE(0xFFEE)));
     ESP_LOGI(TAG, "  MJD_LOBYTE(0xFFEE): 0x%X (sizeof=%u)", MJD_LOBYTE(0xFFEE), sizeof(MJD_LOBYTE(0xFFEE)));
     ESP_LOGI(TAG, "  MJD_HIBYTE(0x0000): 0x%X (sizeof=%u)", MJD_HIBYTE(0x0000), sizeof(MJD_HIBYTE(0x0000)));
@@ -184,7 +184,8 @@ void main_task(void *pvParameter) {
     if (mjd_byte_to_binary_string(input_value_uint8, small_output_string) == ESP_OK) {
         ESP_LOGI(TAG, "OK for value: %3u - bin string 0b%s", input_value_uint8, small_output_string);
     } else {
-        ESP_LOGE(TAG, "***EXPECTED ERROR*** (target string too small, left untouched) value: %3u - bin string 0b%s\n", input_value_uint8,
+        ESP_LOGE(TAG, "***EXPECTED ERROR*** (target string too small, left untouched) value: %3u - bin string 0b%s\n",
+                input_value_uint8,
                 small_output_string);
     }
 
@@ -258,7 +259,7 @@ void main_task(void *pvParameter) {
 
     ESP_LOGI(TAG, "mjd_uint8s_to_hexstring():");
     uint8_t input_uint8s[] =
-        { 0x00, 0x01, 0x0E, 0x0F, 0xF0, 0xF1, 0xFE, 0xFF };
+                { 0x00, 0x01, 0x0E, 0x0F, 0xF0, 0xF1, 0xFE, 0xFF };
     strcpy(hex_string, "");
     if (mjd_uint8s_to_hexstring(input_uint8s, ARRAY_SIZE(input_uint8s), hex_string) == ESP_OK) {
         ESP_LOGI(TAG, "    => input_uint8s[%u]:", ARRAY_SIZE(input_uint8s));
@@ -272,10 +273,10 @@ void main_task(void *pvParameter) {
 
     ESP_LOGI(TAG, "mjd_hexstring_to_uint8s():");
     uint8_t output_uint8s[] =
-        { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+                { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
     if (mjd_hexstring_to_uint8s(hex_string, strlen(hex_string), output_uint8s) == ESP_OK) {
         ESP_LOGI(TAG, "    => hex_string: %s", hex_string);
-        ESP_LOGI(TAG, "    => output_uint8s[%u]:", strlen(hex_string) / 2);
+        ESP_LOGI(TAG, "    <= output_uint8s[%u]:", strlen(hex_string) / 2);
         for (uint32_t i = 0; i < strlen(hex_string) / 2; ++i) {
             ESP_LOGI(TAG, "        idx %5i: %3u (0x%02X)", i, output_uint8s[i], output_uint8s[i]);
         }
@@ -495,53 +496,79 @@ void main_task(void *pvParameter) {
     ESP_LOGV(TAG, "This is a  VERBOSE log message");
 
     uint8_t bin_data[] =
-        {
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-                7,
-                8,
-                9,
-                0,
-                '\r',
-                '\n',
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                '0',
-                '\r',
-                '\n',
-                'a',
-                'b',
-                'c',
-                'd',
-                'e',
-                'f',
-                'g',
-                'h',
-                '\r',
-                '\n',
-                'A',
-                'B',
-                'C',
-                'D',
-                'E',
-                'F',
-                'G',
-                'H',
-                '\r',
-                '\n' };
+                {
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        0,
+                        '\r',
+                        '\n',
+                        '1',
+                        '2',
+                        '3',
+                        '4',
+                        '5',
+                        '6',
+                        '7',
+                        '8',
+                        '9',
+                        '0',
+                        '\r',
+                        '\n',
+                        'a',
+                        'b',
+                        'c',
+                        'd',
+                        'e',
+                        'f',
+                        'g',
+                        'h',
+                        '\r',
+                        '\n',
+                        'A',
+                        'B',
+                        'C',
+                        'D',
+                        'E',
+                        'F',
+                        'G',
+                        'H',
+                        '\r',
+                        '\n' };
     uint8_t ascii_data[] =
-        { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' };
+                {
+                        '1',
+                        '2',
+                        '3',
+                        '4',
+                        '5',
+                        '6',
+                        '7',
+                        '8',
+                        '9',
+                        '0',
+                        'a',
+                        'b',
+                        'c',
+                        'd',
+                        'e',
+                        'f',
+                        'g',
+                        'h',
+                        'A',
+                        'B',
+                        'C',
+                        'D',
+                        'E',
+                        'F',
+                        'G',
+                        'H' };
 
     ESP_LOGI(TAG, "\nESP_LOG_BUFFER_HEXDUMP(): bin_data");
     ESP_LOG_BUFFER_HEXDUMP(TAG, bin_data, ARRAY_SIZE(bin_data), ESP_LOG_INFO);
@@ -634,7 +661,8 @@ void main_task(void *pvParameter) {
     cJSON_AddNumberToObject(cjsonMeasurements, "valueFloatOneDigitBeforeAfterDecimalPoint", 1.5);
     cJSON_AddNumberToObject(cjsonMeasurements, "valueDoubleNineDigitsBeforeAfterDecimalPoint", (double) 123456789.123456789);
     cJSON_AddNumberToObject(cjsonMeasurements, "valueDoubleEighteenDigits", (double) 123456789123456789);
-    cJSON_AddNumberToObject(cjsonMeasurements, "valueDoubleEighteenDigitsBeforeAfterDecimalPoint", (double) 123456789123456789.123456789123456789);
+    cJSON_AddNumberToObject(cjsonMeasurements, "valueDoubleEighteenDigitsBeforeAfterDecimalPoint",
+            (double) 123456789123456789.123456789123456789);
 
     cJSON_PrintPreallocated(cjsonRoot, ptr_json_string, LEN_JSON_STRING, MJD_CJSON_PRINT_UNFORMATTED);
     if (ptr_json_string == NULL) {
@@ -688,7 +716,7 @@ void main_task(void *pvParameter) {
     ESP_LOGI(TAG, "OK status value is \"ok\"");
 
     // LABEL
-    example3_cleanup:;
+    example3_cleanup: ;
 
     cJSON_Delete(json_response);
 
@@ -723,7 +751,8 @@ void main_task(void *pvParameter) {
     ESP_LOGI(TAG, "mbedtls_base64_encode()");
     ESP_LOGI(TAG, "  sstring_one (len %3u): %s", strlen(sstring_one), sstring_one);
 
-    mbedtls_retval = mbedtls_base64_encode(ustring_two, sizeof(ustring_two), &base64_bytes_written, (unsigned char *) sstring_one,
+    mbedtls_retval = mbedtls_base64_encode(ustring_two, sizeof(ustring_two), &base64_bytes_written,
+            (unsigned char *) sstring_one,
             strlen(sstring_one));
     if (mbedtls_retval != 0) {
         ESP_LOGE(TAG, "  mbedtls_base64_encode() failed err %i", mbedtls_retval);
@@ -744,7 +773,7 @@ void main_task(void *pvParameter) {
     mjd_log_memory_statistics();
 
     mjd_led_config_t led_config =
-        { 0 };
+                { 0 };
     led_config.gpio_num = MY_LED_ON_DEVBOARD_GPIO_NUM;
     led_config.wiring_type = MY_LED_ON_DEVBOARD_WIRING_TYPE; // 1 GND MCU Huzzah32 | 2 VCC MCU Lolin32lite
     mjd_led_config(&led_config);
@@ -775,7 +804,8 @@ void main_task(void *pvParameter) {
 
     mjd_log_memory_statistics();
 
-    ESP_LOGI(TAG, "  mjd_wifi_reason_to_msg() reason: %d (msg %s)", WIFI_REASON_UNSPECIFIED, mjd_wifi_reason_to_msg(WIFI_REASON_UNSPECIFIED));
+    ESP_LOGI(TAG, "  mjd_wifi_reason_to_msg() reason: %d (msg %s)", WIFI_REASON_UNSPECIFIED,
+            mjd_wifi_reason_to_msg(WIFI_REASON_UNSPECIFIED));
     ESP_LOGI(TAG, "  mjd_wifi_reason_to_msg() reason: %d (msg %s)", WIFI_REASON_HANDSHAKE_TIMEOUT,
             mjd_wifi_reason_to_msg(WIFI_REASON_HANDSHAKE_TIMEOUT));
 
@@ -842,7 +872,8 @@ void main_task(void *pvParameter) {
 
         ESP_LOGI(TAG, "Helper: Get Station info (Device, connected Access Point) - mjd_wifi_sta_get_info()");
         //   @purpose Use it in my project meteohub to upload this device data
-        mjd_wifi_sta_info_t mjd_wifi_sta_info = { 0 };
+        mjd_wifi_sta_info_t mjd_wifi_sta_info =
+                    { 0 };
         mjd_wifi_sta_get_info(&mjd_wifi_sta_info);
 
         //
@@ -868,9 +899,7 @@ void main_task(void *pvParameter) {
         }
         ESP_LOGI(TAG, "  hostname %s => IPv4 address %s", str_hostname, str_ip_address);
 
-
         mjd_log_memory_statistics();
-
 
         // ***Disconnect
         f_retval = mjd_wifi_sta_disconnect_stop();
@@ -1083,7 +1112,6 @@ void app_main() {
     MYAPP_RTOS_TASK_PRIORITY_NORMAL, NULL,
     APP_CPU_NUM);
     if (xReturned == pdPASS) {
-
         ESP_LOGI(TAG, "OK Task has been created, and is running right now");
     }
 

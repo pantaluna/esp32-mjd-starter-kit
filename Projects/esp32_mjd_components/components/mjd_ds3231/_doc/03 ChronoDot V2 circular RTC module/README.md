@@ -51,7 +51,12 @@ http://docs.macetech.com/doku.php/chronodot_v2.0
 
 https://www.maximintegrated.com/en/products/digital/real-time-clocks/DS3231.html
 
+## SOP: setup the ChronoDot board as an external oscillator 32Khz for the ESP32
+
+Goto document "Setup as external oscillator 32Khz for the ESP32.md"
+
 ## FAQ
+
 - OK 3.3V - 5V.
 - The battery holder is designed for a CR1220 3V lithium coin cell.
 - Accuracy: 1 second.
