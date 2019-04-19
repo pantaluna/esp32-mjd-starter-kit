@@ -5,6 +5,7 @@ C:\myiot\esp32-mjd-starter-kit
 ***SPECIAL*** This is in another parent directory than the usual ESP32 projects!
 --------------------------------------------------------------------------------
 
+
 ***SPECIAL*** SOP: 1. Clean projects.
 -------------------------------------
 @important First clean the Eclipse projects
@@ -13,11 +14,13 @@ C:\myiot\esp32-mjd-starter-kit
 cd /c/myiot/esp/
 ./clean-all.sh
 
-***SPECIAL*** SOP:  Manually copy the artifacts in this super repository
+
+***SPECIAL*** SOP:  Manually COPY the artifacts in this super repository
 ----------------------------------------------
 @important Not my private projects!
 
 Windows Explorer: copy paste folders.
+
 
 **SPECIAL*** SOP Remove ./.git/* - ./build/* - ./.settings/* - .gitignore - .cproject - .project - sdkconfig - sdkconfig.old  from embedded Projects except from the main repository!
 ------------------------------------------------------------------------------------------------------------
@@ -72,12 +75,12 @@ SOP Upload source updates to GitHub
 DIR_REPO_NAME=esp32-mjd-starter-kit
 cd  /c/myiot/${DIR_REPO_NAME}
 git add .
-git commit -m "Upgraded for ESP-IDF v3.2 of April 2019"
+git commit -m "New components and projects"
 
 git config credential.helper store
 git push --set-upstream origin master
 
-git tag --annotate v1.3 --message "Upgraded for ESP-IDF v3.2 of April 2019"
+git tag --annotate v1.4 --message "Added components and projects for the Sensirion SCD30 CO2 RH/T sensor and SSD1306 OLED Displays"
 git push origin --tags
 
 git describe --tags --dirt

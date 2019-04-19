@@ -1,0 +1,89 @@
+menu "MY PROJECT configuration"
+
+###
+### SCD30 CALIBRATION
+choice MY_SCD30_CALIBRATION_C
+   bool "SCD30 Commands"
+   default MY_SCD30_CALIBRATION_COMMAND_SHOW_SETTINGS
+   help
+       Specify the calibration mode for the sensor, or request to show the settings.
+       Go to the README of the mjd_scd30 component for more information.
+
+config MY_SCD30_CALIBRATION_COMMAND_SHOW_SETTINGS
+   bool "Show the settings of the device"
+config MY_SCD30_CALIBRATION_COMMAND_ASC_ON
+   bool "Set ASC=On Activate continuous calculation of reference value for Automatic Self-Calibration"
+config MY_SCD30_CALIBRATION_COMMAND_ASC_OFF
+   bool "Set ASC=Off Deactivate continuous calculation of reference value for Automatic Self-Calibration"
+config MY_SCD30_CALIBRATION_COMMAND_FRC
+   bool "Run a FRC Forced ReCalibration in fresh air (400ppm)"
+endchoice
+
+config MY_SCD30_CALIBRATION_COMMAND
+    int
+    default 1 if MY_SCD30_CALIBRATION_COMMAND_SHOW_SETTINGS
+    default 2 if MY_SCD30_CALIBRATION_COMMAND_ASC_ON
+    default 3 if MY_SCD30_CALIBRATION_COMMAND_ASC_OFF
+    default 4 if MY_SCD30_CALIBRATION_COMMAND_FRC
+
+
+###
+### SCD30
+config MY_SCD30_I2C_SLAVE_ADDRESS
+    hex "MY_SCD30_I2C_SLAVE_ADDRESS (Default 0x61 for SCD30)"
+    default 0x61
+
+config MY_SCD30_I2C_MASTER_PORT_NUM
+    int "MY_SCD30_I2C_MASTER_PORT_NUM (default 1; 0=I2C_NUM_0 | 1=I2C_NUM_1)"
+    default 1
+
+config MY_SCD30_I2C_SCL_GPIO_NUM
+    int "MY_SCD30_I2C_SCL_GPIO_NUM (Huzzah32 #21=bottomleft)"
+    default 21
+
+config MY_SCD30_I2C_SDA_GPIO_NUM
+    int "MY_SCD30_I2C_SDA_GPIO_NUM (Huzzah32 #17=bottomleft-1)"
+    default 17
+
+##
+## OLED
+choice MY_SSD1306_OLED_ENABLED
+    prompt "OLED Display enabled? [default Yes]"
+    default MY_SSD1306_OLED_ENABLED_YES
+config MY_SSD1306_OLED_ENABLED_YES
+    bool "Yes"
+config MY_SSD1306_OLED_ENABLED_NO
+    bool "No"
+endchoice
+config MY_SSD1306_OLED_ENABLED
+    int
+    default 1 if MY_SSD1306_OLED_ENABLED_YES
+    default 0 if MY_SSD1306_OLED_ENABLED_NO
+
+config MY_SSD1306_I2C_SLAVE_ADDRESS
+    hex "MY_SSD1306_I2C_SLAVE_ADDRESS (Default 0x3C for SSD1306)"
+    default 0x3C
+
+config MY_SSD1306_I2C_MASTER_PORT_NUM
+    int "MY_SSD1306_I2C_MASTER_PORT_NUM (default 0; 0=I2C_NUM_0 | 1=I2C_NUM_1)"
+    default 0
+
+config MY_SSD1306_I2C_SCL_GPIO_NUM
+    int "MY_SSD1306_I2C_SCL_GPIO_NUM (Huzzah32 #23=bottomright)"
+    default 23
+
+config MY_SSD1306_I2C_SDA_GPIO_NUM
+    int "MY_SSD1306_I2C_SDA_GPIO_NUM (Huzzah32 #22=bottomright-1)"
+    default 22
+
+##
+## LED On-board
+config MY_LED_ON_DEVBOARD_GPIO_NUM
+    int "On-board LED GPIO# (Huzzah32 #13) (Lolin32lite #22)"
+    default 13
+
+config MY_LED_ON_DEVBOARD_WIRING_TYPE
+    int "On-board LED wiring type (Huzzah32 1=GND) (Lolin32lite 2=VCC)"
+    default 1
+
+endmenu

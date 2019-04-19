@@ -128,7 +128,10 @@ Let's highlight a few projects that demonstrate how to use the extra components 
 - `esp32_lorabee_using_pc_usbuart` This project demonstrates how to issue basic commands to the LoraBee module using a Windows PC and a USB-UART board (such as an FTDI). This is an easy way to get familiar with the features of the LoraBee / Microchip RN2843A board.
 - `esp32_mlx90393_using_lib` How to get magnetic field data using the Melexis MLX90393 magnetic field sensor.
 - `esp32_neom8n_gps_using_lib` How to get GPS data from the GPS Ublox NEO-M8N module.
+- ```esp32_scd30_sensor_settings_using_lib``` This project for the Sensirion SCD30 CO2 and RH/T Sensor Module is used to verify that the sensor is working properly, to show all the settings** of the sensor and to run the various calibration modes.
+- ```esp32_scd30_sensor_readings_using_lib``` This project for the Sensirion SCD30 CO2 and RH/T Sensor Module reads continuously the CO2 measurement, the related and derived measurements and the air quality index.
 - ```esp32_sht3x_sensor_using_lib``` This project demonstrates the components mjd_sht3x. The mjd_sht3x component for the Sensirion SHT3x Digital Humidity and Temperature Sensor is used configure the device and collect its output metrics (temperature C F, relative humidity % and alos the dew point C F.
+- ```esp32_ssd1306_oled_using_lib``` This project for the popular 128x32 and 128x64 OLED Displays based on the SSD1306 OLED Driver IC demonstrates the component mjd_ssd1306 to show text on an OLED display.
 - ```esp32_tmp36_sensor_ads1115_adc_using_lib``` This project demonstrates the components mjd_ads1115 and mjd_tmp36. The mjd_ads1115 component for the TI ADS1115 Analog-To-Digital-Convertor is used to read the voltage output of the analog temperature sensor. The mjd_tmp36 component for the TMP36 sensor is used to convert the raw voltage reading of the ADC to the ambient temperature in Degrees Celsius transparently.
 - `esp32_wifi_device_scanner` How to scan all Wifi channels and discover the devices.
 - `esp32_wifi_ssid_cloner` How to clone existing Access Points.
@@ -181,7 +184,9 @@ This is the list of new components:
 - ```mjd_nanopb``` Component to work with Google Protocol Buffers. It includes the common C files of the Nanopb library v0.3.9.2. It also declares Nanopb specific project-wide compilation directives (-D) in Makefile.projbuild
 - `mjd_net` Component to facilitate various networking features (getting IP address, DNS resolve hostnames, etc.). 
 - `mjd_neom8n` Component for the GPS u-blox NEO-M8N module.
+- `mjd_scd30` Component for the Sensirion SCD30 CO2 and RH/T Sensor Module.
 - ```mjd_sht3x``` Component for the Sensirion SHT3x Digital Humidity and Temperature Sensor.
+- `mjd_ssd1306` Component for the popular 128x32 and 128x64 OLED displays which are based on the SSD1306 OLED Driver IC.
 - ```mjd_tmp36``` Component for the TMP36 Analog Temperature Sensor from Analog Devices. To be used together with an ADC.
 - `mjd_wifi` Component to facilitate, as a Wifi Station, a connection to a Wifi Access Point.
 
@@ -218,10 +223,16 @@ Let's categorize these components in more detail:
 
 #### ESP32 Peripherals - Devices
 - ADC TI ADS1115 16-bit.
+- BH1750FVI light intensity sensor.
 - GPS u-blox NEO-M8N module.
 - Real Time Clock DS1302 ZS-042.
 
+#### ESP32 Peripherals - Displays
+
+* 128x32 128x64 OLED Displays based on the SSD1306 IC.
+
 #### ESP32 Peripherals - RGB LED's
+
 This component supports several RGB LED packages. It comes with the essential documentation such as data sheets, schematics, and instructions on how to wire them to your development board and eventually an extra power supply.
 
 - RGB LED packages such as the WS2812, WS2812B, WS2813xs chips from the manufacturer Worldsemi http://www.world-semi.com/solution/list-4-1.html 
@@ -238,7 +249,9 @@ These components come with the essential documentation such as data sheets, sche
 - BMP280 meteo sensor by Bosch.
 - HC-SR501 PIR motion sensor.
 - KY-032 Infrared obstacle avoidance sensor.
-- SHT3x digital humidity and temperature sensor by Sensirion.
+- Melexis MLX90393 Triaxis magnetic field sensor.
+- Sensirion SHT3x digital humidity and temperature sensor.
+- Sensirion SCD30 CO2 and RH/T sensor.
 - TMP36 analog temperature sensor by Analog Devices.
 
 
@@ -256,23 +269,14 @@ These components come with the essential documentation such as data sheets, sche
 ### Then start using this Starter Kit
 
 Procedure:
-1. A working installation of the Espressif **ESP-IDF V3.1.1** development framework (instructions @ http://esp-idf.readthedocs.io/en/latest/get-started/index.html).
-   @important Make sure to clone **the version v3.1.1** of the framework when following the Espressif Getting Started instructions e.g. `git clone -b v3.1.1 --recursive https://github.com/espressif/esp-idf.git esp-idf`
-
+1. Check the earlier section "HW SW requirements of the ESP32 MJD Starter Kit".
 2. A C language editor such as Notepad++ or the Eclipse IDE CDT (instructions @ http://esp-idf.readthedocs.io/en/latest/get-started/index.html).
-
 3. Clone this Github repository. `git clone https://github.com/pantaluna/esp32-mjd-starter-kit.git`
-
 4. Read the documentation about development boards, USB to TTL boards, batteries, etc.
-
 5. `cd` into the directory of the project you want to explore under `./projects`.
-
 6. Read the instructions in the README for the hardware, wiring, and software setup.
-
 7. Read the instructions in the README of all the extra components that are used in this project in the ./components directory. Remember that the wiring instructions are always documented in the component's directory ./_doc/ (not in the project directory). The documentation typically documents the wiring for the Adafruit HUZZAH32 (a good ESP32 development board) and that info can easily be extrapolated to other ESP32 dev boards.
-
 8. Run `make menuconfig` to modify the settings of the project that you want to run (e.g. GPIO PIN#, WiFi credentials, ...).
-
 9. Run `make flash monitor` to build and upload the example to your dev board and monitor the execution via the serial terminal.
 
 

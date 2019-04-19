@@ -8,8 +8,6 @@
 extern "C" {
 #endif
 
-
-
 // Includes
 #include "esp_mqtt.h"
 
@@ -35,8 +33,6 @@ esp_err_t mjd_mqtt_init(size_t buffer_size, int command_timeout);
 esp_err_t mjd_mqtt_start(const char *host, const char *port, const char *client_id, const char *username, const char *password);
 esp_err_t mjd_mqtt_publish(const char *topic, uint8_t *payload, size_t len, int qos, bool retained);
 esp_err_t mjd_mqtt_stop();
-
-
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,17 @@
 menu "MY PROJECT configuration"
 
+##
+## WIFI
+config MY_WIFI_SSID
+    string "MY_WIFI_SSID"
+    default "AREA51"
+
+config MY_WIFI_PASSWORD
+    string "MY_WIFI_PASSWORD"
+    default "jupijupi"    
+
+##
+## LED On-board
 choice MY_LED_ON_DEVBOARD_GPIO_NUM
     prompt "On-board LED GPIO#"
     default MY_LED_ON_DEVBOARD_GPIO_NUM_HUZZAH32_13
@@ -37,13 +49,5 @@ config MY_LED_ON_DEVBOARD_WIRING_TYPE
     default 1 if MY_LED_ON_DEVBOARD_WIRING_TYPE_HUZZAH32_GND_1
     default 2 if MY_LED_ON_DEVBOARD_WIRING_TYPE_LOLIN32LITE_VCC_2
 
-
-config MY_WIFI_SSID
-    string "MY_WIFI_SSID"
-    default "AREA51"
-
-config MY_WIFI_PASSWORD
-    string "MY_WIFI_PASSWORD"
-    default "jupijupi"    
 
 endmenu

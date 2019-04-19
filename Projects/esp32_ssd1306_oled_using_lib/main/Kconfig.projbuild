@@ -1,0 +1,31 @@
+menu "MY PROJECT configuration"
+
+##
+## OLED SSD1306
+config MY_SSD1306_I2C_SLAVE_ADDRESS
+    hex "MY_SSD1306_I2C_SLAVE_ADDRESS (Default 0x3C for SSD1306)"
+    default 0x3C
+
+config MY_SSD1306_I2C_MASTER_PORT_NUM
+    int "MY_SSD1306_I2C_MASTER_PORT_NUM (0 = I2C_NUM_0 | 1 = I2C_NUM_1)"
+    default 0
+
+config MY_SSD1306_I2C_SCL_GPIO_NUM
+    int "MY_SSD1306_I2C_SCL_GPIO_NUM (Huzzah32 #21=bottomleft)"
+    default 21
+
+config MY_SSD1306_I2C_SDA_GPIO_NUM
+    int "MY_SSD1306_I2C_SDA_GPIO_NUM (Huzzah32 #17=bottomleft-1)"
+    default 17
+
+##
+## LED on-board
+config MY_LED_ON_DEVBOARD_GPIO_NUM
+    int "LED on-board GPIO# (Huzzah32 #13) (Lolin32lite #22)"
+	default 13
+
+config MY_LED_ON_DEVBOARD_WIRING_TYPE
+    int "LED on-board wiring type (Huzzah32 1=GND) (Lolin32lite 2=VCC)"
+	default 1
+
+endmenu

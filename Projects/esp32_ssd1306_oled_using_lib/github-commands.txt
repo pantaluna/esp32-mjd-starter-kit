@@ -1,0 +1,53 @@
+https://github.com/pantaluna/esp32_ssd1306_oled_using_lib
+
+C:\myiot\esp\esp32_ssd1306_oled_using_lib
+
+
+SOP Upload new repo to GitHub
+-----------------------------
+
+1. BROWSER: create GitHub public repo at Github.com
+
+2 MSYS2: git
+```
+DIR_REPO_NAME=esp32_ssd1306_oled_using_lib
+cd  /c/myiot/esp/${DIR_REPO_NAME}
+pwd
+git init
+git add .
+git commit -m "First commit"
+git remote add origin https://github.com/pantaluna/${DIR_REPO_NAME}.git
+
+git config credential.helper store
+git push --set-upstream origin master
+
+git remote show origin
+
+git tag --annotate v1.0 --message "First release"
+git push origin --tags
+
+git describe --tags --dirt
+git rev-parse --short HEAD
+git rev-parse HEAD
+git status
+```
+
+*NOTUSEDYET* SOP Upload source updates to GitHub
+-----------------------------------
+```
+DIR_REPO_NAME=esp32_ssd1306_oled_using_lib
+cd  /c/myiot/esp/${DIR_REPO_NAME}
+git add .
+git commit -m "Updated"
+
+git config credential.helper store
+git push --set-upstream origin master
+
+git tag --annotate v1.1 --message "Second release"
+git push origin --tags
+
+git describe --tags --dirt
+git rev-parse --short HEAD
+git rev-parse HEAD
+git status
+```

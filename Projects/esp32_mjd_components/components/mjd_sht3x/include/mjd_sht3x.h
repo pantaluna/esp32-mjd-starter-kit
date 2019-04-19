@@ -23,13 +23,13 @@ extern "C" {
  *      0x45            ADDR (pin 2) connected to logic high
  *
  */
-#define MJD_SHT3X_I2C_ADDRESS_DEFAULT        (0x44)       /*!< The default 0x44 can be changed. */
-#define MJD_SHT3X_I2C_MASTER_NUM_DEFAULT     (I2C_NUM_0)  /*!< The default I2C_NUM_0 can be changed. */
-#define MJD_SHT3X_I2C_TIMEOUT_DEFAULT        (2000 / portTICK_PERIOD_MS) /*!< The default 2000ms can be changed. */
-#define MJD_SHT3X_I2C_MASTER_FREQ_HZ         (100 * 1000) /*!< [ESP32 Max 1 MHz.] Use 10Khz for long wires (>25cm). I2C master clock freq: Normal (100 KHz), FastMode (400 Khz), FastModePlus (1 Mhz). */
-#define MJD_SHT3X_I2C_MASTER_RX_BUF_DISABLE  (0)          /*!< I2C master does not need RX buffer. This param is for I2C slaves. */
-#define MJD_SHT3X_I2C_MASTER_TX_BUF_DISABLE  (0)          /*!< I2C master does not need TX buffer. This param is for I2C slaves. */
-#define MJD_SHT3X_I2C_MASTER_INTR_FLAG_NONE  (0)
+#define MJD_SHT3X_I2C_ADDRESS_DEFAULT           (0x44)       /*!< The default 0x44 can be changed. */
+#define MJD_SHT3X_I2C_MASTER_NUM_DEFAULT        (I2C_NUM_0)  /*!< The default I2C_NUM_0 can be changed. */
+#define MJD_SHT3X_I2C_MAX_TICKS_TO_WAIT_DEFAULT (1000 / portTICK_PERIOD_MS) /*!< The default 1000ms can be changed. */
+#define MJD_SHT3X_I2C_MASTER_FREQ_HZ            (100 * 1000) /*!< (ESP32 Max 1 MHz) Use 10Khz for long wires (>25cm). I2C master clock freq: Normal (100 KHz), FastMode (400 Khz), FastModePlus (1 Mhz). */
+#define MJD_SHT3X_I2C_MASTER_RX_BUF_DISABLE     (0)          /*!< I2C master does not need RX buffer. This param is for I2C slaves. */
+#define MJD_SHT3X_I2C_MASTER_TX_BUF_DISABLE     (0)          /*!< I2C master does not need TX buffer. This param is for I2C slaves. */
+#define MJD_SHT3X_I2C_MASTER_INTR_FLAG_NONE     (0)
 
 /**
  * TIMER SETTINGS
@@ -55,15 +55,16 @@ extern "C" {
 
 /*
  * mjd_sht3x_config_t
- *      int_gpio_num : INT DRDY Data Ready pin @rule -1 means not used to detect that a measurement is ready to be read.
+ *   param int_gpio_num         : INT DRDY Data Ready pin @rule -1 means not used to detect that a measurement is ready to be read.
+ *   param i2c_max_ticks_to_wait: Max ticks to wait for for i2c_master_cmd_begin() *Nothing to do with I2C clockstretching.*
  */
 typedef struct {
         bool manage_i2c_driver;
         uint8_t i2c_slave_addr;
-        int i2c_timeout; /*<! @param ticks_to_wait Maximum waiting ticks */
         i2c_port_t i2c_port_num;
         gpio_num_t i2c_scl_gpio_num;
         gpio_num_t i2c_sda_gpio_num;
+        int i2c_max_ticks_to_wait;
 
         mjd_sht3x_repeatability_t repeatability;
 } mjd_sht3x_config_t;
@@ -71,7 +72,7 @@ typedef struct {
 #define MJD_SHT3X_CONFIG_DEFAULT() { \
     .manage_i2c_driver = true, \
     .i2c_slave_addr = MJD_SHT3X_I2C_ADDRESS_DEFAULT, \
-    .i2c_timeout = MJD_SHT3X_I2C_TIMEOUT_DEFAULT, \
+    .i2c_max_ticks_to_wait = MJD_SHT3X_I2C_MAX_TICKS_TO_WAIT_DEFAULT, \
     .i2c_port_num = MJD_SHT3X_I2C_MASTER_NUM_DEFAULT, \
     .i2c_scl_gpio_num = -1, \
     .i2c_sda_gpio_num = -1, \

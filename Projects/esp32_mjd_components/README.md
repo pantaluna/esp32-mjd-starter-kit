@@ -2,8 +2,6 @@
 
 This project contains a ton of **components for the ESP32 ESP-IDF framework** which targets the ESP32 chip of Espressif.
 
-
-
 The project can be **executed on its own** and it will use all the components that do not require additional hardware or wiring; for example it will demonstrate all features of the "mjd" component but it will not demonstrate the "mjd_bme280" because it requires that a Bosch BME280 meteo sensor is wired to the microcontroller.
 
 
