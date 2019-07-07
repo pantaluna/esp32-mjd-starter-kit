@@ -26,7 +26,7 @@ static uint32_t _total_nbr_of_first_connect_warnings = 0;
 static uint32_t _total_nbr_of_fatal_connect_errors = 0;
 
 static mjd_wifi_sta_info_t _mjd_wifi_sta_info =
-    { 0 };
+            { 0 };
 
 /***
  * Messages
@@ -43,10 +43,10 @@ typedef struct {
 static const char _mjd_wifi_unknown_msg[] = "UNKNOWN ERROR MSG";
 
 static const mjd_wifi_reason_msg_t _mjd_wifi_reason_msg_table[] =
-    {
-    MJD_WIFI_ADD_ERROR_ITEM( WIFI_REASON_UNSPECIFIED),               // 1
-MJD_WIFI_ADD_ERROR_ITEM( WIFI_REASON_AUTH_EXPIRE),               // 2
-MJD_WIFI_ADD_ERROR_ITEM( WIFI_REASON_AUTH_LEAVE),                // 3
+            {
+            MJD_WIFI_ADD_ERROR_ITEM( WIFI_REASON_UNSPECIFIED),               // 1
+        MJD_WIFI_ADD_ERROR_ITEM( WIFI_REASON_AUTH_EXPIRE),               // 2
+    MJD_WIFI_ADD_ERROR_ITEM( WIFI_REASON_AUTH_LEAVE),                // 3
 MJD_WIFI_ADD_ERROR_ITEM( WIFI_REASON_ASSOC_EXPIRE),              // 4
 MJD_WIFI_ADD_ERROR_ITEM( WIFI_REASON_ASSOC_TOOMANY),             // 5
 MJD_WIFI_ADD_ERROR_ITEM( WIFI_REASON_NOT_AUTHED),                // 6
@@ -149,7 +149,8 @@ static IRAM_ATTR esp_err_t _mjd_wifi_sta_event_handler(void *ctx, system_event_t
 
         // @debug show reason code!
         system_event_sta_disconnected_t *disconnected = &event->event_info.disconnected;
-        ESP_LOGW(TAG, "  SYSTEM_EVENT_STA_DISCONNECTED: ssid: %s | ssid_len: %d | reason: %d (%s)", disconnected->ssid, disconnected->ssid_len,
+        ESP_LOGW(TAG, "  SYSTEM_EVENT_STA_DISCONNECTED: ssid: %s | ssid_len: %d | reason: %d (%s)", disconnected->ssid,
+                disconnected->ssid_len,
                 disconnected->reason, mjd_wifi_reason_to_msg(disconnected->reason));
 
         xEventGroupClearBits(_wifi_event_group, WIFI_CONNECTED_BIT);
@@ -198,7 +199,7 @@ esp_err_t mjd_wifi_sta_init(const char *param_ssid, const char *param_password) 
     tcpip_adapter_init();
 
     wifi_init_config_t wifi_init_config = WIFI_INIT_CONFIG_DEFAULT()
-    ;
+            ;
 
     f_retval = esp_wifi_init(&wifi_init_config);
     if (f_retval != ESP_OK) {
@@ -222,7 +223,7 @@ esp_err_t mjd_wifi_sta_init(const char *param_ssid, const char *param_password) 
     }
 
     wifi_config_t wifi_config =
-        { 0 };    // init struct fields for this variable
+                { 0 };    // init struct fields for this variable
     strcpy((char *) wifi_config.sta.ssid, param_ssid);  // (to,from)
     strcpy((char *) wifi_config.sta.password, param_password);  // (to,from)
 
@@ -259,7 +260,7 @@ esp_err_t mjd_wifi_sta_start() {
         goto cleanup;
     }
 
-    uxBits = xEventGroupWaitBits(_wifi_event_group, WIFI_CONNECTED_BIT, pdFALSE, pdTRUE, RTOS_DELAY_5SEC); // (1-3sec=AUTH_FAIL!) RTOS_DELAY_5SEC RTOS_DELAY_10SEC
+    uxBits = xEventGroupWaitBits(_wifi_event_group, WIFI_CONNECTED_BIT, pdFALSE, pdTRUE, RTOS_DELAY_6SEC); // (1-3sec=AUTH_FAIL!) RTOS_DELAY_1SEC RTOS_DELAY_6SEC
     if ((uxBits & WIFI_CONNECTED_BIT) == 0) {
         ESP_LOGW(TAG, "FIRST TIME esp_wifi_start() failed to connect. Wait 5 seconds and try a 2nd time...");
 
@@ -286,7 +287,8 @@ esp_err_t mjd_wifi_sta_start() {
             ++_total_nbr_of_fatal_connect_errors;
 
             ESP_LOGE(TAG, "ERROR: SECOND TIME esp_wifi_start() failed to connect. => ABORT");
-            ESP_LOGI(TAG, "  @stats _total_nbr_of_first_connect_warnings (retried): %u", _total_nbr_of_first_connect_warnings);
+            ESP_LOGI(TAG, "  @stats _total_nbr_of_first_connect_warnings (retried): %u",
+                    _total_nbr_of_first_connect_warnings);
             ESP_LOGI(TAG, "  @stats _total_nbr_of_fatal_connect_errors:             %u", _total_nbr_of_fatal_connect_errors);
 
             f_retval = MJD_ERR_ESP_WIFI; // mark error code
@@ -332,7 +334,7 @@ esp_err_t mjd_wifi_sta_disconnect_stop() {
         goto cleanup;
     }
 
-    uxBits = xEventGroupWaitBits(_wifi_event_group, WIFI_DISCONNECTED_BIT, pdFALSE, pdTRUE, RTOS_DELAY_5SEC);   // @important Wait at the most 5 sec
+    uxBits = xEventGroupWaitBits(_wifi_event_group, WIFI_DISCONNECTED_BIT, pdFALSE, pdTRUE, RTOS_DELAY_5SEC); // @important Wait at the most 5 sec
     if ((uxBits & WIFI_DISCONNECTED_BIT) == 0) {
         ESP_LOGE(TAG, "esp_wifi_disconnect() & esp_wifi_stop() failed to disconnect or stop. Aborting...");
 

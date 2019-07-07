@@ -11,12 +11,16 @@ config MY_SSD1306_I2C_MASTER_PORT_NUM
     default 0
 
 config MY_SSD1306_I2C_SCL_GPIO_NUM
-    int "MY_SSD1306_I2C_SCL_GPIO_NUM (Huzzah32 #21=bottomleft)"
+    int "MY_SSD1306_I2C_SCL_GPIO_NUM (Huzzah32 #21=bottomleft #23=bottomright)"
     default 21
 
 config MY_SSD1306_I2C_SDA_GPIO_NUM
-    int "MY_SSD1306_I2C_SDA_GPIO_NUM (Huzzah32 #17=bottomleft-1)"
+    int "MY_SSD1306_I2C_SDA_GPIO_NUM (Huzzah32 #17=bottomleft-1 #22=bottomright-1)"
     default 17
+
+config MY_SSD1306_OLED_DIMENSION_NUM
+    int "MY_SSD1306_OLED_DIMENSION_NUM (0 = 128x32 | 1 = 128x64)"
+    default 0
 
 ##
 ## LED on-board

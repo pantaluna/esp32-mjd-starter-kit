@@ -1,7 +1,11 @@
 ## Project Description
-This project demonstrates the components mjd_ads1115 and mjd_tmp36. The mjd_ads1115 component for the TI ADS1115 Analog-To-Digital-Convertor is used to read the voltage output of the analog temperature sensor. The mjd_tmp36 component for the TMP36 sensor is used to convert the raw voltage reading of the ADC to the ambient temperature in Degrees Celsius transparently.
+This project demonstrates the components **mjd_ads1115** and **mjd_tmp36**.
 
-The Gain of the ADC is set to 2.048V to achieve a higher accuracy of the voltage readings (the default of the mjd_ads1115 component is 4.096V). The 2.048V covers the maximum voltage of the TMP36 sensor of 1.75V for +-125 Degrees Celsius (maximum temperature).
+The **mjd_ads1115** component for the TI ADS1115 Analog-To-Digital-Convertor is used to read the voltage output of the analog temperature sensor.
+
+The **mjd_tmp36** component for the TMP36 sensor is used to convert the raw voltage reading of the ADC to the ambient temperature in Degrees Celsius.
+
+The **Gain (PGA)** of the ADC is set to **2.048V** to achieve a higher accuracy of the voltage readings (the default of the mjd_ads1115 component is 4.096V). The 2.048V covers the maximum voltage of the TMP36 sensor of 1.75V for +-125 Degrees Celsius (its maximum temperature).
 
 Go to the component directory "components/mjd_tmp36" for more documentation, suggested breakout boards (if relevant), installation and wiring instructions, data sheets, FAQ, photo's, etc.
 
@@ -25,7 +29,7 @@ Go to the component directory "components/mjd_ads1115" for more documentation, s
 ```
 mkdir ~/esp
 cd    ~/esp
-git clone -b v3.3 --recursive https://github.com/espressif/esp-idf.git esp-idf-v3.2
+git clone -b v3.2 --recursive https://github.com/espressif/esp-idf.git esp-idf-v3.2
 ```
 
 - A C language editor or the Eclipse IDE CDT (instructions also @ http://esp-idf.readthedocs.io/en/latest/get-started/index.html).
@@ -60,6 +64,7 @@ SCL          GPIO#21
 SDA          GPIO#17
 ADDR         --
 ALR/RDY      GPIOI#16
+
 ```
 
 
@@ -72,6 +77,11 @@ TMP36 PIN#  PIN NAME  MCU PIN#
          1  VCC       GPIO#21
          2  VOUT      VCC 3.3V
          3  GND       GND
+
+- Connect a 0.1uF ceramic capacitor (I chose 100uF) between the TMP36's pins VCC and GND. It should be as close as possible to the VCC pin of the sensor.
+- Connect a +-2.2uF tantalum capacitor between the TMP36's pins VCC and GND when the
+device is operated in the presence of high frequency radiated or conducted noise.
+
 ```
 
 

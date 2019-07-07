@@ -1,0 +1,106 @@
+menu "MY PROJECT configuration"
+
+##
+## LED on-board
+choice MY_LED_ON_DEVBOARD_GPIO_NUM
+    prompt "On-board LED GPIO#"
+    default MY_LED_ON_DEVBOARD_GPIO_NUM_HUZZAH32_13
+    help
+        The on-board LED GPIO# to be used.
+config MY_LED_ON_DEVBOARD_GPIO_NUM_HUZZAH32_13
+    bool "HUZZAH32 GPIO#13"
+config MY_LED_ON_DEVBOARD_GPIO_NUM_LOLIN32LITE_22
+    bool "LOLIN32LITE GPIO#22"
+config MY_LED_ON_DEVBOARD_GPIO_NUM_OTHER
+    bool "Other GPIO#"
+endchoice
+config MY_LED_ON_DEVBOARD_GPIO_NUM_OTHER_VAL
+    int "Other On-board LED GPIO#" if MY_LED_ON_DEVBOARD_GPIO_NUM_OTHER
+    default 99
+config MY_LED_ON_DEVBOARD_GPIO_NUM
+    int
+    default 13 if MY_LED_ON_DEVBOARD_GPIO_NUM_HUZZAH32_13
+    default 22 if MY_LED_ON_DEVBOARD_GPIO_NUM_LOLIN32LITE_22
+    default MY_LED_ON_DEVBOARD_GPIO_NUM_OTHER_VAL if MY_LED_ON_DEVBOARD_GPIO_NUM_OTHER
+
+
+choice MY_LED_ON_DEVBOARD_WIRING_TYPE
+    prompt "LED on-board wiring type"
+    default MY_LED_ON_DEVBOARD_WIRING_TYPE_HUZZAH32_GND_1
+    help
+        The LED on-board wiring type to be used.
+config MY_LED_ON_DEVBOARD_WIRING_TYPE_HUZZAH32_GND
+    bool "HUZZAH32 GND"
+config MY_LED_ON_DEVBOARD_WIRING_TYPE_LOLIN32LITE_VCC
+    bool "LOLIN32LITE VCC"
+endchoice
+config MY_LED_ON_DEVBOARD_WIRING_TYPE
+    int
+    default 1 if MY_LED_ON_DEVBOARD_WIRING_TYPE_HUZZAH32_GND
+    default 2 if MY_LED_ON_DEVBOARD_WIRING_TYPE_LOLIN32LITE_VCC
+
+##
+## Sensor JSN-SR04T
+config MY_JSNSR04T_TRIGGER_GPIO_NUM
+    int "MY_JSNSR04T_TRIGGER_GPIO_NUM (Huzzah32 GPIO#16 = bottomleft-2)"
+    default 16
+
+config MY_JSNSR04T_ECHO_GPIO_NUM
+    int "MY_JSNSR04T_ECHO_GPIO_NUM (Huzzah32 GPIO#14 = bottomright-2)"
+    default 14
+
+##
+## OLED SSD1306
+choice MY_SSD1306_OLED_IS_USED
+    prompt "Use OLED Display? [default Yes]"
+    default MY_SSD1306_OLED_IS_USED_YES
+config MY_SSD1306_OLED_IS_USED_YES
+    bool "Yes"
+config MY_SSD1306_OLED_IS_USED_NO
+    bool "No"
+endchoice
+config MY_SSD1306_OLED_IS_USED
+    int
+    default 1 if MY_SSD1306_OLED_IS_USED_YES
+    default 0 if MY_SSD1306_OLED_IS_USED_NO
+
+config MY_SSD1306_I2C_SLAVE_ADDRESS
+    hex "MY_SSD1306_I2C_SLAVE_ADDRESS (default 0x3C for SSD1306)"
+    default 0x3C
+ 
+config MY_SSD1306_I2C_MASTER_PORT_NUM
+    int "MY_SSD1306_I2C_MASTER_PORT_NUM (0 = I2C_NUM_0 | 1 = I2C_NUM_1)"
+    default 0
+
+config MY_SSD1306_I2C_SCL_GPIO_NUM
+    int "MY_SSD1306_I2C_SCL_GPIO_NUM (Huzzah32 GPIO#21 = bottomleft)"
+    default 21
+    
+config MY_SSD1306_I2C_SDA_GPIO_NUM
+    int "MY_SSD1306_I2C_SDA_GPIO_NUM (Huzzah32 GPIO#17 = bottomleft-1)"
+    default 17
+
+config MY_SSD1306_OLED_DIMENSION_NUM
+    int "MY_SSD1306_OLED_DIMENSION_NUM (0 = 128x32 | 1 = 128x64)"
+    default 0
+
+##
+## N Channel POWER MOSFET.
+choice MY_POWER_MOSFET_IS_USED
+    prompt "Use Power MOSFET N Channel (control power to sensor)? [default Yes]"
+    default MY_POWER_MOSFET_IS_USED_YES
+config MY_POWER_MOSFET_IS_USED_YES
+    bool "Yes"
+config MY_POWER_MOSFET_IS_USED_NO
+    bool "No"
+endchoice
+config MY_POWER_MOSFET_IS_USED
+    int
+    default 1 if MY_POWER_MOSFET_IS_USED_YES
+    default 0 if MY_POWER_MOSFET_IS_USED_NO
+
+config MY_POWER_MOSFET_GATE_GPIO_NUM
+    int "MY_POWER_MOSFET_GATE_GPIO_NUM (Huzzah32 GPIO#4 = bottomleft-6)"
+    default 4
+
+endmenu

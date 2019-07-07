@@ -49,8 +49,8 @@ esp_err_t mjd_ssd1306_cmd_clear_screen(mjd_ssd1306_config_t* param_ptr_config) {
     /*
      * Main
      */
-    u8g2_ClearBuffer(&param_ptr_config->u8g2);
-    u8g2_SendBuffer(&param_ptr_config->u8g2);
+    u8g2_ClearBuffer(&param_ptr_config->_u8g2);
+    u8g2_SendBuffer(&param_ptr_config->_u8g2);
 
     return f_retval;
 }
@@ -62,7 +62,7 @@ esp_err_t mjd_ssd1306_cmd_clear_screen(mjd_ssd1306_config_t* param_ptr_config) {
  *
  *********************************************************************************/
 esp_err_t mjd_ssd1306_cmd_write_line(mjd_ssd1306_config_t* param_ptr_config, const mjd_ssd1306_line_nr_t param_line_nr,
-                                  const char* param_ptr_text) {
+                                     const char* param_ptr_text) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
@@ -82,11 +82,12 @@ esp_err_t mjd_ssd1306_cmd_write_line(mjd_ssd1306_config_t* param_ptr_config, con
      * Main
      */
     if (param_line_nr == MJD_SSD1306_LINE_NR_1) {
-        u8g2_ClearBuffer(&param_ptr_config->u8g2);
+        u8g2_ClearBuffer(&param_ptr_config->_u8g2);
     }
-    u8g2_SetFont(&param_ptr_config->u8g2, MJD_SSD1306_FONT_ID);
-    u8g2_DrawStr(&param_ptr_config->u8g2, 0, MJD_SSD1306_Y_FIRST_LINE + (param_line_nr-1) * MJD_SSD1306_Y_LINE_SPACING, param_ptr_text);
-    u8g2_SendBuffer(&param_ptr_config->u8g2);
+    u8g2_SetFont(&param_ptr_config->_u8g2, MJD_SSD1306_FONT_ID);
+    u8g2_DrawStr(&param_ptr_config->_u8g2, 0,
+            param_ptr_config->_y_first_line + (param_line_nr - 1) * param_ptr_config->_y_line_spacing, param_ptr_text);
+    u8g2_SendBuffer(&param_ptr_config->_u8g2);
 
     // LABEL
     cleanup: ;
@@ -131,22 +132,26 @@ esp_err_t mjd_ssd1306_init(mjd_ssd1306_config_t* param_ptr_config) {
     u8g2_esp32_hal_init(u8g2_esp32_hal);
 
     if (param_ptr_config->oled_dimension == MJD_SSD1306_OLED_DIMENSION_128x32) {
+        param_ptr_config->_y_first_line = 11;   // Value has been determined by trial and error.
+        param_ptr_config->_y_line_spacing = 17; // Value has been determined by trial and error.
         u8g2_Setup_ssd1306_i2c_128x32_univision_f(
-                &param_ptr_config->u8g2,
+                &param_ptr_config->_u8g2,
                 U8G2_R0,
                 u8g2_esp32_i2c_byte_cb,
                 u8g2_esp32_gpio_and_delay_cb);
     } else if (param_ptr_config->oled_dimension == MJD_SSD1306_OLED_DIMENSION_128x64) {
+        param_ptr_config->_y_first_line = 11;   // Value has been determined by trial and error.
+        param_ptr_config->_y_line_spacing = 17; // Value has been determined by trial and error.
         u8g2_Setup_ssd1306_i2c_128x64_noname_f(
-                &param_ptr_config->u8g2,
+                &param_ptr_config->_u8g2,
                 U8G2_R0,
                 u8g2_esp32_i2c_byte_cb,
                 u8g2_esp32_gpio_and_delay_cb);
     }
 
-    u8x8_SetI2CAddress(&param_ptr_config->u8g2.u8x8, (param_ptr_config->i2c_slave_addr << 1) | I2C_MASTER_WRITE); // 0x3C => 0x78
-    u8g2_InitDisplay(&param_ptr_config->u8g2); // send init sequence to the display, display is in sleep mode after this
-    u8g2_SetPowerSave(&param_ptr_config->u8g2, 0); // wake up display
+    u8x8_SetI2CAddress(&param_ptr_config->_u8g2.u8x8, (param_ptr_config->i2c_slave_addr << 1) | I2C_MASTER_WRITE); // 0x3C => 0x78
+    u8g2_InitDisplay(&param_ptr_config->_u8g2); // send init sequence to the display, display is in sleep mode after this
+    u8g2_SetPowerSave(&param_ptr_config->_u8g2, 0); // wake up display
 
     /*
      * Logging
@@ -167,6 +172,8 @@ esp_err_t mjd_ssd1306_init(mjd_ssd1306_config_t* param_ptr_config) {
         // GOTO
         goto cleanup;
     }
+
+    u8g2_SetFlipMode(&param_ptr_config->_u8g2, param_ptr_config->oled_flip_mode);
 
     // DEVTEMP
     /////mjd_rtos_wait_forever();

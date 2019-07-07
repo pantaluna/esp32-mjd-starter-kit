@@ -6,13 +6,31 @@
 #include <esp_wifi.h>
 #include <nvs_flash.h>
 
-#define WIFI_SSID "ssid"
-#define WIFI_PASS "pass"
+#define WIFI_SSID ""
+#define WIFI_PASS ""
 
 #define MQTT_HOST "broker.shiftr.io"
 #define MQTT_USER "try"
 #define MQTT_PASS "try"
+
 #define MQTT_PORT "1883"
+#define MQTTS_PORT "8883"
+
+// openssl s_client -showcerts -connect broker.shiftr.io:8883
+extern const uint8_t server_root_cert_pem_start[] asm("_binary_server_root_cert_pem_start");
+extern const uint8_t server_root_cert_pem_end[] asm("_binary_server_root_cert_pem_end");
+
+static void connect() {
+  static bool use_tls = false;
+
+  // cycle use tls
+  use_tls = !use_tls;
+
+  // start mqtt
+  ESP_LOGI("test", "starting mqtt with tls=%d", use_tls);
+  esp_mqtt_tls(use_tls, true, server_root_cert_pem_start, server_root_cert_pem_end - server_root_cert_pem_start);
+  esp_mqtt_start(MQTT_HOST, use_tls ? MQTTS_PORT : MQTT_PORT, "esp-mqtt", MQTT_USER, MQTT_PASS);
+}
 
 static void process(void *p) {
   for (;;) {
@@ -24,10 +42,10 @@ static void process(void *p) {
 
 static void restart(void *_) {
   for (;;) {
-    // stop and start mqtt every minute
-    vTaskDelay(60000 / portTICK_PERIOD_MS);
+    // stop and start mqtt 15s
+    vTaskDelay(15000 / portTICK_PERIOD_MS);
     esp_mqtt_stop();
-    esp_mqtt_start(MQTT_HOST, MQTT_PORT, "esp-mqtt", MQTT_USER, MQTT_PASS);
+    connect();
   }
 }
 
@@ -36,11 +54,13 @@ static esp_err_t event_handler(void *ctx, system_event_t *event) {
     case SYSTEM_EVENT_STA_START:
       // connect to ap
       esp_wifi_connect();
+
       break;
 
     case SYSTEM_EVENT_STA_GOT_IP:
       // start mqtt
-      esp_mqtt_start(MQTT_HOST, MQTT_PORT, "esp-mqtt", MQTT_USER, MQTT_PASS);
+      connect();
+
       break;
 
     case SYSTEM_EVENT_STA_DISCONNECTED:
@@ -49,6 +69,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event) {
 
       // reconnect wifi
       esp_wifi_connect();
+
       break;
 
     default:
@@ -63,10 +84,13 @@ static void status_callback(esp_mqtt_status_t status) {
     case ESP_MQTT_STATUS_CONNECTED:
       // subscribe
       esp_mqtt_subscribe("/hello", 2);
+
       break;
+
     case ESP_MQTT_STATUS_DISCONNECTED:
       // reconnect
-      esp_mqtt_start(MQTT_HOST, MQTT_PORT, "esp-mqtt", MQTT_USER, MQTT_PASS);
+      connect();
+
       break;
   }
 }

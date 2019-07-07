@@ -1,7 +1,7 @@
 ## Project Description
 This project demonstrates the Lora TX Transmit functionality. Note: it uses Lora P2P and not LoRaWAN.
 
-This project demonstrates the basics of using the MJD component "mjd_lorabee" for the popular SODAQ LoraBee board. That board is basically an XBee breakout board that contains a Microchip RN2843A Lora module (note the subversion "A"). The Microchip RN2483A module contains a Semtech SX1276 Lora transceiver chip. It must be used in combination with the Parallax XBee Adapter Board 32403 which breaks out the Xbee pins to breadboard-compatible pins.
+This project demonstrates the basics of using the MJD component "mjd_lorabee" for the popular SODAQ LoraBee board. This board is basically an XBee breakout board that contains a Microchip RN2843A Lora module (note the subversion "A"). The Microchip RN2483A module contains a Semtech SX1276 Lora transceiver chip. It must be used in combination with the Parallax XBee Adapter Board 32403 which breaks out the Xbee pins to breadboard-compatible pins.
 
 Use it to get insights in how to use this component.
 
@@ -25,7 +25,7 @@ Goto the component "components/mjd_lorabee" for documentation, installation, sol
 ```
 mkdir ~/esp
 cd    ~/esp
-git clone -b v3.3 --recursive https://github.com/espressif/esp-idf.git esp-idf-v3.2
+git clone -b v3.2 --recursive https://github.com/espressif/esp-idf.git esp-idf-v3.2
 ```
 
 - A C language editor or the Eclipse IDE CDT (instructions also @ http://esp-idf.readthedocs.io/en/latest/get-started/index.html).

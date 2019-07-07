@@ -20,17 +20,15 @@ extern "C" {
 #include "lwip/apps/sntp.h" // ESP-IDF >= V3.2 Component: lwip - App: sntp
 
 /**********
- * Network helpers
+ * MAC ADDRESSES
+ *
  */
-
-// Mac Address helper for printf
-#define MJDMACFMT "%02X:%02X:%02X:%02X:%02X:%02X"
-#define MJDMAC2STR(a) (a)[0], (a)[1], (a)[2], (a)[3], (a)[4], (a)[5]
+esp_err_t mjd_string_to_mac(const char * param_ptr_input, uint8_t param_ptr_mac[], size_t param_size_mac);
+esp_err_t mjd_mac_to_string(const uint8_t param_ptr_input_mac[], size_t param_size_mac, char * param_ptr_output);
 
 /**********
  * IP
  */
-
 esp_err_t mjd_net_get_ip_address(char * param_ptr_ip_address);
 
 /**

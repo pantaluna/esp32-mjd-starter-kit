@@ -14,9 +14,9 @@ static const int MY_LED_ON_DEVBOARD_GPIO_NUM = CONFIG_MY_LED_ON_DEVBOARD_GPIO_NU
 static const int MY_LED_ON_DEVBOARD_WIRING_TYPE = CONFIG_MY_LED_ON_DEVBOARD_WIRING_TYPE;
 
 static const int MY_LORABEE_UART_PORT_NUM = CONFIG_MY_LORABEE_UART_PORT_NUM; // @default UART_NUM_1
-static const int MY_LORABEE_UART_TX_GPIO_NUM = CONFIG_MY_LORABEE_UART_TX_GPIO_NUM;// @default 22
-static const int MY_LORABEE_UART_RX_GPIO_NUM = CONFIG_MY_LORABEE_UART_RX_GPIO_NUM;// @default 23
-static const int MY_LORABEE_RESET_GPIO_NUM = CONFIG_MY_LORABEE_RESET_GPIO_NUM;// @default 14
+static const int MY_LORABEE_UART_TX_GPIO_NUM = CONFIG_MY_LORABEE_UART_TX_GPIO_NUM; // @default 22
+static const int MY_LORABEE_UART_RX_GPIO_NUM = CONFIG_MY_LORABEE_UART_RX_GPIO_NUM; // @default 23
+static const int MY_LORABEE_RESET_GPIO_NUM = CONFIG_MY_LORABEE_RESET_GPIO_NUM; // @default 14
 
 /*
  * FreeRTOS settings
@@ -26,14 +26,14 @@ static const int MY_LORABEE_RESET_GPIO_NUM = CONFIG_MY_LORABEE_RESET_GPIO_NUM;//
 
 /*
  * LORA settings
- * #define MY_LORABEE_RADIO_POWER (-3)
  *
+ * - POWER (-3) = lowest 17mA supply current
  */
-#define MY_LORABEE_RADIO_POWER (14)
-#define MY_LORABEE_RADIO_FREQUENCY (865100000)
-#define MY_LORABEE_RADIO_SPREADING_FACTOR ("sf7")
-#define MY_LORABEE_RADIO_BANDWIDTH (125)
-
+#define MY_LORABEE_RADIO_POWER (10)
+#define MY_LORABEE_RADIO_FREQUENCY (868900000)
+#define MY_LORABEE_RADIO_SPREADING_FACTOR (MJD_LORABEE_SPREADING_FACTOR_SF7)
+#define MY_LORABEE_RADIO_BANDWIDTH (MJD_LORABEE_BANDWIDTH_125KHZ)
+#define MY_LORABEE_RADIO_CODING_RATE (MJD_LORABEE_CODING_RATE_4_8)
 
 /*
  * TASKS
@@ -61,7 +61,7 @@ void main_task(void *pvParameter) {
      *
      */
     mjd_led_config_t led_config =
-        { 0 };
+                { 0 };
     led_config.gpio_num = MY_LED_ON_DEVBOARD_GPIO_NUM;
     led_config.wiring_type = MY_LED_ON_DEVBOARD_WIRING_TYPE; // 1 GND MCU Huzzah32 | 2 VCC MCU Lolin32lite
     mjd_led_config(&led_config);
@@ -82,6 +82,7 @@ void main_task(void *pvParameter) {
     lorabee_config.radio_frequency = MY_LORABEE_RADIO_FREQUENCY;
     lorabee_config.radio_spreading_factor = MY_LORABEE_RADIO_SPREADING_FACTOR;
     lorabee_config.radio_bandwidth = MY_LORABEE_RADIO_BANDWIDTH;
+    lorabee_config.radio_coding_rate = MY_LORABEE_RADIO_CODING_RATE;
 
     f_retval = mjd_lorabee_init(&lorabee_config);
     if (f_retval != ESP_OK) {
@@ -98,7 +99,7 @@ void main_task(void *pvParameter) {
      */
 
     mjd_lorabee_version_info_t microtech_info =
-        { 0 };
+                { 0 };
     f_retval = mjd_lorabee_sys_get_version(&lorabee_config, &microtech_info);
     if (f_retval != ESP_OK) {
         // GOTO
@@ -110,12 +111,11 @@ void main_task(void *pvParameter) {
     ESP_LOGI(TAG, "    microtech_info.firmware_version %s", microtech_info.firmware_version);
     ESP_LOGI(TAG, "    microtech_info.firmware_date    %s", microtech_info.firmware_date);
 
-
     /**********
      * COMMAND: RADIO TX *
      *
      */
-    const uint32_t NBR_OF_TX = 25; // 10 25 50 100 1000 10000
+    const uint32_t NBR_OF_TX = 10000; // 10 25 50 100 1000 10000
     ESP_LOGI(TAG, "radio tx LOOP: NBR_OF_TX %u", NBR_OF_TX);
 
     mjd_log_memory_statistics();
@@ -125,18 +125,20 @@ void main_task(void *pvParameter) {
 
     // @error Too large payload 256 chars
     /////char radio_tx_string_payload[] =
-    /////        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
+    /////        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     for (uint32_t i = 1; i <= NBR_OF_TX; ++i) {
         ESP_LOGI(TAG, "");
         ESP_LOGI(TAG, "***radio tx LOOP ITEM #%u of %u***", i, NBR_OF_TX);
 
-        // @doc Payload "19700101000002 HELLO WORLD FROM ESP32 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        char radio_tx_string_payload[96] = "";
+        // @doc Payload 5 + 14 +
+        char radio_tx_string_payload[1024] = "";
         char current_time[20];
         mjd_get_current_time_yyyymmddhhmmss(current_time);
-        sprintf(radio_tx_string_payload, "%s HELLO WORLD FROM ESP32 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", current_time);
+        sprintf(radio_tx_string_payload, "%u %s"
+                "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"
+                "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789",
+                i, current_time);
 
         ESP_LOGI(TAG, "  Details of the PAYLOAD which will be transmitted:");
         ESP_LOGI(TAG, "    radio_tx_string_payload:         %s", radio_tx_string_payload);
@@ -151,7 +153,8 @@ void main_task(void *pvParameter) {
             goto cleanup;
         }
 
-        f_retval = mjd_lorabee_radio_tx(&lorabee_config, (uint8_t *) radio_tx_string_payload, strlen(radio_tx_string_payload));
+        f_retval = mjd_lorabee_radio_tx(&lorabee_config, (uint8_t *) radio_tx_string_payload,
+                strlen(radio_tx_string_payload));
         if (f_retval == ESP_FAIL) {
             // GOTO
             goto cleanup;
@@ -164,9 +167,14 @@ void main_task(void *pvParameter) {
             goto cleanup;
         }
 
-        // DELAY @important Respect state laws.
-        ESP_LOGI(TAG, "  Delay 1 second");
-        vTaskDelay(RTOS_DELAY_1SEC);
+        /*
+         * DELAY
+         *   @important Send 'radio tx' too quickly causes error 'busy' for subsequent requests!
+         *   @important Give receiver (single channel!) a time window to process the data and get ready to receive new packets.
+         *   @important Respect state laws.
+         */
+        ESP_LOGI(TAG, "  Delay 3 seconds");
+        vTaskDelay(RTOS_DELAY_3SEC);
     }
 
     mjd_log_memory_statistics();

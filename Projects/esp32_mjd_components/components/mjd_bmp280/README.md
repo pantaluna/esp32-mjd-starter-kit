@@ -49,14 +49,13 @@ https://www.bosch-sensortec.com/bst/products/all_products/bmp280
 - Metrics: temperature, pressure (both in high precision).
 - Pressure sensor: 300 .. 1100 hPa. Pressure resolution: 0.16 Pa (not hectoPascal!). Altitude precision: 0.16 Pa is equivalent to +- 1 meter difference in altitude.
 - Temperature sensor range: -40°C .. +85°C. Temperature resolution 0.01°C.
-- Supports the I2C protocol (opposed to the timing sensitive 1-Wire protocol of the meteo sensors DHT11 and AM2320 from Aosong).
 - Sensor CHIP ID for the board GY-BMP280-3.3: 0x58 \
-  @important for clones: the address must be 0x56 or 0x57 or 0x58 else the embedded Bosch driver does not work!
+     @important for clones: the address must be 0x56 or 0x57 or 0x58 else the embedded Bosch driver does not work!
 - Dependencies (included): Bosch BMP280_driver (https://github.com/BoschSensortec/BMP280_driver) \
      Revision : 2.0.5 (Pressure and Temperature compensation code revision is 1.1) \
      Date : 2016/07/01
-- Supports the SPI protocol (up to 10 MHz).
-- Good: no external pull-up resistor is required.
+- Supports the I2C protocol (opposed to the timing sensitive 1-Wire protocol of the meteo sensors DHT11 and AM2320 from Aosong). No external pull-up resistor is required.
+- Supports the SPI protocol (up to 10 MHz) if the pins are broken out.
 
 
 

@@ -69,11 +69,10 @@ s8 BMP280_I2C_bus_write(u8 dev_addr, u8 reg_addr, u8 *reg_data, u8 cnt) {
 
     //DEVTEMP DEBUG Insert this before the write code
     /*printf("WR: 0x%X len %d", reg_addr, cnt);
-    for(uint16_t idx = 0; idx < cnt; idx++)
-    printf(" 0x%X", reg_data[idx]);
-    printf("\n");*/
+     for(uint16_t idx = 0; idx < cnt; idx++)
+     printf(" 0x%X", reg_data[idx]);
+     printf("\n");*/
     //DEVTEMP DEBUG END
-
     return (s8) f_retval;
 }
 
@@ -120,11 +119,10 @@ s8 BMP280_I2C_bus_read(u8 dev_addr, u8 reg_addr, u8 *reg_data, u8 cnt) {
 
     //DEVTEMP DEBUG Insert this after the read code
     /*printf("RD: reg 0x%X len %d:", reg_addr, cnt);
-    for(uint16_t idx = 0; idx < cnt; idx++)
-        printf(" 0x%X", reg_data[idx]);
-    printf("\n");*/
+     for(uint16_t idx = 0; idx < cnt; idx++)
+     printf(" 0x%X", reg_data[idx]);
+     printf("\n");*/
     //DEVTEMP DEBUG END
-
     return (s8) f_retval;
 }
 
@@ -141,7 +139,8 @@ esp_err_t mjd_bmp280_init(const mjd_bmp280_config_t* config) {
 
     if (config->manage_i2c_driver == true) {
         // Config
-        i2c_config_t i2c_conf = { 0 };
+        i2c_config_t i2c_conf =
+            { 0 };
         i2c_conf.mode = I2C_MODE_MASTER;
         i2c_conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
         i2c_conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
@@ -176,17 +175,20 @@ esp_err_t mjd_bmp280_init(const mjd_bmp280_config_t* config) {
     i2c_master_stop(cmd);
     f_retval = i2c_master_cmd_begin(config->i2c_port_num, cmd, RTOS_DELAY_1SEC);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "ABORT. i2c_master_cmd_begin() I2C slave NOT working or wrong I2C slave address - error (%i)", f_retval);
+        ESP_LOGE(TAG, "ABORT. i2c_master_cmd_begin() I2C slave NOT working or wrong I2C slave address - error (%i)",
+                f_retval);
         // LABEL
         goto cleanup;
     }
     i2c_cmd_link_delete(cmd);
 
     // Bosch driver: verify the sensor chip_id is correct, e.g. it is the correct sensor device
-    struct bmp280_t bmp280 = { .bus_write = BMP280_I2C_bus_write, .bus_read = BMP280_I2C_bus_read, .delay_msec =
-            BMP280_delay_millisec, .dev_addr = config->i2c_slave_addr };
+    struct bmp280_t bmp280 =
+        { .bus_write = BMP280_I2C_bus_write, .bus_read = BMP280_I2C_bus_read, .delay_msec =
+                BMP280_delay_millisec, .dev_addr = config->i2c_slave_addr };
     com_rslt = bmp280_init(&bmp280);
-    ESP_LOGD(TAG, "  chip id: 0x%hhx (d %hhu) [EXPECT 0x56 or 0x57 or 0x58 for sensor BMP280]", bmp280.chip_id, bmp280.chip_id);
+    ESP_LOGD(TAG, "  chip id: 0x%hhx (d %hhu) [EXPECT 0x56 or 0x57 or 0x58 for sensor BMP280]", bmp280.chip_id,
+            bmp280.chip_id);
     if (com_rslt != SUCCESS) {
         ESP_LOGE(TAG, "ABORT. bmp280_init() failed err %i", com_rslt);
         f_retval = ESP_FAIL;
@@ -195,7 +197,7 @@ esp_err_t mjd_bmp280_init(const mjd_bmp280_config_t* config) {
     }
 
     // LABEL
-    cleanup:;
+    cleanup: ;
 
     return f_retval;
 }
@@ -215,10 +217,25 @@ esp_err_t mjd_bmp280_deinit(const mjd_bmp280_config_t* config) {
             // LABEL
             goto cleanup;
         }
+        // @purpose Save power consumption.
+        //   1. Reset an gpio to default state (select gpio function, enable pullup and disable input and output).
+        //   2. it also configures the IOMUX for this pin to the GPIO function, and disconnects any other peripheral output configured via GPIO Matrix.
+        f_retval = gpio_reset_pin(config->i2c_scl_gpio_num);
+        if (f_retval != ESP_OK) {
+            ESP_LOGE(TAG, "ABORT. Cannot gpio_reset_pin(SCL) | error (%i)", f_retval);
+            // LABEL
+            goto cleanup;
+        }
+        f_retval = gpio_reset_pin(config->i2c_sda_gpio_num);
+        if (f_retval != ESP_OK) {
+            ESP_LOGE(TAG, "ABORT. Cannot gpio_reset_pin(SDA) | error (%i)", f_retval);
+            // LABEL
+            goto cleanup;
+        }
     }
 
     // LABEL
-    cleanup:;
+    cleanup: ;
 
     return f_retval;
 }
@@ -245,10 +262,12 @@ esp_err_t mjd_bmp280_read_forced(const mjd_bmp280_config_t* config, mjd_bmp280_d
      */
     ESP_LOGD(TAG, "do bmp280_init()");
 
-    struct bmp280_t bmp280 = { .bus_write = BMP280_I2C_bus_write, .bus_read = BMP280_I2C_bus_read, .delay_msec =
-            BMP280_delay_millisec, .dev_addr = config->i2c_slave_addr };
+    struct bmp280_t bmp280 =
+        { .bus_write = BMP280_I2C_bus_write, .bus_read = BMP280_I2C_bus_read, .delay_msec =
+                BMP280_delay_millisec, .dev_addr = config->i2c_slave_addr };
     com_rslt = bmp280_init(&bmp280);
-    ESP_LOGD(TAG, "  chip id: 0x%hhx (d %hhu) [EXPECT 0x56 or 0x57 or 0x58 for sensor BMP280]", bmp280.chip_id, bmp280.chip_id);
+    ESP_LOGD(TAG, "  chip id: 0x%hhx (d %hhu) [EXPECT 0x56 or 0x57 or 0x58 for sensor BMP280]", bmp280.chip_id,
+            bmp280.chip_id);
     if (com_rslt != SUCCESS) {
         ESP_LOGE(TAG, "ABORT. bmp280_init() failed err %i", com_rslt);
         f_retval = ESP_FAIL;
@@ -478,7 +497,7 @@ esp_err_t mjd_bmp280_read_forced(const mjd_bmp280_config_t* config, mjd_bmp280_d
     }
 
     // LABEL
-    cleanup:;
+    cleanup: ;
 
     return f_retval;
 }

@@ -1,15 +1,18 @@
 ## Project Description
-This project demonstrates how to issue basic commands to the LoraBee module via a USB-UART board (such as an FTDI board) using the command prompt on a Windows PC. It is an easy way to get familiar with the features of the LoraBee / Microchip RN2843A board.
+This project demonstrates how to issue basic commands to the LoraBee module via a USB-UART board (such as an FTDI board) using the command prompt on a Windows PC (mostly CygWin Bash scripts).
 
-This project is specific for the popular SODAQ LoraBee board. That board is an XBee breakout board that contains a Microchip RN2843A Lora module (note the subversion "A"). The Microchip RN2483A module contains a Semtech SX1276 Lora transceiver chip. It must be used in combination with the Parallax XBee Adapter Board 32403 which breaks out the Xbee pins to breadboard-compatible pins.
+It is an easy way to get familiar with the features of the LoraBee / Microchip RN2843A board, before moving on and using LoRa in combination with a microcontroller.
+
+This project is specific for the popular SODAQ LoraBee board. This board is an XBee breakout board that contains a Microchip RN2843A Lora module (note the subversion "A"). The Microchip RN2483A module contains a Semtech SX1276 Lora transceiver chip. It must be used in combination with the Parallax XBee Adapter Board 32403 which breaks out the XBee pins to breadboard-compatible pins.
 
 ## Products
 - SODAQ LoraBee RN2843. https://shop.sodaq.com/lorabee-rn2483-order-now.html
 - Parallax XBee Adapter Board 32403. https://www.parallax.com/product/32403
-- RobotDyn CP2104 UART USB To TTL 3.3V 5V Serial Adapter https://robotdyn.com/usb-serial-adapter-microcontroller-cp2104-5v-3-3v-digital-i-o-micro-usb.html
+- RobotDyn CP2104 UART USB To TTL 3.3V Serial Adapter https://robotdyn.com/usb-serial-adapter-microcontroller-cp2104-5v-3-3v-digital-i-o-micro-usb.html
 
 ## Hardware installation
-- Goto the component directory "components/mjd_lorabee" for documentation, installation, soldering, data sheets, FAQ, photo's, etc for the LoraBee board. @important Skip the section "wiring instructions" because we will not wire up the LoraBee board to an ESP32 development board but to the USB UART board.
+- Goto the component directory "components/mjd_lorabee" for documentation, installation, **soldering**, data sheets, FAQ, photo's, etc for the LoraBee board.
+  @important Skip the section "wiring instructions" because we will not wire up the LoraBee board to an ESP32 development board but to the USB UART board.
 - Configure the RobotDyn CP2104 UART USB board for 3.3V (consult the MJD ESP32 Starter Kit for detailed instructions).
 
 ## Wiring instructions
@@ -59,11 +62,11 @@ Parallax board  =>  ESP32 Dev Board
 ## Running the Bash scripts.
 - Install Cygwin with the default settings.
 - Start a Cygwin terminal
-- Run `ls -l /dev` to identify the device id for the USB UART board. A typical name is /dev/ttyS15 Use this device id consequently in all Bash scripts.
+- Run `ls -l /dev` to identify the device id for the USB UART board. A typical name is `/dev/ttyS15`. Use this device ID consequently in all Bash scripts.
 - Copy-paste the commands from the various Bash scripts in the `bash_scripts` directory.
 
 ## Using a terminal emulator program
-I recommend RealTerm (https://realterm.i2cchip.com/). Don't forget to tick the boxes "CR" and "LF" in the tab "Send" so each command is suffixed with \r\n.
+I recommend QCOM V1.6 from Quectel or RealTerm (https://realterm.i2cchip.com/). Make sure to configure the terminal to send the characters CR "\r" and LF "\n" after each command.
 
 ## Notes
 - It can be useful to also run the project `my_lorabee_tx_using_lib` or `my_lorabee_tx_using_lib` simultaneously to see how they all interact. These projects respectively transmit/receive Lora data using an ESP32 development board + LoraBee board.

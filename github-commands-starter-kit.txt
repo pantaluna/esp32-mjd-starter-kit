@@ -6,6 +6,10 @@ C:\myiot\esp32-mjd-starter-kit
 --------------------------------------------------------------------------------
 
 
+***SPECIAL*** SOP: 0. Update README.md from the Starter Kit
+-----------------------------------------------------------
+README.md
+
 ***SPECIAL*** SOP: 1. Clean projects.
 -------------------------------------
 @important First clean the Eclipse projects
@@ -80,7 +84,7 @@ git commit -m "New components and projects"
 git config credential.helper store
 git push --set-upstream origin master
 
-git tag --annotate v1.4 --message "Added components and projects for the Sensirion SCD30 CO2 RH/T sensor and SSD1306 OLED Displays"
+git tag --annotate v1.6 --message "Added LOLIN D32 to the ESP32 Development boards, Added component and projects for the JSN-SR04T-2.0 Waterproof Ultrasonic Sensor Module, Added documentation about MOSFETs and voltage regulators, Updated documentation for TP4056 solar battery charger board, various changes"
 git push origin --tags
 
 git describe --tags --dirt

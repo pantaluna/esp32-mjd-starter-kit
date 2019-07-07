@@ -25,6 +25,29 @@ static portMUX_TYPE sensor_port_mux = portMUX_INITIALIZER_UNLOCKED;  // @source 
  * @important Custom for the DHT22 sensor!
  * @doc RMT source clock = APB Clock 80Mhz. It ticks 80,000,000 times a second or 80,000 times a MILLIsecond or 80 times a MICROsecond or 0.08 times a NANOsecond. This is FAST enough for meteo sensors.
  * @doc RMT If we divide the base clock by 80 (giving 1Mhz) then the granularity unit becomes 1 microsecond (=enough granularity for our sensors, and very easy to reason with that).
+ *
+ * @doc DIVIDER examples for ABP clock freq of 80Mhz:
+     *                                  --DIVIDER---
+     *      80 Mhz: esp_clk_apb_freq() /        1  = 80000000 ticks/second  ERROR [@problem min=2]
+     *      40 Mhz: esp_clk_apb_freq() /        2  = 40000000 ticks/second  OK
+     *      10 Mhz: esp_clk_apb_freq() /        8  = 10000000 ticks/second  OK
+     *       5 Mhz: esp_clk_apb_freq() /       16  =  5000000 ticks/second  OK
+     *       1 Mhz: esp_clk_apb_freq() /       80  =  1000000 ticks/second  OK
+     *     100 Khz: esp_clk_apb_freq() /      800  =   100000 ticks/second  OK
+     *      10 Khz: esp_clk_apb_freq() /     8000  =    10000 ticks/second  OK
+     *    1.25 Khz: esp_clk_apb_freq() /    64000  =     1250 ticks/second  OK
+     *       1 Khz: esp_clk_apb_freq() /    80000  =     1000 ticks/second  ERROR [@problem max=65536]
+     *     100 Hz : esp_clk_apb_freq() /   800000  =      100 ticks/second  ERROR [@problem max=65536]
+     *      10 Hz : esp_clk_apb_freq() /  8000000  =       10 ticks/second  ERROR [@problem max=65536]
+     *       1 Hz : esp_clk_apb_freq() / 80000000  =        1 ticks/second  ERROR [@problem max=65536]
+     *
+     *       Kolban:
+     *       - The base clock runs by default at 80MHz. That means it ticks 80,000,000 times a second or 80,000 times a millisecond
+     *         or 80 times a microsecond or 0.08 times a nano second.
+     *         Flipping this around, our granularity of interval is 1/80,000,000 is 0.0000000125 seconds or 0.0000125 milliseconds
+     *         or 0.0125 microseconds or 12.5 nanoseconds. This is fast.
+     *       - About the clock divider value. If the base clock is 80MHz then a divisor of 80 gives us 1MHz.
+     *
  *********************************************************************************/
 esp_err_t mjd_dht22_init(const mjd_dht22_config_t* config) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
@@ -64,7 +87,7 @@ esp_err_t mjd_dht22_init(const mjd_dht22_config_t* config) {
  *********************************************************************************/
 static esp_err_t parse_items(rmt_item32_t* ptr_item, int num_items, mjd_dht22_data_t *data) {
     // Clock divisor (base clock is 80MHz)
-    const int CLK_DIV = 100;
+    const int CLK_DIV = esp_clk_apb_freq() / 1000000;
     // Number of clock ticks that represent 10us. 10us = 1/100th msec.
     const int TICK_10_US = 80000000 / CLK_DIV / 100000;
 

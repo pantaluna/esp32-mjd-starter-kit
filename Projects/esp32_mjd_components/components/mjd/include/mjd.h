@@ -31,6 +31,7 @@
 
 
 #include "cJSON.h"
+#include "driver/gpio.h"
 #include "driver/i2c.h"
 #include "driver/rmt.h"
 #include "driver/uart.h"
@@ -145,6 +146,11 @@ esp_err_t mjd_string_to_hexstring(const char * param_ptr_input, size_t param_len
 esp_err_t mjd_hexstring_to_string(const char * param_ptr_input, size_t param_len_input, char * param_ptr_output);
 
 /**********
+ * CRYPTO
+ */
+esp_err_t mjd_crypto_xor_cipher(const uint8_t param_key, uint8_t* param_ptr_values, const size_t param_values_len);
+
+/**********
  * DATE TIME
  * @doc unsigned int (uint32_t on ESP32) Maximum value: 4294967295
  */
@@ -159,7 +165,17 @@ void mjd_set_timezone_amsterdam();
 void mjd_get_current_time_yyyymmddhhmmss(char *ptr_buffer);
 
 /**********
+ * Network helpers
+ */
+
+// Mac Address helper for printf
+#define MJDMACFMT "%02X:%02X:%02X:%02X:%02X:%02X"
+#define MJDMAC2STR(a) (a)[0], (a)[1], (a)[2], (a)[3], (a)[4], (a)[5]
+
+/**********
  * RTOS vTaskDelay() parameter
+ *
+ * @important Do NOT use vTaskDelay() for time periods smnaller than 10 millisec (use ets_delay_us() instead!)
  */
 #define RTOS_DELAY_0             (0)
 #define RTOS_DELAY_1MILLISEC     (   1 / portTICK_PERIOD_MS)
@@ -167,7 +183,7 @@ void mjd_get_current_time_yyyymmddhhmmss(char *ptr_buffer);
 #define RTOS_DELAY_10MILLISEC    (  10 / portTICK_PERIOD_MS)
 #define RTOS_DELAY_25MILLISEC    (  25 / portTICK_PERIOD_MS)
 #define RTOS_DELAY_50MILLISEC    (  50 / portTICK_PERIOD_MS)
-#define RTOS_DELAY_75MILLISEC    (  50 / portTICK_PERIOD_MS)
+#define RTOS_DELAY_75MILLISEC    (  75 / portTICK_PERIOD_MS)
 #define RTOS_DELAY_100MILLISEC   ( 100 / portTICK_PERIOD_MS)
 #define RTOS_DELAY_125MILLISEC   ( 125 / portTICK_PERIOD_MS)
 #define RTOS_DELAY_150MILLISEC   ( 150 / portTICK_PERIOD_MS)
@@ -178,6 +194,7 @@ void mjd_get_current_time_yyyymmddhhmmss(char *ptr_buffer);
 #define RTOS_DELAY_2SEC          ( 2 * 1000 / portTICK_PERIOD_MS)
 #define RTOS_DELAY_3SEC          ( 3 * 1000 / portTICK_PERIOD_MS)
 #define RTOS_DELAY_5SEC          ( 5 * 1000 / portTICK_PERIOD_MS)
+#define RTOS_DELAY_6SEC          ( 6 * 1000 / portTICK_PERIOD_MS)
 #define RTOS_DELAY_10SEC         (10 * 1000 / portTICK_PERIOD_MS)
 #define RTOS_DELAY_15SEC         (15 * 1000 / portTICK_PERIOD_MS)
 #define RTOS_DELAY_30SEC         (30 * 1000 / portTICK_PERIOD_MS)
@@ -244,14 +261,14 @@ void mjd_log_wakeup_details();
 #define HUZZAH32_GPIO_BITPIN_LED (1ULL<<HUZZAH32_GPIO_NUM_LED)
 
 typedef enum {
-    LED_WIRING_TYPE_DEFAULT = 1, /*!< Default */
-    LED_WIRING_TYPE_DIODE_TO_GND = 1, /*!< Resistor LED-DIODE=> GND (MCU Adafruit Huzzah32) */
-    LED_WIRING_TYPE_DIODE_FROM_VCC = 2, /*!< LED-DIODE<= Resistor VCC (MCU Lolin32Lite) */
+    LED_WIRING_TYPE_DEFAULT = 1,        /*!< Default */
+    LED_WIRING_TYPE_DIODE_TO_GND = 1,   /*!< Resistor    .. LED-DIODE=> .. GND (MCU Adafruit HUZZAH32) */
+    LED_WIRING_TYPE_DIODE_FROM_VCC = 2, /*!< <=LED-DIODE .. Resistor    .. VCC (MCU Lolin32Lite, LOLIN D32) */
 } mjd_led_wiring_type_t;
 
 typedef struct {
-    uint32_t is_initialized; /*!< Helper to know if an element was initialized, or not. Mark 1. */
-    uint64_t gpio_num; /*!< GPIO num pin */
+    uint32_t is_initialized;           /*!< Helper to know if an element was initialized, or not. Mark 1. */
+    uint64_t gpio_num;                 /*!< GPIO num pin */
     mjd_led_wiring_type_t wiring_type; /*!< Wiring Type */
 } mjd_led_config_t;
 

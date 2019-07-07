@@ -32,7 +32,7 @@ git rev-parse HEAD
 git status
 ```
 
-*NOTUSEDYET* SOP Upload source updates to GitHub
+SOP Upload source updates to GitHub
 -----------------------------------
 ```
 DIR_REPO_NAME=esp32_ssd1306_oled_using_lib
@@ -43,7 +43,7 @@ git commit -m "Updated"
 git config credential.helper store
 git push --set-upstream origin master
 
-git tag --annotate v1.1 --message "Second release"
+git tag --annotate v1.1 --message "Support both 128x32 and 128x64 OLED displays (added to config)"
 git push origin --tags
 
 git describe --tags --dirt

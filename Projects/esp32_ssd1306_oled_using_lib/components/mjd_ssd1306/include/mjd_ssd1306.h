@@ -26,8 +26,8 @@ extern "C" {
 #define MJD_SSD1306_OLED_DIMENSION_DEFAULT  (MJD_SSD1306_OLED_DIMENSION_128x32)  /*!< */
 
 #define MJD_SSD1306_FONT_ID        (u8g2_font_courR12_tf) /*!< u8g2_font_courR10_tf u8g2_font_courR12_tf Font and Line Height are correlated. */
-#define MJD_SSD1306_Y_FIRST_LINE   (11) /*!< Y coordinate: top->down. Correlated to Font. */
-#define MJD_SSD1306_Y_LINE_SPACING (18) /*!< Correlated to Font. */
+#define MJD_SSD1306_Y_FIRST_LINE   (11) /*!< Y coordinate: top->down. Correlated to Font. 11 | 11 */
+#define MJD_SSD1306_Y_LINE_SPACING (17) /*!< Correlated to Font. 18 |17 */
 
 /**
  * Data structs
@@ -58,14 +58,18 @@ typedef enum {
  *
  */
 typedef struct {
-        bool manage_i2c_driver;
+    bool manage_i2c_driver;
         uint8_t i2c_slave_addr;
         i2c_port_t i2c_port_num;
         gpio_num_t i2c_scl_gpio_num;
         gpio_num_t i2c_sda_gpio_num;
 
         mjd_ssd1306_oled_dimension_t oled_dimension;
-        u8g2_t u8g2; /*!< Instance of the U8G2 component */
+        uint8_t oled_flip_mode; /*!< 0: default, the screen is at the right of the pin row. 1: flip it (if you mounted the oled board the other way around). */
+
+        u8g2_t _u8g2; /*!< Instance of the U8G2 component */
+        uint8_t _y_first_line;   /*!< pixels, Y coordinate top->down. Depends on selected font */
+        uint8_t _y_line_spacing; /*!< pixels, Y coordinate top->down. Depends on selected font */
 } mjd_ssd1306_config_t;
 
 #define MJD_SSD1306_CONFIG_DEFAULT() { \
@@ -74,7 +78,10 @@ typedef struct {
     .i2c_port_num = MJD_SSD1306_I2C_MASTER_NUM_DEFAULT, \
     .i2c_scl_gpio_num = -1, \
     .i2c_sda_gpio_num = -1, \
-    .oled_dimension = MJD_SSD1306_OLED_DIMENSION_DEFAULT \
+    .oled_dimension = MJD_SSD1306_OLED_DIMENSION_DEFAULT, \
+    .oled_flip_mode = 0, \
+    ._y_first_line = 0, \
+    ._y_line_spacing = 0, \
 };
 
 /*****

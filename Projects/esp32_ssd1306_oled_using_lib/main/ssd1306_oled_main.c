@@ -12,7 +12,7 @@
 static const char TAG[] = "myapp";
 
 /*
- * KConfig: LED
+ * KConfig: LED, SD1306
  */
 static const int MY_LED_ON_DEVBOARD_GPIO_NUM = CONFIG_MY_LED_ON_DEVBOARD_GPIO_NUM;
 static const int MY_LED_ON_DEVBOARD_WIRING_TYPE = CONFIG_MY_LED_ON_DEVBOARD_WIRING_TYPE;
@@ -21,6 +21,7 @@ static const int MY_SSD1306_I2C_SLAVE_ADDRESS = CONFIG_MY_SSD1306_I2C_SLAVE_ADDR
 static const int MY_SSD1306_I2C_MASTER_PORT_NUM = CONFIG_MY_SSD1306_I2C_MASTER_PORT_NUM;
 static const int MY_SSD1306_I2C_SCL_GPIO_NUM = CONFIG_MY_SSD1306_I2C_SCL_GPIO_NUM;
 static const int MY_SSD1306_I2C_SDA_GPIO_NUM = CONFIG_MY_SSD1306_I2C_SDA_GPIO_NUM;
+static const int MY_SSD1306_OLED_DIMENSION_NUM = CONFIG_MY_SSD1306_OLED_DIMENSION_NUM;
 
 /*
  * FreeRTOS settings
@@ -65,6 +66,10 @@ void peripheral_task(void *pvParameter) {
     ssd1306_config.i2c_port_num = MY_SSD1306_I2C_MASTER_PORT_NUM;
     ssd1306_config.i2c_scl_gpio_num = MY_SSD1306_I2C_SCL_GPIO_NUM;
     ssd1306_config.i2c_sda_gpio_num = MY_SSD1306_I2C_SDA_GPIO_NUM;
+
+    ssd1306_config.oled_dimension = MY_SSD1306_OLED_DIMENSION_NUM;
+    /////ssd1306_config.oled_flip_mode = 1; /*!< Flip the screen or not. 0: default, the screen is at the right of the pin row. 1: flip it (if you mounted the oled board the other way around). */
+
     f_retval = mjd_ssd1306_init(&ssd1306_config);
     if (f_retval != ESP_OK) {
         ESP_LOGE(TAG, "%s(). mjd_ssd1306_init() err %i %s", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
@@ -76,13 +81,13 @@ void peripheral_task(void *pvParameter) {
     /////mjd_rtos_wait_forever();
 
     // OLED
-    char str_line[80];
-    for (uint32_t j=10; j > 0; j--) {
-        ESP_LOGI(TAG, "Show message#%u on the OLED...",j);
+    for (uint32_t j = 1; j <=10; j++) {
+        ESP_LOGI(TAG, "Show message#%u on the OLED...", j);
 
-        sprintf(str_line, "message#%u", j);
-        mjd_ssd1306_cmd_write_line(&ssd1306_config, MJD_SSD1306_LINE_NR_1, str_line);
-        mjd_ssd1306_cmd_write_line(&ssd1306_config, MJD_SSD1306_LINE_NR_2, "12345678901234567890");
+        mjd_ssd1306_cmd_write_line(&ssd1306_config, MJD_SSD1306_LINE_NR_1, "1234567890123");
+        mjd_ssd1306_cmd_write_line(&ssd1306_config, MJD_SSD1306_LINE_NR_2, "1234567890123");
+        mjd_ssd1306_cmd_write_line(&ssd1306_config, MJD_SSD1306_LINE_NR_3, "1234567890123"); // Only visible on OLED 128x64 (not 128x32)
+        mjd_ssd1306_cmd_write_line(&ssd1306_config, MJD_SSD1306_LINE_NR_4, "1234567890123"); // Only visible on OLED 128x64 (not 128x32)
 
         vTaskDelay(RTOS_DELAY_1SEC);
     }
@@ -93,6 +98,8 @@ void peripheral_task(void *pvParameter) {
     ESP_LOGI(TAG, "  mjd_ssd1306_cmd_write_line(), this text stays on the display...");
     mjd_ssd1306_cmd_write_line(&ssd1306_config, MJD_SSD1306_LINE_NR_1, "00 XX XX gg");
     mjd_ssd1306_cmd_write_line(&ssd1306_config, MJD_SSD1306_LINE_NR_2, "00 XX gg XX");
+    mjd_ssd1306_cmd_write_line(&ssd1306_config, MJD_SSD1306_LINE_NR_3, "1234567890123"); // Only visible on OLED 128x64 (not 128x32)
+    mjd_ssd1306_cmd_write_line(&ssd1306_config, MJD_SSD1306_LINE_NR_4, "1234567890123"); // Only visible on OLED 128x64 (not 128x32)
 
     /*
      * DE-INIT
@@ -136,8 +143,8 @@ void app_main() {
     mjd_log_time();
     ESP_LOGI(TAG,
             "@tip You can also change the log level to DEBUG for more detailed logging and to get insights in what the component is actually doing.");
-    ESP_LOGI(TAG, "@doc Wait 2 seconds after power-on (start logic analyzer, let peripherals become active, ...)");
-    vTaskDelay(RTOS_DELAY_2SEC);
+    ESP_LOGI(TAG, "@doc Wait 1 second after power-on (start logic analyzer, ...)");
+    vTaskDelay(RTOS_DELAY_1SEC);
 
     /*
      * Sensor Task

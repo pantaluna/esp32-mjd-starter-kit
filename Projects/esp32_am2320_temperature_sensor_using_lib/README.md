@@ -1,10 +1,10 @@
 ## Project Description
 
-This project demonstrates the basics of using the MJD component "mjd_am2320" for the Aosong AM2320 temperature sensor.
+This project demonstrates the basics of using the MJD component "mjd_am2320" for the Aosong AM2320 temperature and humidity sensor.
 
 Use it to get insights in how to use this component.
 
-Goto the component "components/mjd_am2320" for installation and usage/wiring instructions, data sheets, FAQ, photo's, etc. for the hardware and software.
+Goto the component "components/mjd_am2320" for installation and **usage/wiring instructions**, data sheets, FAQ, photo's, etc. for the hardware and software.
 
 
 
@@ -24,7 +24,7 @@ Goto the component "components/mjd_am2320" for installation and usage/wiring ins
 ```
 mkdir ~/esp
 cd    ~/esp
-git clone -b v3.3 --recursive https://github.com/espressif/esp-idf.git esp-idf-v3.2
+git clone -b v3.2 --recursive https://github.com/espressif/esp-idf.git esp-idf-v3.2
 ```
 
 - A C language editor or the Eclipse IDE CDT (instructions also @ http://esp-idf.readthedocs.io/en/latest/get-started/index.html).

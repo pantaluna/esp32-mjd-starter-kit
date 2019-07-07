@@ -14,7 +14,7 @@ static const char *TAG = "u8g2_hal";
 
 static const unsigned int I2C_TIMEOUT_MS = 1000;
 
-static spi_device_handle_t handle_spi;      // SPI handle.
+static spi_device_handle_t handle_spi;    // SPI handle.
 static i2c_cmd_handle_t handle_i2c;      // I2C handle.
 static u8g2_esp32_hal_t u8g2_esp32_hal;  // HAL state data.
 
@@ -57,7 +57,7 @@ uint8_t u8g2_esp32_spi_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void 
         bus_config.quadwp_io_num = -1; // Not used
         bus_config.quadhd_io_num = -1; // Not used
         //ESP_LOGI(TAG, "... Initializing bus.");
-        ESP_ERROR_CHECK(spi_bus_initialize(HSPI_HOST, &bus_config, 1));
+        ESP_ERROR_CHECK_WITHOUT_ABORT(spi_bus_initialize(HSPI_HOST, &bus_config, 1)); // RHMOD Change ESP_ERROR_CHECK to ESP_ERROR_CHECK_WITHOUT_ABORT
 
         spi_device_interface_config_t dev_config;
         dev_config.address_bits = 0;
@@ -74,7 +74,7 @@ uint8_t u8g2_esp32_spi_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void 
         dev_config.pre_cb = NULL;
         dev_config.post_cb = NULL;
         //ESP_LOGI(TAG, "... Adding device bus.");
-        ESP_ERROR_CHECK(spi_bus_add_device(HSPI_HOST, &dev_config, &handle_spi));
+        ESP_ERROR_CHECK_WITHOUT_ABORT(spi_bus_add_device(HSPI_HOST, &dev_config, &handle_spi)); // RHMOD Change ESP_ERROR_CHECK to ESP_ERROR_CHECK_WITHOUT_ABORT
 
         break;
     }
@@ -90,12 +90,12 @@ uint8_t u8g2_esp32_spi_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void 
         trans_desc.rx_buffer = NULL;
 
         //ESP_LOGI(TAG, "... Transmitting %d bytes.", arg_int);
-        ESP_ERROR_CHECK(spi_device_transmit(handle_spi, &trans_desc));
+        ESP_ERROR_CHECK_WITHOUT_ABORT(spi_device_transmit(handle_spi, &trans_desc)); // RHMOD Change ESP_ERROR_CHECK to ESP_ERROR_CHECK_WITHOUT_ABORT
         break;
     }
     }
     return 0;
-} // u8g2_esp32_spi_byte_cb
+}
 
 /*
  * HAL callback function as prescribed by the U8G2 library.  This callback is invoked
@@ -129,10 +129,10 @@ uint8_t u8g2_esp32_i2c_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void 
             ESP_LOGD(TAG, "clk_speed %d", I2C_MASTER_FREQ_HZ);
             conf.master.clk_speed = I2C_MASTER_FREQ_HZ;
             ESP_LOGD(TAG, "i2c_param_config %d", u8g2_esp32_hal.i2c_port_num);
-            ESP_ERROR_CHECK(i2c_param_config(u8g2_esp32_hal.i2c_port_num, &conf));
+            ESP_ERROR_CHECK_WITHOUT_ABORT(i2c_param_config(u8g2_esp32_hal.i2c_port_num, &conf)); // RHMOD Change ESP_ERROR_CHECK to ESP_ERROR_CHECK_WITHOUT_ABORT
             ESP_LOGD(TAG, "i2c_driver_install %d", u8g2_esp32_hal.i2c_port_num);
-            ESP_ERROR_CHECK(i2c_driver_install(u8g2_esp32_hal.i2c_port_num, conf.mode,
-                    I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0));
+            ESP_ERROR_CHECK_WITHOUT_ABORT(i2c_driver_install(u8g2_esp32_hal.i2c_port_num, conf.mode,
+                    I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0)); // RHMOD Change ESP_ERROR_CHECK to ESP_ERROR_CHECK_WITHOUT_ABORT
         }
         break;
     }
@@ -142,7 +142,7 @@ uint8_t u8g2_esp32_i2c_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void 
         ESP_LOG_BUFFER_HEXDUMP(TAG, data_ptr, arg_int, ESP_LOG_VERBOSE);
 
         while (arg_int > 0) {
-            ESP_ERROR_CHECK(i2c_master_write_byte(handle_i2c, *data_ptr, ACK_CHECK_EN));
+            ESP_ERROR_CHECK_WITHOUT_ABORT(i2c_master_write_byte(handle_i2c, *data_ptr, ACK_CHECK_EN)); // RHMOD Change ESP_ERROR_CHECK to ESP_ERROR_CHECK_WITHOUT_ABORT
             data_ptr++;
             arg_int--;
         }
@@ -153,21 +153,22 @@ uint8_t u8g2_esp32_i2c_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void 
         uint8_t i2c_address = u8x8_GetI2CAddress(u8x8);
         handle_i2c = i2c_cmd_link_create();
         ESP_LOGD(TAG, "Start I2C transfer to %02X.", i2c_address >> 1);
-        ESP_ERROR_CHECK(i2c_master_start(handle_i2c));
-        ESP_ERROR_CHECK(i2c_master_write_byte(handle_i2c, i2c_address | I2C_MASTER_WRITE, ACK_CHECK_EN));
+        ESP_ERROR_CHECK_WITHOUT_ABORT(i2c_master_start(handle_i2c)); // RHMOD Change ESP_ERROR_CHECK to ESP_ERROR_CHECK_WITHOUT_ABORT
+        ESP_ERROR_CHECK_WITHOUT_ABORT(i2c_master_write_byte(handle_i2c, i2c_address | I2C_MASTER_WRITE, ACK_CHECK_EN)); // RHMOD Change ESP_ERROR_CHECK to ESP_ERROR_CHECK_WITHOUT_ABORT
         break;
     }
 
     case U8X8_MSG_BYTE_END_TRANSFER: {
         ESP_LOGD(TAG, "End I2C transfer.");
-        ESP_ERROR_CHECK(i2c_master_stop(handle_i2c));
-        ESP_ERROR_CHECK(i2c_master_cmd_begin(u8g2_esp32_hal.i2c_port_num, handle_i2c, I2C_TIMEOUT_MS / portTICK_RATE_MS));
+        ESP_ERROR_CHECK_WITHOUT_ABORT(i2c_master_stop(handle_i2c)); // RHMOD Change ESP_ERROR_CHECK to ESP_ERROR_CHECK_WITHOUT_ABORT
+        ESP_ERROR_CHECK_WITHOUT_ABORT(
+                i2c_master_cmd_begin(u8g2_esp32_hal.i2c_port_num, handle_i2c, I2C_TIMEOUT_MS / portTICK_RATE_MS)); // RHMOD Change ESP_ERROR_CHECK to ESP_ERROR_CHECK_WITHOUT_ABORT
         i2c_cmd_link_delete(handle_i2c);
         break;
     }
     }
     return 0;
-} // u8g2_esp32_i2c_byte_cb
+}
 
 /*
  * HAL callback function as prescribed by the U8G2 library.  This callback is invoked
@@ -237,4 +238,5 @@ uint8_t u8g2_esp32_gpio_and_delay_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int,
         break;
     }
     return 0;
-} // u8g2_esp32_gpio_and_delay_cb
+}
+

@@ -1,5 +1,5 @@
 # ESP32 MJD Starter Kit for Espressif's ESP-IDF SDK
-April 2019.
+August 2019.
 
 ## Introduction
 
@@ -15,19 +15,19 @@ Are you ready to discover how you can get started quickly?
 
 ### Hardware
 
-- A decent ESP development board. I suggest to buy a popular development board with good technical documentation and a significant user base. Examples: [Adafruit HUZZAH32](https://www.adafruit.com/product/3405),  [Espressif ESP32-DevKitC](http://espressif.com/en/products/hardware/esp32-devkitc/overview), [Pycom WiPy](https://pycom.io/hardware/), [Wemos D32](https://wiki.wemos.cc/products:d32:d32).
-- The peripherals that are used in the project.
-  @tip The README of each component contains a section "Shop Products".
-  @example A Bosch BME280 meteo sensor breakout board.
+- A decent ESP development board. I suggest to buy a popular development board with good technical documentation and a significant user base. Examples: LOLIN D32, [Adafruit HUZZAH32](https://www.adafruit.com/product/3405),  [Espressif ESP32-DevKitC](http://espressif.com/en/products/hardware/esp32-devkitc/overview), [Pycom WiPy](https://pycom.io/hardware/), [Wemos D32](https://wiki.wemos.cc/products:d32:d32).
+- The peripherals that are used in the project. Tip: the README of each component contains a section "Shop Products".
 
-### Software: ESP-IDF v3.2
+
+
+### Software: ESP-IDF v3.2.2
 
 - A working installation of the **Espressif ESP-IDF *V3.2* development framework**** (detailed instructions @ http://esp-idf.readthedocs.io/en/latest/get-started/index.html).
 
 ```
 mkdir ~/esp
 cd    ~/esp
-git clone -b v3.3 --recursive https://github.com/espressif/esp-idf.git esp-idf-v3.2
+git clone -b v3.2.2 --recursive https://github.com/espressif/esp-idf.git esp-idf
 ```
 
 - A C language editor or the Eclipse IDE CDT (instructions also @ http://esp-idf.readthedocs.io/en/latest/get-started/index.html).
@@ -39,6 +39,7 @@ git clone -b v3.3 --recursive https://github.com/espressif/esp-idf.git esp-idf-v
 ### Development Boards Documentation
 
 This part contains basic information about some ESP32 development boards that I have used initially:
+- LOLIN D32.
 - Adafruit HUZZAH32.
 - Wemos Lolin32 Lite.
 
@@ -60,9 +61,21 @@ This part a popular battery charger, a self-made battery discharger, and details
 
 
 
-### Solar Battery Chargers
+### MOSFET
+
+Some documentation about mainly N Channel Power MOSFETs which are often used in combination with an ESP32 development board.
+
+
+
+### Solar Battery Charger
 
 Documentation about the TP4056 module.
+
+
+
+### Voltage Regulator
+
+Some documentation about LDO voltage regulators which are part of an ESP32 development board.
 
 
 
@@ -81,6 +94,13 @@ These projects:
 
 
 
+The special project `esp32_mjd_components`:
+
+- **All the extra ESP-IDF MJD components are centralized in this project.**
+- The project is also runnable and it demonstrates best practices when using ESP-IDF and example code for all non-peripheral components such as linked lists, ESP chip interfaces, Wifi, networking, MQTT, .... 
+
+
+
 Let's highlight a few projects that demonstrate how to use the core ESP-IDF framework.
 - `esp32_button_basics` How to interface with buttons (switches).
 - `esp32_deep_sleep_wakeup_basics` Demonstrates how to use a switch or a magnetic door/window sensor to wake up an ESP32 from deep sleep.
@@ -95,14 +115,8 @@ Let's highlight a few projects that demonstrate how to use the core ESP-IDF fram
 - `esp32_sw180_tilt_sensor` How to interface with this tilt sensor (no extra components needed).
 - `esp32_timer_basics` How to use the standard ESP-IDF Timer driver.
 - `esp32_uart_basics` How to use the standard ESP-IDF UART driver.
+- `esp32_uart_do_output` How to use the standard ESP-IDF UART driver.
 - ```esp32_udp_client``` Demonstrates the basics of implementing an UDP Client using the ESP-IDF framework.
-
-
-
-The special project `esp32_mjd_components`:
-
-- **All the ESP-IDF MJD components are centralized in this project.**
-- The project is also runnable and it demonstrates best practices when using ESP-IDF and example code for all non-peripheral components such as linked lists, ESP chip interfaces, Wifi, networking, MQTT, .... 
 
 
 
@@ -119,6 +133,8 @@ Let's highlight a few projects that demonstrate how to use the extra components 
 - `esp32_ds3231_clock_using_lib` How to get/set data from the DS3231 ZS042 RTC realtime clock board.
 - `esp32_hcsr501_pir_sensor_using_lib` How to read data from the HC-SR501 PIR human infrared sensor.
 - `esp32_huzzah32_battery_voltage_using_lib` How to use specific features of the Adafruit HUZZAH32 development board. example: read battery voltage level. 
+- `esp32_jsnsr04t_using_lib` This project demonstrates all the features of the JSN-SR04T-2.0 Waterproof Ultrasonic Sensor Module in combination with an ESP32 development board. It dumps the measurements in the debug log.
+- `esp32_jsnsr04t_oled_mosfet_using_lib` This project demonstrates all the features of the JSN-SR04T-2.0 Waterproof Ultrasonic Sensor Module in combination with an ESP32 development board, an OLED display module, a Power MOSFET to turn the sensor on and off (to save power consumption during deep sleep), and a deep sleep cycle.
 - `esp32_ky032_obstacle_sensor_using_lib` How to read data from the KY-032 infrared obstacle avoidance sensor.
 - `esp32_ledrgb_using_lib` How to control RGB LED strips (such as the Adafruit Neopixels and BTF-LIGHTNING products).
 - `esp32_linked_list_basics` How to use the Linked List component.
@@ -152,7 +168,7 @@ So after a while I started putting those coding patterns in separate libraries. 
 
 The components can roughly be divided in 3 groups:
 
-1. Related to programmming in the C language (which has its own quirks as all other programming languages). Example: linked lists.
+1. Related to programming in the C language (which has its own quirks as all other programming languages). Example: linked lists.
 
 2. Related to the ESP32 environment and the specifics of embedded systems. Examples: an easy Wifi component. They make those ESP-IDF features easier to use.
 
@@ -174,6 +190,7 @@ This is the list of new components:
 - ```mjd_ds3231``` Component for the DS3231 ZS042 RTC real-time clock board.
 - `mjd_hcsr501` Component for the HC-SR501 PIR human infrared sensor.
 - `mjd_huzzah32` Component for the Adafruit HUZZAH32 development board (read battery voltage level).
+- `mjd_jsnsr04t` Component for the JSN-SR04T-2.0 Waterproof Ultrasonic Sensor Module.
 - `mjd_ky032` Component for the KY-032 infrared obstacle avoidance sensor.
 - `mjd_ledrgb` Component for controlling various RGB LED strips (WorldSemi WS28xx chips such as the Adafruit Neopixels product line).
 - `mjd_list` Component that implements the Linked Lists as used in the Linux Kernel.
@@ -222,10 +239,10 @@ Let's categorize these components in more detail:
 - Determine the Voltage Reference for your device (+-1100mV).
 
 #### ESP32 Peripherals - Devices
-- ADC TI ADS1115 16-bit.
+- ADS1115 ADC 16-Bit 4 Channel with Oscillator and Programmable Gain Amplifier.
 - BH1750FVI light intensity sensor.
 - GPS u-blox NEO-M8N module.
-- Real Time Clock DS1302 ZS-042.
+- DS1302 ZS-042 Real Time Clock.
 
 #### ESP32 Peripherals - Displays
 
@@ -235,21 +252,22 @@ Let's categorize these components in more detail:
 
 This component supports several RGB LED packages. It comes with the essential documentation such as data sheets, schematics, and instructions on how to wire them to your development board and eventually an extra power supply.
 
-- RGB LED packages such as the WS2812, WS2812B, WS2813xs chips from the manufacturer Worldsemi http://www.world-semi.com/solution/list-4-1.html 
+- RGB LED packages such as the WS2812, WS2812B, WS2813xs chips from the manufacturer WorldSemi http://www.world-semi.com/solution/list-4-1.html 
 - Adafruit's Neopixels that use the aforementioned packages.
 
 #### ESP32 Peripherals - Sensors
 These components come with the essential documentation such as data sheets, schematics, and instructions on how to wire them to your development board.
 
 - AM2320 temperature sensor by Aosong.
-- DHT11 temperature sensor by Aosong.
-- DHT22/AM2302 temperature sensor by Aosong.
 - BH1750FVI light sensor.
 - BME280 meteo sensor by Bosch.
 - BMP280 meteo sensor by Bosch.
+- DHT11 temperature sensor by Aosong.
+- DHT22/AM2302 temperature sensor by Aosong.
 - HC-SR501 PIR motion sensor.
+- JSN-SR04T-2.0 Waterproof Ultrasonic Sensor Module.
 - KY-032 Infrared obstacle avoidance sensor.
-- Melexis MLX90393 Triaxis magnetic field sensor.
+- Melexis MLX90393 tri-axis magnetic field sensor.
 - Sensirion SHT3x digital humidity and temperature sensor.
 - Sensirion SCD30 CO2 and RH/T sensor.
 - TMP36 analog temperature sensor by Analog Devices.

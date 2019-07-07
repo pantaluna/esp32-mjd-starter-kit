@@ -26,12 +26,14 @@ static const int MY_LORABEE_RESET_GPIO_NUM = CONFIG_MY_LORABEE_RESET_GPIO_NUM;//
 
 /*
  * LORA settings
+ *
+ * - POWER (-3) = lowest 17mA supply current
  */
-#define MY_LORABEE_RADIO_POWER (-3)
-#define MY_LORABEE_RADIO_FREQUENCY (865100000)
-#define MY_LORABEE_RADIO_SPREADING_FACTOR ("sf7")
-#define MY_LORABEE_RADIO_BANDWIDTH (125)
-
+#define MY_LORABEE_RADIO_POWER (10)
+#define MY_LORABEE_RADIO_FREQUENCY (868900000)
+#define MY_LORABEE_RADIO_SPREADING_FACTOR (MJD_LORABEE_SPREADING_FACTOR_SF7)
+#define MY_LORABEE_RADIO_BANDWIDTH (MJD_LORABEE_BANDWIDTH_125KHZ)
+#define MY_LORABEE_RADIO_CODING_RATE (MJD_LORABEE_CODING_RATE_4_8)
 
 /*
  * TASKS
@@ -80,6 +82,7 @@ void main_task(void *pvParameter) {
     lorabee_config.radio_frequency = MY_LORABEE_RADIO_FREQUENCY;
     lorabee_config.radio_spreading_factor = MY_LORABEE_RADIO_SPREADING_FACTOR;
     lorabee_config.radio_bandwidth = MY_LORABEE_RADIO_BANDWIDTH;
+    lorabee_config.radio_coding_rate = MY_LORABEE_RADIO_CODING_RATE;
 
     f_retval = mjd_lorabee_init(&lorabee_config);
     if (f_retval != ESP_OK) {
@@ -91,7 +94,7 @@ void main_task(void *pvParameter) {
     mjd_lorabee_log_config(&lorabee_config);
 
     /********************************************************************************
-     * UART1: EEPROM nvm get/set icw pin-reset
+     * UART1: EEPROM nvm get/set i.c.w. pin-reset
      *   @doc The EEPROM is only erased when doing a factoryRESET (not with `sys reset` or my pin-reset)
      */
 
@@ -129,7 +132,7 @@ void main_task(void *pvParameter) {
      */
 
     //
-    ESP_LOGI(TAG, "COMMAND: sys set pindig GPIO0 1: SET LED *ON");
+    ESP_LOGI(TAG, "COMMAND 'sys set pindig GPIO0 1': SET LED *ON");
     f_retval = mjd_lorabee_sys_set_pindig(&lorabee_config, MJD_LORABEE_GPIO_NUM_0, MJD_LORABEE_GPIO_LEVEL_HIGH);
     if (f_retval != ESP_OK) {
         // GOTO
@@ -169,7 +172,7 @@ void main_task(void *pvParameter) {
     ESP_LOGI(TAG, "retrieved vdd voltage (uint32_t value): %u", sys_vdd_voltage);
 
     //
-    // MAC PAUSE RESUME PAUSE
+    // MAC PAUSE RESUME PAUSE (LORWAN)
     //
 
     ESP_LOGI(TAG, "COMMAND 'mac pause'");
@@ -197,15 +200,6 @@ void main_task(void *pvParameter) {
      * RADIO GET *
      *
      */
-    ESP_LOGI(TAG, "COMMAND 'radio get mod': get the mode");
-    char radio_mode[16];
-    f_retval = mjd_lorabee_radio_get_mode(&lorabee_config, radio_mode);
-    if (f_retval != ESP_OK) {
-        // GOTO
-        goto cleanup;
-    }
-    ESP_LOGI(TAG, "retrieved mode (string value): %s", radio_mode);
-
     ESP_LOGI(TAG, "COMMAND 'radio get pwr': RADIO GET POWER");
     int32_t radio_power;
     f_retval = mjd_lorabee_radio_get_power(&lorabee_config, &radio_power);
@@ -214,6 +208,15 @@ void main_task(void *pvParameter) {
         goto cleanup;
     }
     ESP_LOGI(TAG, "retrieved power (int32_t signed value): %i", radio_power);
+
+    ESP_LOGI(TAG, "COMMAND 'radio get mod': get the mode");
+    mjd_lorabee_mode_t radio_mode;
+    f_retval = mjd_lorabee_radio_get_mode(&lorabee_config, &radio_mode);
+    if (f_retval != ESP_OK) {
+        // GOTO
+        goto cleanup;
+    }
+    ESP_LOGI(TAG, "retrieved mode (mjd_lorabee_mode_t value): %i", radio_mode);
 
     ESP_LOGI(TAG, "COMMAND 'radio get freq': RADIO GET FREQUENCY");
     uint32_t radio_frequency;
@@ -225,22 +228,22 @@ void main_task(void *pvParameter) {
     ESP_LOGI(TAG, "retrieved frequency (uint32_t value): %u", radio_frequency);
 
     ESP_LOGI(TAG, "COMMAND 'radio get sf': RADIO GET SF");
-    char radio_spreading_factor[16];
-    f_retval = mjd_lorabee_radio_get_spreading_factor(&lorabee_config, radio_spreading_factor);
+    mjd_lorabee_spreading_factor_t radio_spreading_factor;
+    f_retval = mjd_lorabee_radio_get_spreading_factor(&lorabee_config, &radio_spreading_factor);
     if (f_retval != ESP_OK) {
         // GOTO
         goto cleanup;
     }
-    ESP_LOGI(TAG, "retrieved spreading factor (string value): %s", radio_spreading_factor);
+    ESP_LOGI(TAG, "retrieved spreading factor (int32_t value): %i", radio_spreading_factor);
 
     ESP_LOGI(TAG, "COMMAND 'radio get bw': RADIO GET BW");
-    uint32_t radio_bandwidth;
+    mjd_lorabee_bandwidth_t radio_bandwidth;
     f_retval = mjd_lorabee_radio_get_bandwidth(&lorabee_config, &radio_bandwidth);
     if (f_retval != ESP_OK) {
         // GOTO
         goto cleanup;
     }
-    ESP_LOGI(TAG, "retrieved bandwidth (uint32_t value): %u", radio_bandwidth);
+    ESP_LOGI(TAG, "retrieved bandwidth (int32_t value): %u", radio_bandwidth);
 
     ESP_LOGI(TAG, "COMMAND 'radio get wdt': RADIO GET Watchdog timeout");
     uint32_t radio_watchdog_timeout;
@@ -265,20 +268,20 @@ void main_task(void *pvParameter) {
      *
      */
 
-    ESP_LOGI(TAG, "COMMAND: 'RADIO SET mode'");
-    char radio_mode2[] = "lora";
-    ESP_LOGI(TAG, " setting mode (string value): %s", radio_mode2);
-    f_retval = mjd_lorabee_radio_set_mode(&lorabee_config, radio_mode2);
-    if (f_retval != ESP_OK) {
-        // GOTO
-        goto cleanup;
-    }
-
     ESP_LOGI(TAG, "COMMAND: RADIO SET power");
     /////int32_t radio_power2 = 14;
     int32_t radio_power2 = -3;
     ESP_LOGI(TAG, " setting power (int32_t value): %i", radio_power2);
     f_retval = mjd_lorabee_radio_set_power(&lorabee_config, radio_power2);
+    if (f_retval != ESP_OK) {
+        // GOTO
+        goto cleanup;
+    }
+
+    ESP_LOGI(TAG, "COMMAND: 'RADIO SET mode'");
+    mjd_lorabee_mode_t radio_mode2 = MJD_LORABEE_MODE_LORA;
+    ESP_LOGI(TAG, " setting mode (mjd_lorabee_mode_t value): %i", radio_mode2);
+    f_retval = mjd_lorabee_radio_set_mode(&lorabee_config, radio_mode2);
     if (f_retval != ESP_OK) {
         // GOTO
         goto cleanup;
@@ -295,9 +298,9 @@ void main_task(void *pvParameter) {
     }
 
     ESP_LOGI(TAG, "RADIO SET spreading factor");
-    char radio_spreading_factor2[] = "sf7";
+    mjd_lorabee_spreading_factor_t radio_spreading_factor2 = MJD_LORABEE_SPREADING_FACTOR_SF7;
     /////char radio_spreading_factor2[] = "sf12";
-    ESP_LOGI(TAG, " setting spreading factor (string value): %s", radio_spreading_factor2);
+    ESP_LOGI(TAG, " setting spreading factor (mjd_lorabee_spreading_factor_t value): %i", radio_spreading_factor2);
     f_retval = mjd_lorabee_radio_set_spreading_factor(&lorabee_config, radio_spreading_factor2);
     if (f_retval != ESP_OK) {
         // GOTO
@@ -305,8 +308,8 @@ void main_task(void *pvParameter) {
     }
 
     ESP_LOGI(TAG, "RADIO SET bandwith");
-    uint32_t radio_bandwidth2 = 125;
-    ESP_LOGI(TAG, " setting bandwidth (uint32_t value): %u", radio_bandwidth2);
+    mjd_lorabee_bandwidth_t radio_bandwidth2 = MJD_LORABEE_BANDWIDTH_125KHZ;
+    ESP_LOGI(TAG, " setting bandwidth (mjd_lorabee_bandwidth_t value): %u", radio_bandwidth2);
     f_retval = mjd_lorabee_radio_set_bandwidth(&lorabee_config, radio_bandwidth2);
     if (f_retval != ESP_OK) {
         // GOTO

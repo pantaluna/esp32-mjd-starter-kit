@@ -1,0 +1,96 @@
+static esp_err_t _cmd_wakeup_alternative_part1() {
+    /********************************************************************************
+     * Lorabee Wakeup: part#1: GPIO MY_UART_TX_GPIO_NUM: send UART_BREAK
+     *   @seq Before starting the UART driver! This func does not work when UART Driver is loaded as well on the TX RX pins!
+     *   @doc https://en.wikipedia.org/wiki/Universal_asynchronous_receiver-transmitter#Break_condition
+     *   @doc A break condition is signaled to the module by keeping the UART_RX pin low for longer than the time to transmit a complete character (1 char = 10 bits) at that baudrate. Choose 20 bits to be sure!
+     *   @doc The host system needs to transmit to the module a BREAK condition followed by a 0x55 character ('U') at the new baud rate.
+     *   @doc UART 9600: 1 char = +-1millisec
+     *   @doc UART 9600: BREAK := set low for at least 2 millisec (using 5 ms) + set high again
+     */
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    gpio_config_t send_break_io_conf =
+        { 0 };
+
+    ESP_LOGI(TAG, "[Strict timing is required - do not put the log() calls between the time-sensitive commands]");
+    ESP_LOGI(TAG, "gpio_config();");
+    ESP_LOGI(TAG, "gpio_set_level(MY_UART_TX_GPIO_NUM, 0);");
+    ESP_LOGI(TAG, "delay 5 millisec");
+    ESP_LOGI(TAG, "gpio_set_level(MY_UART_TX_GPIO_NUM, 1);");
+
+    send_break_io_conf.pin_bit_mask = (1ULL << MY_UART_TX_GPIO_NUM);
+    send_break_io_conf.mode = GPIO_MODE_OUTPUT;
+    send_break_io_conf.pull_up_en = GPIO_PULLUP_ENABLE;    // UART default = pullup
+    send_break_io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+    send_break_io_conf.intr_type = GPIO_INTR_DISABLE;
+    f_retval = gpio_config(&send_break_io_conf);
+    if (f_retval != ESP_OK) {
+        ESP_LOGE(TAG, "gpio_config() err %i (%s)", f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    f_retval = gpio_set_level(MY_UART_TX_GPIO_NUM, 0);
+    if (f_retval != ESP_OK) {
+        ESP_LOGE(TAG, "gpio_set_level(0) err %i (%s)", f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    ets_delay_us(5 * 1000);
+
+    f_retval = gpio_set_level(MY_UART_TX_GPIO_NUM, 1);
+    if (f_retval != ESP_OK) {
+        ESP_LOGE(TAG, "gpio_set_level(1) err %i (%s)", f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    // DEVTEMP: HALT
+    /////mjd_rtos_wait_forever();
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+static esp_err_t _cmd_wakeup_alternative_part2() {
+    /********************************************************************************
+     * LoraBee: WAKEUP Part#2: send char 0x55 'U'
+     *   @doc The host system needs to transmit to the module a BREAK condition followed by a 0x55 character ('U') at the new baud rate.
+     */
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    char autobaud_string[2] =
+        { 0x55, '\0' };
+    ESP_LOGI(TAG, "  autobaud_string: len %zu val %s", strlen(autobaud_string), autobaud_string);
+
+    // TX 'U'
+    f_retval = uart_write_bytes(MY_UART_NUM, autobaud_string, strlen(autobaud_string));
+    if (f_retval == ESP_FAIL) {
+        ESP_LOGE(TAG, "uart_write_bytes() err %i (%s)", f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    // A standard delay of 100 milliseconds after a standard RN2843 command (except after transmitting data which takes much much longer to get a response!)
+    vTaskDelay(RTOS_DELAY_100MILLISEC);
+
+    // Mark OK
+    f_retval = ESP_OK;
+
+    // DEVTEMP: HALT
+    /////mjd_rtos_wait_forever();
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+

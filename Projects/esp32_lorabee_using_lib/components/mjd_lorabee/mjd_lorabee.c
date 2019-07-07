@@ -26,10 +26,10 @@ static QueueHandle_t _uart_rx_data_queue = NULL;
 #define MJD_LORABEE_UART_BAUD_SPEED              (57600)
 #define MJD_LORABEE_UART_RX_BUFFER_SIZE          (512)
 #define MJD_LORABEE_UART_RX_BUFFER_SIZE_PLUS_ONE (513)
-#define MJD_LORABEE_UART_RX_RINGBUFFER_SIZE       (512 * 2)
+#define MJD_LORABEE_UART_RX_RINGBUFFER_SIZE      (512 * 2)
 
-#define MJD_LORABEE_UART_DRIVER_QUEUE_SIZE      (20)
-#define MJD_LORABEE_UART_RX_DATA_QUEUE_SIZE     (20)
+#define MJD_LORABEE_UART_DRIVER_QUEUE_SIZE  (20)
+#define MJD_LORABEE_UART_RX_DATA_QUEUE_SIZE (20)
 
 /*
  * MUTEX
@@ -38,6 +38,206 @@ static QueueHandle_t _uart_rx_data_queue = NULL;
 static SemaphoreHandle_t _lorabee_service_semaphore = NULL;
 #define MJD_LORABEE_SERVICE_LOCK()     xSemaphoreTake(_lorabee_service_semaphore, portMAX_DELAY)
 #define MJD_LORABEE_SERVICE_UNLOCK()   xSemaphoreGive(_lorabee_service_semaphore)
+
+/*
+ * Mode: mapping enum to string value
+ *
+ */
+#define MJD_LORABEE_MODE_STRING_MAXLEN (5)  // Including the \0
+static const char _MODE_STRING_VALUES[MJD_LORABEE_MODE_MAX][MJD_LORABEE_MODE_STRING_MAXLEN] =
+            { "lora", "fsk" };
+
+static esp_err_t _mode_enum_to_string(mjd_lorabee_mode_t param_enum, char param_ptr_string[]) {
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    if ((param_enum < 0) || (param_enum >= MJD_LORABEE_MODE_MAX)) {
+        f_retval = ESP_ERR_INVALID_ARG;
+        ESP_LOGE(TAG, "%s(). ABORT. param_enum invalid value %u | err %i (%s)", __FUNCTION__, param_enum,
+                f_retval, esp_err_to_name(f_retval));
+        strcpy(param_ptr_string, "");
+        // GOTO
+        goto cleanup;
+    }
+
+    strcpy(param_ptr_string, _MODE_STRING_VALUES[param_enum]);
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+static esp_err_t _mode_string_to_enum(char param_ptr_string[], mjd_lorabee_mode_t *param_ptr_enum) {
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    for (int i = 0; i < ARRAY_SIZE(_MODE_STRING_VALUES); ++i) {
+        if (strcmp(_MODE_STRING_VALUES[i], param_ptr_string) == 0) {
+            *param_ptr_enum = i;
+            // GOTO
+            goto cleanup;
+        }
+    }
+
+    f_retval = ESP_ERR_NOT_FOUND;
+    ESP_LOGE(TAG, "%s(). ABORT. not found param_ptr_string %s | err %i (%s)", __FUNCTION__, param_ptr_string,
+            f_retval, esp_err_to_name(f_retval));
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+/*
+ * Spreading Factor: mapping enum to string value
+ *
+ */
+#define MJD_LORABEE_SPREADING_FACTOR_STRING_MAXLEN (5) // Including the \0
+static esp_err_t _spreading_factor_enum_to_string(mjd_lorabee_spreading_factor_t param_enum, char param_ptr_string[]) {
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    if ((param_enum < 0) || (param_enum >= MJD_LORABEE_SPREADING_FACTOR_MAX)) {
+        f_retval = ESP_ERR_INVALID_ARG;
+        ESP_LOGE(TAG, "%s(). ABORT. param_enum invalid value %u | err %i (%s)", __FUNCTION__, param_enum, f_retval,
+                esp_err_to_name(f_retval));
+        strcpy(param_ptr_string, "");
+        // GOTO
+        goto cleanup;
+    }
+
+    sprintf(param_ptr_string, "sf%i", param_enum);
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+static esp_err_t _spreading_factor_string_to_enum(char param_ptr_string[], mjd_lorabee_spreading_factor_t *param_ptr_enum) {
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    if (sscanf(param_ptr_string, "sf%i", (int *) param_ptr_enum) < 1) {
+        f_retval = ESP_ERR_INVALID_ARG;
+        ESP_LOGE(TAG, "%s(). ABORT. not found in param_ptr_string %s | err %i (%s)", __FUNCTION__, param_ptr_string,
+                f_retval, esp_err_to_name(f_retval));
+        *param_ptr_enum = MJD_LORABEE_SPREADING_FACTOR_MAX;
+        // GOTO
+        goto cleanup;
+    }
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+/*
+ * bandwidth: mapping enum to string value
+ *
+ */
+#define MJD_LORABEE_BANDWIDTH_STRING_MAXLEN (4)// Including the \0
+static esp_err_t _bandwidth_enum_to_string(mjd_lorabee_bandwidth_t param_enum, char param_ptr_string[]) {
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    if ((param_enum < 0) || (param_enum >= MJD_LORABEE_BANDWIDTH_MAX)) {
+        f_retval = ESP_ERR_INVALID_ARG;
+        ESP_LOGE(TAG, "%s(). ABORT. param_code invalid value %u | err %i (%s)", __FUNCTION__, param_enum,
+                f_retval, esp_err_to_name(f_retval));
+        strcpy(param_ptr_string, "");
+        // GOTO
+        goto cleanup;
+    }
+
+    sprintf(param_ptr_string, "%i", param_enum);
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+static esp_err_t _bandwidth_string_to_enum(char param_ptr_string[], mjd_lorabee_bandwidth_t *param_ptr_enum) {
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    if (sscanf(param_ptr_string, "%i", (int *) param_ptr_enum) < 1) {
+        f_retval = ESP_ERR_INVALID_ARG;
+        ESP_LOGE(TAG, "%s(). ABORT. not found in param_ptr_string %s | err %i (%s)", __FUNCTION__, param_ptr_string,
+                f_retval, esp_err_to_name(f_retval));
+        *param_ptr_enum = MJD_LORABEE_BANDWIDTH_MAX;
+        // GOTO
+        goto cleanup;
+    }
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+/*
+ * Coding Rate: mapping enum to string value
+ *
+ */
+#define MJD_LORABEE_CODING_RATE_STRING_MAXLEN (4)  // Including the \0
+static const char _CODING_RATE_STRING_VALUES[MJD_LORABEE_CODING_RATE_MAX][MJD_LORABEE_CODING_RATE_STRING_MAXLEN] =
+            { "4/5", "4/6", "4/7", "4/8" };
+
+static esp_err_t _coding_rate_enum_to_string(mjd_lorabee_coding_rate_t param_enum, char param_ptr_string[]) {
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    if ((param_enum < 0) || (param_enum >= MJD_LORABEE_CODING_RATE_MAX)) {
+        f_retval = ESP_ERR_INVALID_ARG;
+        ESP_LOGE(TAG, "%s(). ABORT. param_enum invalid value %u | err %i (%s)", __FUNCTION__, param_enum,
+                f_retval, esp_err_to_name(f_retval));
+        strcpy(param_ptr_string, "");
+        // GOTO
+        goto cleanup;
+    }
+
+    strcpy(param_ptr_string, _CODING_RATE_STRING_VALUES[param_enum]);
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+static esp_err_t _coding_rate_string_to_enum(char param_ptr_string[], mjd_lorabee_coding_rate_t *param_ptr_enum) {
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    for (int i = 0; i < ARRAY_SIZE(_CODING_RATE_STRING_VALUES); ++i) {
+        if (strcmp(_CODING_RATE_STRING_VALUES[i], param_ptr_string) == 0) {
+            *param_ptr_enum = i;
+            // GOTO
+            goto cleanup;
+        }
+    }
+
+    f_retval = ESP_ERR_NOT_FOUND;
+    ESP_LOGE(TAG, "%s(). ABORT. not found param_ptr_string %s | err %i (%s)", __FUNCTION__, param_ptr_string,
+            f_retval, esp_err_to_name(f_retval));
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
 
 /*
  * Requests & Responses
@@ -60,15 +260,15 @@ static SemaphoreHandle_t _lorabee_service_semaphore = NULL;
 #define MJD_LORABEE_RESPONSE_RADIO_ERROR "radio_err"
 #define MJD_LORABEE_RESPONSE_RADIO_TX_OK "radio_tx_ok"
 
-typedef enum {
-    MJD_LORABEE_OK = 0, // first
-    MJD_LORABEE_ERROR_BUSY,
-    MJD_LORABEE_ERROR_CANNOT_MAC_PAUSE,
-    MJD_LORABEE_ERROR_INVALID_PARAM,
-    MJD_LORABEE_RADIO_ERROR, // 1. TX: if transmission was unsuccessful (interrupted by radio Watchdog Timer time-out) 2. RX: if reception was not successful, reception time-out occurred
-    MJD_LORABEE_RADIO_TX_OK,
-    MJD_LORABEE_ERROR_MAX, // last
-} mjd_lorabee_error_t;
+enum {
+    MJD_LORABEE_STATUS_OK = 0, // first
+    MJD_LORABEE_STATUS_ERROR_BUSY,
+    MJD_LORABEE_STATUS_ERROR_CANNOT_MAC_PAUSE,
+    MJD_LORABEE_STATUS_ERROR_INVALID_PARAM,
+    MJD_LORABEE_STATUS_RADIO_ERROR, // 1. TX: if transmission was unsuccessful (interrupted by radio Watchdog Timer time-out) 2. RX: if reception was not successful, if reception time-out occurred
+    MJD_LORABEE_STATUS_RADIO_TX_OK,
+    MJD_LORABEE_STATUS_ERROR_MAX, // last
+};
 
 #define MJD_LORABEE_ADD_ERROR_ITEM(err)  {err, #err}
 
@@ -80,13 +280,13 @@ typedef struct {
 static const char _err_unknown_msg[] = "UNKNOWN ERROR MSG";
 
 static const mjd_lorabee_err_msg_t _err_msg_table[] =
-    {
-    MJD_LORABEE_ADD_ERROR_ITEM(MJD_LORABEE_OK),
-MJD_LORABEE_ADD_ERROR_ITEM(MJD_LORABEE_ERROR_BUSY),
-MJD_LORABEE_ADD_ERROR_ITEM(MJD_LORABEE_ERROR_CANNOT_MAC_PAUSE),
-MJD_LORABEE_ADD_ERROR_ITEM(MJD_LORABEE_ERROR_INVALID_PARAM),
-MJD_LORABEE_ADD_ERROR_ITEM(MJD_LORABEE_RADIO_ERROR),
-MJD_LORABEE_ADD_ERROR_ITEM(MJD_LORABEE_RADIO_TX_OK), };
+            {
+            MJD_LORABEE_ADD_ERROR_ITEM(MJD_LORABEE_STATUS_OK),
+        MJD_LORABEE_ADD_ERROR_ITEM(MJD_LORABEE_STATUS_ERROR_BUSY),
+    MJD_LORABEE_ADD_ERROR_ITEM(MJD_LORABEE_STATUS_ERROR_CANNOT_MAC_PAUSE),
+MJD_LORABEE_ADD_ERROR_ITEM(MJD_LORABEE_STATUS_ERROR_INVALID_PARAM),
+MJD_LORABEE_ADD_ERROR_ITEM(MJD_LORABEE_STATUS_RADIO_ERROR),
+MJD_LORABEE_ADD_ERROR_ITEM(MJD_LORABEE_STATUS_RADIO_TX_OK), };
 
 const char *mjd_lorabee_err_to_name(int32_t code) {
     for (int i = 0; i < ARRAY_SIZE(_err_msg_table); ++i) {
@@ -184,11 +384,13 @@ static esp_err_t _uart_flush_queue_reset(mjd_lorabee_config_t* param_ptr_config)
  * @important A pointer to the function's static variable is returned to the caller.
  *
  * TODO Change retval to a receive ptr var (goal: separate error codes and returning string).
+ * TODO Handle busy (or handle it higher in the chain)
  *
  */
 static char* _get_next_line_uart(uart_port_t param_uart_port_num) {
     // static => re-used!
     static char _line[MJD_LORABEE_UART_RX_BUFFER_SIZE] = "";
+
     char *_ptr_line = _line;
 
     static uint8_t _data_rx[MJD_LORABEE_UART_RX_BUFFER_SIZE_PLUS_ONE]; // @important +1 for the appended \0 character
@@ -209,14 +411,16 @@ static char* _get_next_line_uart(uart_port_t param_uart_port_num) {
 
                 if (_counter_data_rx == ESP_FAIL) {
                     mjd_log_time();
-                    ESP_LOGE(TAG, "    %s(). uart_read_bytes() err %i (%s)", __FUNCTION__, _counter_data_rx, esp_err_to_name(_counter_data_rx));
+                    ESP_LOGE(TAG, "    %s(). uart_read_bytes() err %i (%s)", __FUNCTION__, _counter_data_rx,
+                            esp_err_to_name(_counter_data_rx));
                     // ABORT
                     return NULL;
                 }
 
                 if (_counter_data_rx == 0) {
                     mjd_log_time();
-                    ESP_LOGD(TAG, "    %s(). uart_read_bytes() returned 0 bytes -> read again from uart until some response comes back...",
+                    ESP_LOGD(TAG,
+                            "    %s(). uart_read_bytes() returned 0 bytes -> read again from uart until some response comes back...",
                             __FUNCTION__);
                     // CONTINUE @important!
                     continue;
@@ -257,62 +461,33 @@ static char* _get_next_line_uart(uart_port_t param_uart_port_num) {
     }
 }
 
-static int _response_text_to_code(const char *param_ptr_response) {
+static int _response_text_to_status_code(const char *param_ptr_response) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     // @important This is the default code value for text values that are NOT CHECKED in the logic below. Especially for case 'radio_rx<space><space><data>'!
-    int error_code = MJD_LORABEE_OK;
+    int status_code = MJD_LORABEE_STATUS_OK;
 
     if (strcmp(param_ptr_response, MJD_LORABEE_RESPONSE_OK) == 0) {
-        error_code = MJD_LORABEE_OK;
+        status_code = MJD_LORABEE_STATUS_OK;
     } else if (strcmp(param_ptr_response, MJD_LORABEE_RESPONSE_BUSY) == 0) {
-        error_code = MJD_LORABEE_ERROR_BUSY;
+        status_code = MJD_LORABEE_STATUS_ERROR_BUSY;
     } else if (strcmp(param_ptr_response, MJD_LORABEE_RESPONSE_INVALID_PARAM) == 0) {
-        error_code = MJD_LORABEE_ERROR_INVALID_PARAM;
+        status_code = MJD_LORABEE_STATUS_ERROR_INVALID_PARAM;
     } else if (strcmp(param_ptr_response, MJD_LORABEE_RESPONSE_RADIO_TX_OK) == 0) {
-        error_code = MJD_LORABEE_RADIO_TX_OK;
+        status_code = MJD_LORABEE_STATUS_RADIO_TX_OK;
     } else if (strcmp(param_ptr_response, MJD_LORABEE_RESPONSE_RADIO_ERROR) == 0) {
-        error_code = MJD_LORABEE_RADIO_ERROR;
+        status_code = MJD_LORABEE_STATUS_RADIO_ERROR;
     }
 
-    return error_code;
-}
-
-/*
- * @brief helpder log config
- *
- */
-esp_err_t mjd_lorabee_log_config(mjd_lorabee_config_t* param_ptr_config) {
-    ESP_LOGD(TAG, "%s()", __FUNCTION__);
-
-    esp_err_t f_retval = ESP_OK;
-
-    ESP_LOGI(TAG, "Log mjd_lorabee_config_t* param_ptr_config:");
-    ESP_LOGI(TAG, "  %32s = %u", "bool is_init", param_ptr_config->is_init);
-    ESP_LOGI(TAG, "  %32s = %i", "uart_port_t uart_port_num", param_ptr_config->uart_port_num);
-    ESP_LOGI(TAG, "  %32s = %i", "gpio_num_t uart_tx_gpio_num", param_ptr_config->uart_tx_gpio_num);
-    ESP_LOGI(TAG, "  %32s = %i", "gpio_num_t uart_rx_gpio_num", param_ptr_config->uart_rx_gpio_num);
-    ESP_LOGI(TAG, "  %32s = %i", "gpio_num_t reset_gpio_num", param_ptr_config->reset_gpio_num);
-
-    ESP_LOGI(TAG, "  %32s = %s", "radio_mode", param_ptr_config->radio_mode);
-    ESP_LOGI(TAG, "  %32s = %i", "radio_power", param_ptr_config->radio_power);
-    ESP_LOGI(TAG, "  %32s = %u", "radio_frequency", param_ptr_config->radio_frequency);
-    ESP_LOGI(TAG, "  %32s = %s", "radio_spreading_factor", param_ptr_config->radio_spreading_factor);
-    ESP_LOGI(TAG, "  %32s = %u", "radio_bandwidth", param_ptr_config->radio_bandwidth);
-    ESP_LOGI(TAG, "  %32s = %u millisec", "radio_watchdog_timeout", param_ptr_config->radio_watchdog_timeout);
-
-    ESP_LOGI(TAG, "  %32s = %u", "uint8_t max_executions_radio_tx", param_ptr_config->max_executions_radio_tx);
-
-    ESP_LOGI(TAG, "  %32s = %u", "uint32_t nbr_of_errors", param_ptr_config->nbr_of_errors);
-
-    return f_retval;
+    return status_code;
 }
 
 /*
  * @brief Execute command and read the RX Response#1 (not #2!)
  *
  */
-esp_err_t mjd_lorabee_cmd(mjd_lorabee_config_t* param_ptr_config, const char* param_ptr_command, mjd_lorabee_response_t* param_ptr_response) {
+esp_err_t mjd_lorabee_cmd(mjd_lorabee_config_t* param_ptr_config, const char* param_ptr_command,
+                          mjd_lorabee_response_t* param_ptr_response) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
@@ -339,7 +514,7 @@ esp_err_t mjd_lorabee_cmd(mjd_lorabee_config_t* param_ptr_config, const char* pa
 
     // RX response#1
     ESP_LOGD(TAG, "RX response#1");
-    char *line_uart = "";
+    char *line_uart; // OLDCODE NOT NEEDED: = "";
     int len_line_uart = 0;
 
     // ONLY relevant for `sys sleep` which gives no uart output at all (no RX response#1)
@@ -372,7 +547,9 @@ esp_err_t mjd_lorabee_cmd(mjd_lorabee_config_t* param_ptr_config, const char* pa
     return f_retval;
 }
 
-static esp_err_t _mjd_lorabee_get_key_returning_string_value(mjd_lorabee_config_t* param_ptr_config, char * param_ptr_category, char * param_ptr_key,
+static esp_err_t _mjd_lorabee_get_key_returning_string_value(mjd_lorabee_config_t* param_ptr_config,
+                                                             char * param_ptr_category,
+                                                             char * param_ptr_key,
                                                              char * param_ptr_result) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
@@ -398,7 +575,9 @@ static esp_err_t _mjd_lorabee_get_key_returning_string_value(mjd_lorabee_config_
     return f_retval;
 }
 
-static esp_err_t _mjd_lorabee_get_key_returning_uint32_value(mjd_lorabee_config_t* param_ptr_config, char * param_ptr_category, char * param_ptr_key,
+static esp_err_t _mjd_lorabee_get_key_returning_uint32_value(mjd_lorabee_config_t* param_ptr_config,
+                                                             char * param_ptr_category,
+                                                             char * param_ptr_key,
                                                              uint32_t * param_ptr_result) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
@@ -426,7 +605,9 @@ static esp_err_t _mjd_lorabee_get_key_returning_uint32_value(mjd_lorabee_config_
     return f_retval;
 }
 
-static esp_err_t _mjd_lorabee_get_key_returning_int32_value(mjd_lorabee_config_t* param_ptr_config, char * param_ptr_category, char * param_ptr_key,
+static esp_err_t _mjd_lorabee_get_key_returning_int32_value(mjd_lorabee_config_t* param_ptr_config,
+                                                            char * param_ptr_category,
+                                                            char * param_ptr_key,
                                                             int32_t * param_ptr_result) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
@@ -454,7 +635,8 @@ static esp_err_t _mjd_lorabee_get_key_returning_int32_value(mjd_lorabee_config_t
     return f_retval;
 }
 
-static esp_err_t _mjd_lorabee_set_key_with_string_value(mjd_lorabee_config_t* param_ptr_config, char * param_ptr_category, char * param_ptr_key,
+static esp_err_t _mjd_lorabee_set_key_with_string_value(mjd_lorabee_config_t* param_ptr_config, char * param_ptr_category,
+                                                        char * param_ptr_key,
                                                         char * param_value) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
@@ -472,8 +654,8 @@ static esp_err_t _mjd_lorabee_set_key_with_string_value(mjd_lorabee_config_t* pa
         goto cleanup;
     }
 
-    f_retval = _response_text_to_code(response.response_1);
-    if (f_retval != MJD_LORABEE_OK) {
+    f_retval = _response_text_to_status_code(response.response_1);
+    if (f_retval != MJD_LORABEE_STATUS_OK) {
         ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, mjd_lorabee_err_to_name(f_retval));
         // GOTO
         goto cleanup;
@@ -485,7 +667,8 @@ static esp_err_t _mjd_lorabee_set_key_with_string_value(mjd_lorabee_config_t* pa
     return f_retval;
 }
 
-static esp_err_t _mjd_lorabee_set_key_with_uint32_value(mjd_lorabee_config_t* param_ptr_config, char * param_ptr_category, char * param_ptr_key,
+static esp_err_t _mjd_lorabee_set_key_with_uint32_value(mjd_lorabee_config_t* param_ptr_config, char * param_ptr_category,
+                                                        char * param_ptr_key,
                                                         uint32_t param_value) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
@@ -503,8 +686,8 @@ static esp_err_t _mjd_lorabee_set_key_with_uint32_value(mjd_lorabee_config_t* pa
         goto cleanup;
     }
 
-    f_retval = _response_text_to_code(response.response_1);
-    if (f_retval != MJD_LORABEE_OK) {
+    f_retval = _response_text_to_status_code(response.response_1);
+    if (f_retval != MJD_LORABEE_STATUS_OK) {
         ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, mjd_lorabee_err_to_name(f_retval));
         // GOTO
         goto cleanup;
@@ -516,7 +699,8 @@ static esp_err_t _mjd_lorabee_set_key_with_uint32_value(mjd_lorabee_config_t* pa
     return f_retval;
 }
 
-static esp_err_t _mjd_lorabee_set_key_with_int32_value(mjd_lorabee_config_t* param_ptr_config, char * param_ptr_category, char * param_ptr_key,
+static esp_err_t _mjd_lorabee_set_key_with_int32_value(mjd_lorabee_config_t* param_ptr_config, char * param_ptr_category,
+                                                       char * param_ptr_key,
                                                        int32_t param_value) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
@@ -534,8 +718,8 @@ static esp_err_t _mjd_lorabee_set_key_with_int32_value(mjd_lorabee_config_t* par
         goto cleanup;
     }
 
-    f_retval = _response_text_to_code(response.response_1);
-    if (f_retval != MJD_LORABEE_OK) {
+    f_retval = _response_text_to_status_code(response.response_1);
+    if (f_retval != MJD_LORABEE_STATUS_OK) {
         ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, mjd_lorabee_err_to_name(f_retval));
         // GOTO
         goto cleanup;
@@ -549,10 +733,15 @@ static esp_err_t _mjd_lorabee_set_key_with_int32_value(mjd_lorabee_config_t* par
 
 //
 // SYS SET
+//
+
+/*
+ * <address>: hexadecimal number representing user EEPROM address, from 300 to 3FF
+ * <data>: hexadecimal number representing data, from 00 to FF
+ *
+ * The EEPROM is only erased when doing a factoryRESET (not with `sys reset` or my pin-reset).
+ */
 esp_err_t mjd_lorabee_sys_set_nvm(mjd_lorabee_config_t* param_ptr_config, uint32_t param_hex_address, uint8_t param_value) {
-    // @doc <address>: hexadecimal number representing user EEPROM address, from 300 to 3FF
-    // @doc <data>: hexadecimal number representing data, from 00 to FF
-    // @doc The EEPROM is only erased when doing a factoryRESET (not with `sys reset` or my pin-reset)
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
@@ -569,8 +758,8 @@ esp_err_t mjd_lorabee_sys_set_nvm(mjd_lorabee_config_t* param_ptr_config, uint32
         goto cleanup;
     }
 
-    f_retval = _response_text_to_code(response.response_1);
-    if (f_retval != MJD_LORABEE_OK) {
+    f_retval = _response_text_to_status_code(response.response_1);
+    if (f_retval != MJD_LORABEE_STATUS_OK) {
         ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, mjd_lorabee_err_to_name(f_retval));
         // GOTO
         goto cleanup;
@@ -600,8 +789,8 @@ esp_err_t mjd_lorabee_sys_set_pindig(mjd_lorabee_config_t* param_ptr_config, mjd
         goto cleanup;
     }
 
-    f_retval = _response_text_to_code(response.response_1);
-    if (f_retval != MJD_LORABEE_OK) {
+    f_retval = _response_text_to_status_code(response.response_1);
+    if (f_retval != MJD_LORABEE_STATUS_OK) {
         ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, mjd_lorabee_err_to_name(f_retval));
         // GOTO
         goto cleanup;
@@ -615,6 +804,8 @@ esp_err_t mjd_lorabee_sys_set_pindig(mjd_lorabee_config_t* param_ptr_config, mjd
 
 //
 // SYS GET
+//
+
 esp_err_t mjd_lorabee_sys_get_nvm(mjd_lorabee_config_t* param_ptr_config, uint32_t param_address, uint8_t * param_result) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
@@ -668,8 +859,10 @@ esp_err_t mjd_lorabee_sys_get_hweui(mjd_lorabee_config_t* param_ptr_config, char
     return f_retval;
 }
 
+/*
+ * %[^characters] Negated scanset. Any number of characters none of them specified as characters between the brackets.
+ */
 esp_err_t mjd_lorabee_sys_get_version(mjd_lorabee_config_t* param_ptr_config, mjd_lorabee_version_info_t * param_ptr_result) {
-    // @doc %[^characters] Negated scanset. Any number of characters none of them specified as characters between the brackets.
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
@@ -683,7 +876,8 @@ esp_err_t mjd_lorabee_sys_get_version(mjd_lorabee_config_t* param_ptr_config, mj
     }
 
     // Compute derived values
-    sscanf(param_ptr_result->raw, "%s %s %[^\n]s", param_ptr_result->model, param_ptr_result->firmware_version, param_ptr_result->firmware_date);
+    sscanf(param_ptr_result->raw, "%s %s %[^\n]s", param_ptr_result->model, param_ptr_result->firmware_version,
+            param_ptr_result->firmware_date);
 
     ESP_LOGD(TAG, "mjd_lorabee_version_info_t * param_ptr_result:");
     ESP_LOGD(TAG, "    param_ptr_result->raw %s", param_ptr_result->raw);
@@ -697,9 +891,11 @@ esp_err_t mjd_lorabee_sys_get_version(mjd_lorabee_config_t* param_ptr_config, mj
     return f_retval;
 }
 
+/*
+ * Response: 0–3600 (decimal value from 0 to 3600)
+ * This command informs the RN2483 module to do an ADC conversion on the VDD. The measurement is converted and returned as a voltage (mV).
+ */
 esp_err_t mjd_lorabee_sys_get_vdd(mjd_lorabee_config_t* param_ptr_config, uint32_t * param_ptr_result) {
-    // @doc Response: 0–3600 (decimal value from 0 to 3600)
-    // @doc This command informs the RN2483 module to do an ADC conversion on the VDD. The measurement is converted and returned as a voltage (mV).
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
@@ -719,33 +915,27 @@ esp_err_t mjd_lorabee_sys_get_vdd(mjd_lorabee_config_t* param_ptr_config, uint32
 }
 
 //
-// RADIO GET
-esp_err_t mjd_lorabee_radio_get_mode(mjd_lorabee_config_t* param_ptr_config, char * param_ptr_result) {
+// ...
+//
+
+/*
+ * @doc <pwrOut>: signed decimal number representing the transceiver output power, from -3 to 15
+ * @doc -3 works fine for short distances (building)
+ * @doc TABLE 2-5: OUTPUT POWER OF TX POWER SETTING for BAND 868Mhz @ Microchip data sheet
+ *          TX:     dBm output power    mA supply current
+ *          ------- ----------------    -----------------
+ *          -3      -4.0                17
+ *           0      -1.7                20
+ *           7       5.8                29
+ *          14      13.5                38
+ */
+esp_err_t mjd_lorabee_radio_set_power(mjd_lorabee_config_t* param_ptr_config, int32_t param_value) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
 
     // MAIN
-    f_retval = _mjd_lorabee_get_key_returning_string_value(param_ptr_config, "radio", "mod", param_ptr_result);
-    if (f_retval == ESP_FAIL) {
-        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
-        // GOTO
-        goto cleanup;
-    }
-
-    // LABEL
-    cleanup: ;
-
-    return f_retval;
-}
-
-esp_err_t mjd_lorabee_radio_get_frequency(mjd_lorabee_config_t* param_ptr_config, uint32_t * param_ptr_result) {
-    ESP_LOGD(TAG, "%s()", __FUNCTION__);
-
-    esp_err_t f_retval = ESP_OK;
-
-    // MAIN
-    f_retval = _mjd_lorabee_get_key_returning_uint32_value(param_ptr_config, "radio", "freq", param_ptr_result);
+    f_retval = _mjd_lorabee_set_key_with_int32_value(param_ptr_config, "radio", "pwr", param_value);
     if (f_retval == ESP_FAIL) {
         ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
         // GOTO
@@ -777,14 +967,24 @@ esp_err_t mjd_lorabee_radio_get_power(mjd_lorabee_config_t* param_ptr_config, in
     return f_retval;
 }
 
-esp_err_t mjd_lorabee_radio_get_spreading_factor(mjd_lorabee_config_t* param_ptr_config, char * param_ptr_result) {
-    // TODO Maybe make return param an uint8_t?
+/*
+ * <mode>: string representing the modulation method, either `lora` or `fsk`.
+ */
+esp_err_t mjd_lorabee_radio_set_mode(mjd_lorabee_config_t* param_ptr_config, mjd_lorabee_mode_t param_value) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
 
     // MAIN
-    f_retval = _mjd_lorabee_get_key_returning_string_value(param_ptr_config, "radio", "sf", param_ptr_result);
+    char string_value[MJD_LORABEE_MODE_STRING_MAXLEN] = "";
+    f_retval = _mode_enum_to_string(param_value, string_value);
+    if (f_retval != ESP_OK) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    f_retval = _mjd_lorabee_set_key_with_string_value(param_ptr_config, "radio", "mod", string_value);
     if (f_retval == ESP_FAIL) {
         ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
         // GOTO
@@ -797,13 +997,302 @@ esp_err_t mjd_lorabee_radio_get_spreading_factor(mjd_lorabee_config_t* param_ptr
     return f_retval;
 }
 
-esp_err_t mjd_lorabee_radio_get_bandwidth(mjd_lorabee_config_t* param_ptr_config, uint32_t * param_ptr_result) {
+esp_err_t mjd_lorabee_radio_get_mode(mjd_lorabee_config_t* param_ptr_config, mjd_lorabee_mode_t *param_ptr_value) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
 
     // MAIN
-    f_retval = _mjd_lorabee_get_key_returning_uint32_value(param_ptr_config, "radio", "bw", param_ptr_result);
+    char string_value[MJD_LORABEE_MODE_STRING_MAXLEN] = "";
+
+    f_retval = _mjd_lorabee_get_key_returning_string_value(param_ptr_config, "radio", "mod", string_value);
+    if (f_retval == ESP_FAIL) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    f_retval = _mode_string_to_enum(string_value, param_ptr_value);
+    if (f_retval != ESP_OK) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+/*
+ * @doc RN2843 API: radio set freq <frequency>
+ *        where <frequency> = decimal representing the frequency, from 433050000 to 434790000 or from 863000000 to 870000000, in Hz.
+ *
+ * @doc My selected frequencies -> my channel list:
+ *      #1 868.90 Mhz 868900000 [SF7BW125]
+ *      #2 869.10 Mhz 869100000 [SF7BW125]
+ *      #3 869.50 Mhz 869500000 [SF7BW125]
+ *      #4 869.80 Mhz 869800000 [SF7BW125]
+ *
+ * @rule EU 863-870 ISM Band channel frequencies https://www.efis.dk/views2/search-general.jsp
+ *    865 MHz    - 868 MHz range. RFID & Non-specific SRDs
+ *    865.00 MHz - 865.60 MHz RFID
+ *    867.60 MHz - 868.00 MHz RFID
+ *    868.00 MHz - 868.60 MHz Non-specific SRDs (TTN)
+ *    868.70 MHz - 869.20 MHz Non-specific SRDs
+ *    869.40 MHz - 869.65 MHz Non-specific SRDs
+ *    869.70 MHz - 870.00 MHz Non-specific SRDs
+ *
+ * TTN LoRaWAN Frequencies Overview:
+ *   This is a list of frequency plan definitions used in The Things Network.
+ *   These frequency plans are based on what is specified in the LoRaWAN regional parameters document. See the list of frequency plans by country list.
+ *   # EU863-870 Uplink: 865100000
+ *     868.1 Mhz - SF7BW125 to SF12BW125
+ *     868.3 Mhz - SF7BW125 to SF12BW125 and SF7BW250
+ *     868.5 Mhz - SF7BW125 to SF12BW125
+ *     867.1 Mhz - SF7BW125 to SF12BW125
+ *     867.3 Mhz - SF7BW125 to SF12BW125
+ *     867.5 Mhz - SF7BW125 to SF12BW125
+ *     867.7 Mhz - SF7BW125 to SF12BW125
+ *     867.9 Mhz - SF7BW125 to SF12BW125
+ *     868.8 Mhz - FSK
+ *   # EU863-870 Downlink:
+ *       Uplink channels 1-9 (RX1)
+ *       869.525 Mhz - SF9BW125 (RX2 downlink only)
+ *     @doc TTN uses the non-standard SF9BW125 data rate for RX2 in Europe. If your devices use OTAA, that is configured automatically when joining (not so for ABP).
+ */
+esp_err_t mjd_lorabee_radio_set_frequency(mjd_lorabee_config_t* param_ptr_config, uint32_t param_value) {
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    // MAIN
+    f_retval = _mjd_lorabee_set_key_with_uint32_value(param_ptr_config, "radio", "freq", param_value);
+    if (f_retval == ESP_FAIL) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+esp_err_t mjd_lorabee_radio_get_frequency(mjd_lorabee_config_t* param_ptr_config, uint32_t * param_ptr_result) {
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    // MAIN
+    f_retval = _mjd_lorabee_get_key_returning_uint32_value(param_ptr_config, "radio", "freq", param_ptr_result);
+    if (f_retval == ESP_FAIL) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+/*
+ * <spreadingFactor>: string representing the spreading factor. Parameter values can be: sf7, sf8, sf9, sf10, sf11 or sf12.
+ */
+esp_err_t mjd_lorabee_radio_set_spreading_factor(mjd_lorabee_config_t* param_ptr_config,
+                                                 mjd_lorabee_spreading_factor_t param_value) {
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    // MAIN
+    char string_value[MJD_LORABEE_SPREADING_FACTOR_STRING_MAXLEN] = "";
+    f_retval = _spreading_factor_enum_to_string(param_value, string_value);
+    if (f_retval != ESP_OK) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    f_retval = _mjd_lorabee_set_key_with_string_value(param_ptr_config, "radio", "sf", string_value);
+    if (f_retval == ESP_FAIL) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+esp_err_t mjd_lorabee_radio_get_spreading_factor(mjd_lorabee_config_t* param_ptr_config,
+                                                 mjd_lorabee_spreading_factor_t *param_ptr_value) {
+    // MJD_LORABEE_SPREADING_FACTOR_VALUE_MAXLEN
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    // MAIN
+    char string_value[MJD_LORABEE_SPREADING_FACTOR_STRING_MAXLEN] = "";
+
+    f_retval = _mjd_lorabee_get_key_returning_string_value(param_ptr_config, "radio", "sf", string_value);
+    if (f_retval == ESP_FAIL) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    f_retval = _spreading_factor_string_to_enum(string_value, param_ptr_value);
+    if (f_retval != ESP_OK) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+/*
+ * <bandWidth>: decimal representing the operating radio bandwidth, in kHz. Parameter values can be: 125, 250, 500.
+ */
+esp_err_t mjd_lorabee_radio_set_bandwidth(mjd_lorabee_config_t* param_ptr_config, mjd_lorabee_bandwidth_t param_value) {
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    // MAIN
+    char string_value[MJD_LORABEE_BANDWIDTH_STRING_MAXLEN] = "";
+    f_retval = _bandwidth_enum_to_string(param_value, string_value);
+    if (f_retval != ESP_OK) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    f_retval = _mjd_lorabee_set_key_with_string_value(param_ptr_config, "radio", "bw", string_value);
+    if (f_retval == ESP_FAIL) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+esp_err_t mjd_lorabee_radio_get_bandwidth(mjd_lorabee_config_t* param_ptr_config, mjd_lorabee_bandwidth_t * param_ptr_value) {
+    // MJD_LORABEE_BANDWIDTH_VALUE_MAXLEN
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    // MAIN
+    char string_value[MJD_LORABEE_BANDWIDTH_STRING_MAXLEN] = "";
+
+    f_retval = _mjd_lorabee_get_key_returning_string_value(param_ptr_config, "radio", "bw", string_value);
+    if (f_retval == ESP_FAIL) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    f_retval = _bandwidth_string_to_enum(string_value, param_ptr_value);
+    if (f_retval != ESP_OK) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+/*
+ * <coding rate>: string representing the coding rate, Parameter values can be: 4/5, 4/6, 4/7, 4/8.
+ *   Firmware default: 4/5
+ *
+ */
+esp_err_t mjd_lorabee_radio_set_coding_rate(mjd_lorabee_config_t* param_ptr_config, mjd_lorabee_coding_rate_t param_value) {
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    // MAIN
+    char string_value[MJD_LORABEE_CODING_RATE_STRING_MAXLEN] = "";
+    f_retval = _coding_rate_enum_to_string(param_value, string_value);
+    if (f_retval != ESP_OK) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    f_retval = _mjd_lorabee_set_key_with_string_value(param_ptr_config, "radio", "cr", string_value);
+    if (f_retval == ESP_FAIL) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+esp_err_t mjd_lorabee_radio_get_coding_rate(mjd_lorabee_config_t* param_ptr_config,
+                                            mjd_lorabee_coding_rate_t *param_ptr_value) {
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    // MAIN
+    char string_value[MJD_LORABEE_CODING_RATE_STRING_MAXLEN] = "";
+
+    f_retval = _mjd_lorabee_get_key_returning_string_value(param_ptr_config, "radio", "cr", string_value);
+    if (f_retval == ESP_FAIL) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    f_retval = _coding_rate_string_to_enum(string_value, param_ptr_value);
+    if (f_retval != ESP_OK) {
+        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
+/*
+ * <watchDog>: decimal number representing the time-out length for the Watchdog Timer, from 0 to 4294967295 milliseconds.
+ *             Set to ‘0’ to disable this functionality.
+ * @default 15000 (=15 seconds)
+ */
+esp_err_t mjd_lorabee_radio_set_watchdog_timeout(mjd_lorabee_config_t* param_ptr_config, uint32_t param_value) {
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    // MAIN
+    f_retval = _mjd_lorabee_set_key_with_uint32_value(param_ptr_config, "radio", "wdt", param_value);
     if (f_retval == ESP_FAIL) {
         ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
         // GOTO
@@ -835,6 +1324,12 @@ esp_err_t mjd_lorabee_radio_get_watchdog_timeout(mjd_lorabee_config_t* param_ptr
     return f_retval;
 }
 
+/*
+ * GET SNR.
+ *   This command reads back the Signal Noise Ratio (SNR) for the last received packet.
+ *   Response: signed decimal number representing the signal to noise ratio (SNR), from -128 to 127.
+ *
+ */
 esp_err_t mjd_lorabee_radio_get_signal_noise_ratio(mjd_lorabee_config_t* param_ptr_config, int32_t * param_ptr_result) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
@@ -855,164 +1350,13 @@ esp_err_t mjd_lorabee_radio_get_signal_noise_ratio(mjd_lorabee_config_t* param_p
 }
 
 //
-// RADIO SET
-esp_err_t mjd_lorabee_radio_set_mode(mjd_lorabee_config_t* param_ptr_config, char * param_ptr_value) {
-    // @doc <mode>: string representing the modulation method, either lora or fsk.
-    ESP_LOGD(TAG, "%s()", __FUNCTION__);
-
-    esp_err_t f_retval = ESP_OK;
-
-    // MAIN
-    f_retval = _mjd_lorabee_set_key_with_string_value(param_ptr_config, "radio", "mod", param_ptr_value);
-    if (f_retval == ESP_FAIL) {
-        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
-        // GOTO
-        goto cleanup;
-    }
-
-    // LABEL
-    cleanup: ;
-
-    return f_retval;
-}
-
-esp_err_t mjd_lorabee_radio_set_frequency(mjd_lorabee_config_t* param_ptr_config, uint32_t param_value) {
-    // @doc <frequency>: decimal representing the frequency, from 433050000 to 434790000 or from 863000000 to 870000000, in Hz.
-    //  @rule EU863-870 ISM Band channel frequencies: 868.10 868.30 868.50
-    /*
-     * LoTTN RaWAN Frequencies Overview:
-     *   This is a list of frequency plan definitions used in The Things Network.
-     *   These frequency plans are based on what is specified in the LoRaWAN regional parameters document. See the list of frequency plans by country list.
-     *   # EU863-870 Uplink:
-     *     868.1 - SF7BW125 to SF12BW125
-     *     868.3 - SF7BW125 to SF12BW125 and SF7BW250
-     *     868.5 - SF7BW125 to SF12BW125
-     *     867.1 - SF7BW125 to SF12BW125
-     *     867.3 - SF7BW125 to SF12BW125
-     *     867.5 - SF7BW125 to SF12BW125
-     *     867.7 - SF7BW125 to SF12BW125
-     *     867.9 - SF7BW125 to SF12BW125
-     *     868.8 - FSK
-     *  # EU863-870 Downlink:
-     *      Uplink channels 1-9 (RX1)
-     *      869.525 - SF9BW125 (RX2 downlink only)
-     *      @doc TTN uses the non-standard SF9BW125 data rate for RX2 in Europe. If your devices use OTAA, that is configured automatically when they join (not so for ABP).
-     */
-    ESP_LOGD(TAG, "%s()", __FUNCTION__);
-
-    esp_err_t f_retval = ESP_OK;
-
-    // MAIN
-    f_retval = _mjd_lorabee_set_key_with_uint32_value(param_ptr_config, "radio", "freq", param_value);
-    if (f_retval == ESP_FAIL) {
-        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
-        // GOTO
-        goto cleanup;
-    }
-
-    // LABEL
-    cleanup: ;
-
-    return f_retval;
-}
-
-esp_err_t mjd_lorabee_radio_set_power(mjd_lorabee_config_t* param_ptr_config, int32_t param_value) {
-    // @doc <pwrOut>: signed decimal number representing the transceiver output power, from -3 to 15
-    // @doc -3 works fine for short distances (same room)
-    /* @doc <pwrOut>: signed decimal number representing the transceiver output power, from -3 to 15
-     * @doc TABLE 2-5: OUTPUT POWER OF TX POWER SETTING for BAND 868Mhz @ Microchip data sheet
-     *          TX:     dBm output power    mA supply current
-     *          ------- ----------------    -----------------
-     *          -3      -4.0                17.3
-     *           0      -1.7                20.2
-     *           7       5.8                28.8
-     *          14      13.5                38
-     */
-
-    ESP_LOGD(TAG, "%s()", __FUNCTION__);
-
-    esp_err_t f_retval = ESP_OK;
-
-    // MAIN
-    f_retval = _mjd_lorabee_set_key_with_int32_value(param_ptr_config, "radio", "pwr", param_value);
-    if (f_retval == ESP_FAIL) {
-        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
-        // GOTO
-        goto cleanup;
-    }
-
-    // LABEL
-    cleanup: ;
-
-    return f_retval;
-}
-
-esp_err_t mjd_lorabee_radio_set_spreading_factor(mjd_lorabee_config_t* param_ptr_config, char * param_ptr_value) {
-    // @doc <spreadingFactor>: string representing the spreading factor. Parameter values can be: sf7, sf8, sf9, sf10, sf11 or sf12.
-    ESP_LOGD(TAG, "%s()", __FUNCTION__);
-
-    esp_err_t f_retval = ESP_OK;
-
-    // MAIN
-    f_retval = _mjd_lorabee_set_key_with_string_value(param_ptr_config, "radio", "sf", param_ptr_value);
-    if (f_retval == ESP_FAIL) {
-        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
-        // GOTO
-        goto cleanup;
-    }
-
-    // LABEL
-    cleanup: ;
-
-    return f_retval;
-}
-
-esp_err_t mjd_lorabee_radio_set_bandwidth(mjd_lorabee_config_t* param_ptr_config, uint32_t param_value) {
-    // @doc <bandWidth>: decimal representing the operating radio bandwidth, in kHz. Parameter values can be: 125, 250, 500.
-    ESP_LOGD(TAG, "%s()", __FUNCTION__);
-
-    esp_err_t f_retval = ESP_OK;
-
-    // MAIN
-    f_retval = _mjd_lorabee_set_key_with_uint32_value(param_ptr_config, "radio", "bw", param_value);
-    if (f_retval == ESP_FAIL) {
-        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
-        // GOTO
-        goto cleanup;
-    }
-
-    // LABEL
-    cleanup: ;
-
-    return f_retval;
-}
-
-esp_err_t mjd_lorabee_radio_set_watchdog_timeout(mjd_lorabee_config_t* param_ptr_config, uint32_t param_value) {
-    // @doc <watchDog>: decimal number representing the time-out length for the Watchdog Timer, from 0 to 4294967295 milliseconds. Set to ‘0’ to disable this functionality.
-    // @default 15000 (=15 seconds)
-    ESP_LOGD(TAG, "%s()", __FUNCTION__);
-
-    esp_err_t f_retval = ESP_OK;
-
-    // MAIN
-    f_retval = _mjd_lorabee_set_key_with_uint32_value(param_ptr_config, "radio", "wdt", param_value);
-    if (f_retval == ESP_FAIL) {
-        ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
-        // GOTO
-        goto cleanup;
-    }
-
-    // LABEL
-    cleanup: ;
-
-    return f_retval;
-}
+// ...
 
 /*
  * @brief RADIO TX
  *
- * @rule EU863-870 Maximum payload size ASCII 115 => HEXSTR 230
- * @dep mjd_lorabee_config_t->max_executions_radio_tx
+ * @rule EU863-870 Maximum payload size ASCII 230 => HEXSTR 460
+ * @dep mjd_lorabee_config_t->max_nbr_of_radio_tx
  * TODO More research FIX TOO LONG DELAY 5SEC AFTER SENDING PACKET and waiting for response (duration varies with quality of Lora network/environment!)
  *
  * @techdoc
@@ -1032,9 +1376,10 @@ esp_err_t mjd_lorabee_radio_tx(mjd_lorabee_config_t* param_ptr_config, uint8_t* 
 
     esp_err_t f_retval = ESP_OK;
 
-    if (param_len * 2 > MJD_LORABEE_LORA_TX_PAYLOAD_MAX_BYTES) {
+    if (param_len > MJD_LORABEE_LORA_TX_PAYLOAD_MAX_BYTES) {
         f_retval = ESP_FAIL;
-        ESP_LOGE(TAG, "ABORT %s(). Payload length %i exceeds maximum (SF7 %i bytes) | err %i (%s)", __FUNCTION__, param_len * 2,
+        ESP_LOGE(TAG, "ABORT %s(). Payload length %i exceeds maximum (SF7 %i bytes) | err %i (%s)", __FUNCTION__,
+                param_len,
                 MJD_LORABEE_LORA_TX_PAYLOAD_MAX_BYTES, f_retval, esp_err_to_name(f_retval));
         // GOTO
         goto cleanup;
@@ -1043,7 +1388,8 @@ esp_err_t mjd_lorabee_radio_tx(mjd_lorabee_config_t* param_ptr_config, uint8_t* 
     char command[MJD_LORABEE_TX_COMMAND_MAX_SIZE] = ""; // @important Also reserve bytes for the command prefix
     f_retval = mjd_uint8s_to_hexstring(param_ptr_payload, param_len, command);
     if (f_retval != ESP_OK) {
-        ESP_LOGE(TAG, "ABORT %s(). mjd_uint8s_to_hexstring() failed | err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "ABORT %s(). mjd_uint8s_to_hexstring() failed | err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         goto cleanup;
     }
 
@@ -1052,9 +1398,10 @@ esp_err_t mjd_lorabee_radio_tx(mjd_lorabee_config_t* param_ptr_config, uint8_t* 
     uint8_t seq_execution = 0;
     while (true) {
         seq_execution++;
-        if (seq_execution > param_ptr_config->max_executions_radio_tx) {
+        if (seq_execution > param_ptr_config->max_nbr_of_radio_tx) {
             f_retval = ESP_FAIL;
-            ESP_LOGE(TAG, "    %s(). Exceeded max nbr of executions (%u) | err %i (%s)", __FUNCTION__, param_ptr_config->max_executions_radio_tx,
+            ESP_LOGE(TAG, "    %s(). Exceeded max nbr of executions (%u) | err %i (%s)", __FUNCTION__,
+                    param_ptr_config->max_nbr_of_radio_tx,
                     f_retval, esp_err_to_name(f_retval));
             ESP_LOGE(TAG, "    %s(): goto cleanup (ABORT)", __FUNCTION__);
             goto cleanup;
@@ -1064,13 +1411,14 @@ esp_err_t mjd_lorabee_radio_tx(mjd_lorabee_config_t* param_ptr_config, uint8_t* 
         mjd_lorabee_response_t response = MJD_LORABEE_RESPONSE_DEFAULT();
         f_retval = mjd_lorabee_cmd(param_ptr_config, command, &response);
         if (f_retval == ESP_FAIL) {
+            ++param_ptr_config->nbr_of_errors;
             ESP_LOGE(TAG, "    %s(). cmd-retval err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
-            ESP_LOGE(TAG, "    %s(): continue (try again)", __FUNCTION__);
+            ESP_LOGW(TAG, "    %s(): continue (try again)", __FUNCTION__);
             continue;
         }
 
-        f_retval = _response_text_to_code(response.response_1);
-        if (f_retval == MJD_LORABEE_OK) { // BREAK when OKAY (success)
+        f_retval = _response_text_to_status_code(response.response_1);
+        if (f_retval == MJD_LORABEE_STATUS_OK) {
             ESP_LOGD(TAG, "    %s(). text2code Response OK", __FUNCTION__);
 
             ESP_LOGD(TAG, "Handle RX response#2");
@@ -1078,9 +1426,9 @@ esp_err_t mjd_lorabee_radio_tx(mjd_lorabee_config_t* param_ptr_config, uint8_t* 
             int len_line_uart = 0;
             line_uart = _get_next_line_uart(param_ptr_config->uart_port_num);
             if (line_uart == NULL) {
-                ESP_LOGE(TAG, "    %s(): RX response#2 line_uart == NULL (means ESP_FAIL, goto cleanup)", __FUNCTION__);
                 ++param_ptr_config->nbr_of_errors;
-                ESP_LOGE(TAG, "    %s(): continue (try again)", __FUNCTION__);
+                ESP_LOGE(TAG, "    %s(): RX response#2 line_uart == NULL (means ESP_FAIL, goto cleanup)", __FUNCTION__);
+                ESP_LOGW(TAG, "    %s(): continue (try again)", __FUNCTION__);
                 continue;
             }
 
@@ -1094,22 +1442,25 @@ esp_err_t mjd_lorabee_radio_tx(mjd_lorabee_config_t* param_ptr_config, uint8_t* 
             response.data_received = true;
             strcpy(response.response_2, line_uart);
 
-            f_retval = _response_text_to_code(response.response_2);
-            if (f_retval != MJD_LORABEE_RADIO_TX_OK) {
-                ESP_LOGE(TAG, "    %s(). err %i (%s)", __FUNCTION__, f_retval, mjd_lorabee_err_to_name(f_retval));
+            f_retval = _response_text_to_status_code(response.response_2);
+            if (f_retval != MJD_LORABEE_STATUS_RADIO_TX_OK) {
                 ++param_ptr_config->nbr_of_errors;
-                ESP_LOGE(TAG, "    %s(): continue (try again)", __FUNCTION__);
+                ESP_LOGE(TAG, "    %s(). err %i (%s)", __FUNCTION__, f_retval, mjd_lorabee_err_to_name(f_retval));
+                ESP_LOGW(TAG, "    %s(): continue (try again)", __FUNCTION__);
                 continue;
             }
 
-            //
-            // BREAK (EXIT LOOP OK)
+            // Mark OK for calling func
+            f_retval = ESP_OK;
+
+            // ---BREAK (EXIT LOOP OK)
             break;
-            //
+            //---
+
         } else {
-            ESP_LOGE(TAG, "    %s(). text2code err %i (%s)", __FUNCTION__, f_retval, mjd_lorabee_err_to_name(f_retval));
             ++param_ptr_config->nbr_of_errors;
-            ESP_LOGE(TAG, "    %s(): continue (try again)", __FUNCTION__);
+            ESP_LOGE(TAG, "    %s(). text2code err %i (%s)", __FUNCTION__, f_retval, mjd_lorabee_err_to_name(f_retval));
+            ESP_LOGW(TAG, "    %s(): continue (try again)", __FUNCTION__);
             continue;
         }
     }
@@ -1123,18 +1474,18 @@ esp_err_t mjd_lorabee_radio_tx(mjd_lorabee_config_t* param_ptr_config, uint8_t* 
 /*
  * @brief RADIO RX START
  *
- * @dep mjd_lorabee_config_t->max_executions_radio_rx
  *
  * @techdoc
- *  Response after entering the command:
+ *  - 1st response after entering the command:
  *      # ok            – if parameter is valid and the transceiver is configured in Transmit mode ==> OK, CONTINUE
  *      # invalid_param – if parameter is not valid ==> ERROR
  *      # busy          – if the transceiver is currently busy ==> RETRY
- *  Response after the effective transmission:
+ *  - 2nd response after the effective data reception:
  *      # radio_rx<space><space><data> – if reception was successful, <data>: hexadecimal value that was received ==> OK
  *      # radio_err       – if reception was not successful, reception time-out occurred ==> RETRY
  *
- * @doc This is an endless loop issuing 'radio rx 0' commands and reading a message when it arrives (a different approach than the one shot in the 'radio tx' function).
+ * @doc This is an endless loop issuing 'radio rx 0' commands and reading a message when it arrives
+ *      (a different approach than the one shot command in the 'radio tx' function).
  *
  */
 esp_err_t mjd_lorabee_radio_rx(mjd_lorabee_config_t* param_ptr_config, uint8_t* param_ptr_result, size_t* param_ptr_len) {
@@ -1159,14 +1510,15 @@ esp_err_t mjd_lorabee_radio_rx(mjd_lorabee_config_t* param_ptr_config, uint8_t* 
         mjd_lorabee_response_t response = MJD_LORABEE_RESPONSE_DEFAULT();
         f_retval = mjd_lorabee_cmd(param_ptr_config, command, &response);
         if (f_retval == ESP_FAIL) {
+            ++param_ptr_config->nbr_of_errors;
             ESP_LOGE(TAG, "    %s(). cmd-retval err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
-            ESP_LOGE(TAG, "    %s(): continue (try again)", __FUNCTION__);
+            ESP_LOGW(TAG, "    %s(): continue (try again)", __FUNCTION__);
             // CONTINUE
             continue;
         }
 
-        f_retval = _response_text_to_code(response.response_1);
-        if (f_retval == MJD_LORABEE_OK) { // BREAK when OKAY (success)
+        f_retval = _response_text_to_status_code(response.response_1);
+        if (f_retval == MJD_LORABEE_STATUS_OK) {
             ESP_LOGD(TAG, "    %s(). text2code Response OK", __FUNCTION__);
 
             // Read Response#2
@@ -1175,9 +1527,9 @@ esp_err_t mjd_lorabee_radio_rx(mjd_lorabee_config_t* param_ptr_config, uint8_t* 
             int len_line_uart = 0;
             line_uart = _get_next_line_uart(param_ptr_config->uart_port_num);
             if (line_uart == NULL) {
-                ESP_LOGE(TAG, "    %s(): RX response#2 line_uart == NULL (means ESP_FAIL, goto cleanup)", __FUNCTION__);
                 ++param_ptr_config->nbr_of_errors;
-                ESP_LOGE(TAG, "    %s(): continue (try again)", __FUNCTION__);
+                ESP_LOGE(TAG, "    %s(): RX response#2 line_uart == NULL (means ESP_FAIL, goto cleanup)", __FUNCTION__);
+                ESP_LOGW(TAG, "    %s(): continue (try again)", __FUNCTION__);
                 // CONTINUE
                 continue;
             }
@@ -1187,49 +1539,53 @@ esp_err_t mjd_lorabee_radio_rx(mjd_lorabee_config_t* param_ptr_config, uint8_t* 
             ESP_LOG_BUFFER_HEXDUMP(TAG, line_uart, len_line_uart, ESP_LOG_DEBUG);
 
             // Response#2 Save
-            // @important COPY the string
+            //   @important COPY the string
             response.data_received = true;
             strcpy(response.response_2, line_uart);
 
             // Response#2 Check
-            f_retval = _response_text_to_code(response.response_2);
-            if (f_retval == MJD_LORABEE_RADIO_ERROR) {
-                ESP_LOGE(TAG, "    %s(). err %i (%s) Drop this response.", __FUNCTION__, f_retval, mjd_lorabee_err_to_name(f_retval));
+            f_retval = _response_text_to_status_code(response.response_2);
+            if (f_retval == MJD_LORABEE_STATUS_RADIO_ERROR) {
                 ++param_ptr_config->nbr_of_errors;
-                ESP_LOGE(TAG, "    %s(): continue (try again)", __FUNCTION__);
+                ESP_LOGE(TAG, "    %s(). err %i (%s) Drop this response.", __FUNCTION__, f_retval,
+                        mjd_lorabee_err_to_name(f_retval));
+                ESP_LOGW(TAG, "    %s(): continue (try again)", __FUNCTION__);
                 // CONTINUE
                 continue;
             }
             if (mjd_string_starts_with(response.response_2, MJD_LORABEE_RESPONSE_PREFIX_RADIO_RX) == false) {
-                ESP_LOGE(TAG, "    %s(). response2 does not start with '%s'. Drop this response.", __FUNCTION__, MJD_LORABEE_RESPONSE_PREFIX_RADIO_RX);
-                ESP_LOGE(TAG, "    %s().   response2: %s", __FUNCTION__, response.response_2);
                 ++param_ptr_config->nbr_of_errors;
-                ESP_LOGE(TAG, "    %s(): continue (try again)", __FUNCTION__);
+                ESP_LOGE(TAG, "    %s(). response2 does not start with '%s'. Drop this response.", __FUNCTION__,
+                        MJD_LORABEE_RESPONSE_PREFIX_RADIO_RX);
+                ESP_LOGE(TAG, "    %s().   response2: %s", __FUNCTION__, response.response_2);
+                ESP_LOGW(TAG, "    %s(): continue (try again)", __FUNCTION__);
                 // CONTINUE
                 continue;
             }
 
             // Response#2 Extract received data (integers). Format: radio_rx<space><space><hexdata>
-            // => uint8_t* param_ptr_result, size_t param_len
-            //  @special Remove prefix  using memmove() https://stackoverflow.com/questions/4295754/how-to-remove-first-character-from-c-string
-            memmove(response.response_2, response.response_2 + strlen(MJD_LORABEE_RESPONSE_PREFIX_RADIO_RX), strlen(response.response_2));
+            //   => uint8_t* param_ptr_result, size_t param_len
+            //    @special Remove prefix  using memmove() https://stackoverflow.com/questions/4295754/how-to-remove-first-character-from-c-string
+            memmove(response.response_2, response.response_2 + strlen(MJD_LORABEE_RESPONSE_PREFIX_RADIO_RX),
+                    strlen(response.response_2));
             if (mjd_hexstring_to_uint8s(response.response_2, strlen(response.response_2), param_ptr_result) != ESP_OK) {
                 ++param_ptr_config->nbr_of_errors;
-                ESP_LOGE(TAG, "    %s(): continue (try again)", __FUNCTION__);
+                ESP_LOGE(TAG, "    %s(). Response#2 err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+                ESP_LOGW(TAG, "    %s(): continue (try again)", __FUNCTION__);
                 // CONTINUE
                 continue;
             }
             *param_ptr_len = strlen(response.response_2) / 2;
 
             //
-            // BREAK (EXIT LOOP OK)
+            // BREAK (***OK: EXIT LOOP***)
             break;
             //
 
         } else {
-            ESP_LOGE(TAG, "    %s(). text2code err %i (%s)", __FUNCTION__, f_retval, mjd_lorabee_err_to_name(f_retval));
             ++param_ptr_config->nbr_of_errors;
-            ESP_LOGE(TAG, "    %s(): continue (try again)", __FUNCTION__);
+            ESP_LOGE(TAG, "    %s(). text2code err %i (%s)", __FUNCTION__, f_retval, mjd_lorabee_err_to_name(f_retval));
+            ESP_LOGW(TAG, "    %s(): continue (try again)", __FUNCTION__);
             // CONTINUE
             continue;
         }
@@ -1259,8 +1615,10 @@ esp_err_t mjd_lorabee_mac_pause(mjd_lorabee_config_t* param_ptr_config) {
         goto cleanup;
     }
 
+    // SPECIAL LOGIC
+    //   @important Do NOT use _response_text_to_status_code()
     if (strcmp(response.response_1, MJD_LORABEE_RESPONSE_CANNOT_MAC_PAUSE) == 0) {
-        f_retval = MJD_LORABEE_ERROR_CANNOT_MAC_PAUSE;
+        f_retval = MJD_LORABEE_STATUS_ERROR_CANNOT_MAC_PAUSE;
         ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, mjd_lorabee_err_to_name(f_retval));
         // GOTO
         goto cleanup;
@@ -1288,8 +1646,8 @@ esp_err_t mjd_lorabee_mac_resume(mjd_lorabee_config_t* param_ptr_config) {
         goto cleanup;
     }
 
-    f_retval = _response_text_to_code(response.response_1);
-    if (f_retval != MJD_LORABEE_OK) {
+    f_retval = _response_text_to_status_code(response.response_1);
+    if (f_retval != MJD_LORABEE_STATUS_OK) {
         ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, mjd_lorabee_err_to_name(f_retval));
         // GOTO
         goto cleanup;
@@ -1309,12 +1667,12 @@ esp_err_t mjd_lorabee_mac_resume(mjd_lorabee_config_t* param_ptr_config) {
  * @return
  *
  *   @bug It is mandatory to reset the LoraBee device at the start of the app, else the LoraBee does not emit UART responses!
- *   @important The device is available for use again no earlier than 250 millisec after the reset.
  *   @seq AFTER mjd_lorabee_init()
  *
  *   @doc I sacrificed an extra ESP32 pin for this feature. The SJ1 pads on the LoraBee board must be solder-joined.
- *   @logic GPIO Config + Set LOW for 1 millisec (should reset the device!) + Set HIGH again
- *   @pcb RN2483 PIN #32 "RESET" Input Active-low device Reset | LoraBee Xbee Board PIN#17 ("IO7") | Parallax Xbee Adapter Board PIN#IO3
+ *        GPIO Config + Set LOW for 1 millisec (should reset the device!) + Set HIGH again
+ *        RN2483 PIN #32 "RESET" Input Active-low device Reset | LoraBee Xbee Board PIN#17 ("IO7") | Parallax Xbee Adapter Board PIN#IO3
+ *        The device is available for use again no earlier than 250 millisec after the reset.
  *
  *   @doc Strict timing is required in this code. Do not put the log() calls between the time-sensitive commands.
  *
@@ -1325,12 +1683,12 @@ esp_err_t mjd_lorabee_reset(mjd_lorabee_config_t* param_ptr_config) {
     esp_err_t f_retval = ESP_OK;
 
     gpio_config_t reset_io_conf =
-        { 0 };
+                { 0 };
 
     ESP_LOGD(TAG, "  gpio_config();");
-    ESP_LOGD(TAG, "  gpio_set_level(x, 0);");
+    ESP_LOGD(TAG, "  gpio_set_level(PIN, 0);");
     ESP_LOGD(TAG, "  delay 1 millisec (arbitrarily)");
-    ESP_LOGD(TAG, "  gpio_set_level(x, 1);");
+    ESP_LOGD(TAG, "  gpio_set_level(PIN, 1);");
     ESP_LOGD(TAG, "  delay 250 millisec (the device is booting)");
 
     reset_io_conf.pin_bit_mask = (1ULL << param_ptr_config->reset_gpio_num);
@@ -1359,8 +1717,9 @@ esp_err_t mjd_lorabee_reset(mjd_lorabee_config_t* param_ptr_config) {
     // Wait to let the device come alive (and generate UART output with the boot message)
     vTaskDelay(RTOS_DELAY_250MILLISEC);
 
-    // Consume the UART output aka flush it (else the next lorabee command will get that output and returns error 'unexpected response')
-    //   @data "RN2483 1.0.3 Mar 22 2017 06:00:42"
+    // Consume after the reset the UART output
+    //   else the next lorabee command will get that output and return error 'unexpected response'
+    //   output: "RN2483 1.0.3 Mar 22 2017 06:00:42"
     char *line_uart = "";
     int len_line_uart = 0;
 
@@ -1383,8 +1742,9 @@ esp_err_t mjd_lorabee_reset(mjd_lorabee_config_t* param_ptr_config) {
 
 /********************************************************************************
  * LoraBee: SLEEP COMMAND
- * @brief 4294967295 = +- 50 days. <length>: decimal number representing the number of milliseconds the system is put to Sleep, from 100 to 4294967296.
- * @important
+ *   <length>: decimal number representing the number of milliseconds the system is put to Sleep, from 100 to 4294967296.
+ *   4294967295 = +-50 days.
+ *
  * @param mjd_lorabee_config_t
  * @return
  *
@@ -1409,15 +1769,18 @@ esp_err_t mjd_lorabee_sleep(mjd_lorabee_config_t* param_ptr_config) {
 
 /********************************************************************************
  * LoraBee: WAKEUP COMMAND
- * @brief
- * @important
+ *
+ * @doc The host system needs to transmit to the MicroChip module a BREAK condition
+ *      followed by one 0x55 character ('U') at the new baud rate
+ * @doc A break condition is signaled to the module by keeping the UART_TX pin low
+ *      for longer than the time to transmit a complete character (1 char = 10 bits) at that baudrate.
+ * @logic A valid break condition for the default baud rate 57600 bps is keeping the UART_RX pin low
+ *        for at least 938 microsec. Using 1250 microsec in the code.
+ * @problem Cannot use uart_write_bytes_with_break() because a) Sends the BREAK -after- the data; 2) The data/buf cannot be empty;
+ *
  * @param mjd_lorabee_config_t
  * @return
  *
- *   @doc The host system needs to transmit to the MicroChip module a BREAK condition followed by one 0x55 character ('U') at the new baud rate
- *   @doc A break condition is signaled to the module by keeping the UART_TX pin low for longer than the time to transmit a complete character (1 char = 10 bits) at that baudrate.
- *   @logic A valid break condition for the default baud rate 57600 bps is keeping the UART_RX pin low for at least 938 microsec. Using 1250 microsec in the code.
- *   @problem Cannot use uart_write_bytes_with_break() because a) Sends the BREAK -after- the data! 2) The data/buf cannot be empty!
  */
 esp_err_t mjd_lorabee_wakeup(mjd_lorabee_config_t* param_ptr_config) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
@@ -1467,6 +1830,80 @@ esp_err_t mjd_lorabee_wakeup(mjd_lorabee_config_t* param_ptr_config) {
  * PUBLIC.
  *
  */
+/*
+ * @brief helper log config
+ *
+ */
+esp_err_t mjd_lorabee_log_config(mjd_lorabee_config_t* param_ptr_config) {
+    ESP_LOGD(TAG, "%s()", __FUNCTION__);
+
+    esp_err_t f_retval = ESP_OK;
+
+    ESP_LOGI(TAG, "Log mjd_lorabee_config_t* param_ptr_config:");
+    ESP_LOGI(TAG, "  %32s = %u", "bool is_init", param_ptr_config->is_init);
+    ESP_LOGI(TAG, "  %32s = %i", "uart_port_t uart_port_num", param_ptr_config->uart_port_num);
+    ESP_LOGI(TAG, "  %32s = %i", "gpio_num_t uart_tx_gpio_num", param_ptr_config->uart_tx_gpio_num);
+    ESP_LOGI(TAG, "  %32s = %i", "gpio_num_t uart_rx_gpio_num", param_ptr_config->uart_rx_gpio_num);
+    ESP_LOGI(TAG, "  %32s = %i", "gpio_num_t reset_gpio_num", param_ptr_config->reset_gpio_num);
+
+    ESP_LOGI(TAG, "  %32s = %i", "radio_power", param_ptr_config->radio_power);
+
+    {
+        char string_value[MJD_LORABEE_MODE_STRING_MAXLEN] = "";
+        f_retval = _mode_enum_to_string(param_ptr_config->radio_mode, string_value);
+        if (f_retval != ESP_OK) {
+            ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+            // GOTO
+            goto cleanup;
+        }
+        ESP_LOGI(TAG, "  %32s = %s", "radio_mode", string_value);
+    }
+
+    ESP_LOGI(TAG, "  %32s = %u", "radio_frequency", param_ptr_config->radio_frequency);
+
+    {
+        char string_value[MJD_LORABEE_SPREADING_FACTOR_STRING_MAXLEN] = "";
+        f_retval = _spreading_factor_enum_to_string(param_ptr_config->radio_spreading_factor, string_value);
+        if (f_retval != ESP_OK) {
+            ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+            // GOTO
+            goto cleanup;
+        }
+        ESP_LOGI(TAG, "  %32s = %s", "radio_spreading_factor", string_value);
+    }
+
+    {
+        char string_value[MJD_LORABEE_BANDWIDTH_STRING_MAXLEN] = "";
+        f_retval = _bandwidth_enum_to_string(param_ptr_config->radio_bandwidth, string_value);
+        if (f_retval != ESP_OK) {
+            ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+            // GOTO
+            goto cleanup;
+        }
+        ESP_LOGI(TAG, "  %32s = %s", "radio_bandwidth", string_value);
+    }
+
+    {
+        char string_value[MJD_LORABEE_CODING_RATE_STRING_MAXLEN] = "";
+        f_retval = _coding_rate_enum_to_string(param_ptr_config->radio_coding_rate, string_value);
+        if (f_retval != ESP_OK) {
+            ESP_LOGE(TAG, "%s(). err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+            // GOTO
+            goto cleanup;
+        }
+        ESP_LOGI(TAG, "  %32s = %s", "radio_coding_rate", string_value);
+    }
+
+    ESP_LOGI(TAG, "  %32s = %u millisec", "radio_watchdog_timeout", param_ptr_config->radio_watchdog_timeout);
+    ESP_LOGI(TAG, "  %32s = %u", "uint8_t max_nbr_of_radio_tx", param_ptr_config->max_nbr_of_radio_tx);
+    ESP_LOGI(TAG, "  %32s = %u", "uint32_t nbr_of_errors", param_ptr_config->nbr_of_errors);
+
+    // LABEL
+    cleanup: ;
+
+    return f_retval;
+}
+
 esp_err_t mjd_lorabee_init(mjd_lorabee_config_t* param_ptr_config) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
@@ -1476,7 +1913,8 @@ esp_err_t mjd_lorabee_init(mjd_lorabee_config_t* param_ptr_config) {
 
     if (param_ptr_config->is_init == true) {
         f_retval = ESP_ERR_INVALID_STATE;
-        ESP_LOGE(TAG, "%s(). The component has already been init'd | err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
+        ESP_LOGE(TAG, "%s(). The component has already been init'd | err %i (%s)", __FUNCTION__, f_retval,
+                esp_err_to_name(f_retval));
         // GOTO
         goto cleanup;
     }
@@ -1494,9 +1932,13 @@ esp_err_t mjd_lorabee_init(mjd_lorabee_config_t* param_ptr_config) {
 
     // Configure the UART1 controller
     uart_config_t uart_config =
-        { .baud_rate = MJD_LORABEE_UART_BAUD_SPEED, .data_bits = UART_DATA_8_BITS, .parity = UART_PARITY_DISABLE, .stop_bits = UART_STOP_BITS_1,
-                .flow_ctrl =
-                UART_HW_FLOWCTRL_DISABLE };
+                {
+                        .baud_rate = MJD_LORABEE_UART_BAUD_SPEED,
+                        .data_bits = UART_DATA_8_BITS,
+                        .parity = UART_PARITY_DISABLE,
+                        .stop_bits = UART_STOP_BITS_1,
+                        .flow_ctrl =
+                                UART_HW_FLOWCTRL_DISABLE };
     f_retval = uart_param_config(param_ptr_config->uart_port_num, &uart_config);
     if (f_retval != ESP_OK) {
         ESP_LOGE(TAG, "%s(). uart_param_config() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
@@ -1504,8 +1946,9 @@ esp_err_t mjd_lorabee_init(mjd_lorabee_config_t* param_ptr_config) {
         goto cleanup;
     }
 
-    f_retval = uart_set_pin(param_ptr_config->uart_port_num, param_ptr_config->uart_tx_gpio_num, param_ptr_config->uart_rx_gpio_num,
-    UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+    f_retval = uart_set_pin(param_ptr_config->uart_port_num, param_ptr_config->uart_tx_gpio_num,
+            param_ptr_config->uart_rx_gpio_num,
+            UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
     if (f_retval != ESP_OK) {
         ESP_LOGE(TAG, "%s(). uart_set_pin() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
         // GOTO
@@ -1513,7 +1956,8 @@ esp_err_t mjd_lorabee_init(mjd_lorabee_config_t* param_ptr_config) {
     }
 
     // @doc Param UART TX ring buffer size. OK If set to zero Then the driver will not use the TX buffer; the TX function will block the task until all data has been sent out.
-    f_retval = uart_driver_install(param_ptr_config->uart_port_num, MJD_LORABEE_UART_RX_RINGBUFFER_SIZE, 0, MJD_LORABEE_UART_DRIVER_QUEUE_SIZE, &_uart_driver_queue, 0);
+    f_retval = uart_driver_install(param_ptr_config->uart_port_num, MJD_LORABEE_UART_RX_RINGBUFFER_SIZE, 0,
+    MJD_LORABEE_UART_DRIVER_QUEUE_SIZE, &_uart_driver_queue, 0);
     if (f_retval != ESP_OK) {
         ESP_LOGE(TAG, "%s(). uart_driver_install() err %i (%s)", __FUNCTION__, f_retval, esp_err_to_name(f_retval));
         // GOTO
@@ -1537,7 +1981,8 @@ esp_err_t mjd_lorabee_init(mjd_lorabee_config_t* param_ptr_config) {
      * RTOS CREATE TASK: monitor UART events (more specifically UART_DATA & ERRORS).
      */
     BaseType_t xReturned;
-    xReturned = xTaskCreatePinnedToCore(&_uart_events_task, "_uart_events_task (name)", MY_LORABEE_TASK_UART_EVENTS_TASK_STACK_SIZE, NULL,
+    xReturned = xTaskCreatePinnedToCore(&_uart_events_task, "_uart_events_task (name)",
+    MY_LORABEE_TASK_UART_EVENTS_TASK_STACK_SIZE, NULL,
     RTOS_TASK_PRIORITY_NORMAL, &_uart_events_task_handle, APP_CPU_NUM);
     if (xReturned != pdPASS) {
         ESP_LOGE(TAG, "%s(). xTaskCreatePinnedToCore(_uart_events_task) | err %i (%s)", __FUNCTION__, xReturned, "!=pdPASS");
@@ -1599,6 +2044,12 @@ esp_err_t mjd_lorabee_init(mjd_lorabee_config_t* param_ptr_config) {
         goto cleanup;
     }
 
+    f_retval = mjd_lorabee_radio_set_coding_rate(param_ptr_config, param_ptr_config->radio_coding_rate);
+    if (f_retval != ESP_OK) {
+        // GOTO
+        goto cleanup;
+    }
+
     f_retval = mjd_lorabee_radio_set_watchdog_timeout(param_ptr_config, param_ptr_config->radio_watchdog_timeout);
     if (f_retval != ESP_OK) {
         // GOTO
@@ -1633,7 +2084,7 @@ esp_err_t mjd_lorabee_deinit(mjd_lorabee_config_t* param_ptr_config) {
 
     esp_err_t f_retval = ESP_OK;
 
-    // Lora device Sleep
+    // Lora device Sleep (save power)
     mjd_lorabee_sleep(param_ptr_config);
 
     // Delete task & rx data queue

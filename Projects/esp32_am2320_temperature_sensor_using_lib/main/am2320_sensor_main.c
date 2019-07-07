@@ -61,8 +61,8 @@ void sensor_task(void *pvParameter) {
 
         mjd_led_off(MY_LED_ON_DEVBOARD_GPIO_NUM);
 
-        ESP_LOGD(TAG, "@doc Wait 5 seconds @ end of loop");
-        vTaskDelay(RTOS_DELAY_5SEC);
+        ESP_LOGD(TAG, "@doc Wait 2 seconds @ end of loop");
+        vTaskDelay(RTOS_DELAY_2SEC);
     }
 }
 

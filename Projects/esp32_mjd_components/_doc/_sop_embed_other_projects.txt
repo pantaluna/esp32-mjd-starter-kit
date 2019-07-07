@@ -58,7 +58,7 @@ mv --verbose bmp280_support.c example
 
 
 ===========================================
-COMPONENT esp-mqtt v0.6.1
+COMPONENT esp-mqtt v0.7.1
 ===========================================
 @source Feb2018 Git REPO https://github.com/256dpi/esp-mqtt.git
 
@@ -78,8 +78,8 @@ git status
 cd /c/myiot/esp/esp32_mjd_components/components/esp-mqtt
 git tag --list
 git checkout tags/v0.4.4
-git describe --tags
 git submodule update --init --recursive
+git describe --tags
 git status
 rm --verbose --recursive .git
 
@@ -88,8 +88,8 @@ rm --verbose --recursive .git
 cd /c/myiot/esp/esp32_mjd_components/components/esp-mqtt
 git tag --list
 git checkout tags/v0.6.0
-git describe --tags
 git submodule update --init --recursive
+git describe --tags
 git status
 rm --verbose --recursive .git
 
@@ -98,8 +98,18 @@ rm --verbose --recursive .git
 cd /c/myiot/esp/esp32_mjd_components/components/esp-mqtt
 git tag --list
 git checkout tags/v0.6.1
-git describe --tags
 git submodule update --init --recursive
+git describe --tags
+git status
+rm --verbose --recursive .git
+
+##
+## ***OK May2019*** Checkout tag v0.7.1 (supports ESP-IDF V3)
+cd /c/myiot/esp/esp32_mjd_components/components/esp-mqtt
+git tag --list
+git checkout tags/v0.7.1
+git submodule update --init --recursive
+git describe --tags
 git status
 rm --verbose --recursive .git
 
@@ -143,11 +153,11 @@ typedef enum {
 ===========================================
 COMPONENT mjd_nanopb <= Nanopb
 ===========================================
-@sop ./README.md
+Mar2019
+@instructions ./README.md
 
 ===========================================
 COMPONENT u8g2
 ===========================================
 Apr2019.
 @instructions REF component mjd_ssd1306 README.md
-

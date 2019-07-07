@@ -27,8 +27,8 @@ extern "C" {
 #define ACK_CHECK_DIS  (0x0)                 //  I2C master will not check ack from slave
 
 typedef struct {
-        bool manage_i2c_driver; // ***Added new property***
-        i2c_port_t i2c_port_num; // ***Added new property*** I2C_NUM_0 I2C_NUM_1
+        bool manage_i2c_driver; // RHMOD ***Added new property***
+        i2c_port_t i2c_port_num; // RHMOD ***Added new property*** I2C_NUM_0 I2C_NUM_1
         gpio_num_t clk;
         gpio_num_t mosi;
         gpio_num_t sda; // data for I2C
@@ -36,7 +36,7 @@ typedef struct {
         gpio_num_t cs;
         gpio_num_t reset;
         gpio_num_t dc;
-} u8g2_esp32_hal_t;
+}u8g2_esp32_hal_t;
 
 #define U8G2_ESP32_HAL_DEFAULT { \
     U8G2_ESP32_HAL_UNDEFINED, \

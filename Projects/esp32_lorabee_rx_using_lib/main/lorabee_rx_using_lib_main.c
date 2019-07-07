@@ -14,9 +14,9 @@ static const int MY_LED_ON_DEVBOARD_GPIO_NUM = CONFIG_MY_LED_ON_DEVBOARD_GPIO_NU
 static const int MY_LED_ON_DEVBOARD_WIRING_TYPE = CONFIG_MY_LED_ON_DEVBOARD_WIRING_TYPE;
 
 static const int MY_LORABEE_UART_PORT_NUM = CONFIG_MY_LORABEE_UART_PORT_NUM; // @default UART_NUM_1
-static const int MY_LORABEE_UART_TX_GPIO_NUM = CONFIG_MY_LORABEE_UART_TX_GPIO_NUM;// @default 22
-static const int MY_LORABEE_UART_RX_GPIO_NUM = CONFIG_MY_LORABEE_UART_RX_GPIO_NUM;// @default 23
-static const int MY_LORABEE_RESET_GPIO_NUM = CONFIG_MY_LORABEE_RESET_GPIO_NUM;// @default 14
+static const int MY_LORABEE_UART_TX_GPIO_NUM = CONFIG_MY_LORABEE_UART_TX_GPIO_NUM; // @default 22
+static const int MY_LORABEE_UART_RX_GPIO_NUM = CONFIG_MY_LORABEE_UART_RX_GPIO_NUM; // @default 23
+static const int MY_LORABEE_RESET_GPIO_NUM = CONFIG_MY_LORABEE_RESET_GPIO_NUM; // @default 14
 
 /*
  * FreeRTOS settings
@@ -24,17 +24,16 @@ static const int MY_LORABEE_RESET_GPIO_NUM = CONFIG_MY_LORABEE_RESET_GPIO_NUM;//
 #define MYAPP_RTOS_TASK_STACK_SIZE_LARGE (8192)
 #define MYAPP_RTOS_TASK_PRIORITY_NORMAL (RTOS_TASK_PRIORITY_NORMAL)
 
-
 /*
  * LORA settings
- * #define MY_LORABEE_RADIO_POWER (-3)
  *
+ * - POWER (-3) = lowest 17mA supply current
  */
-#define MY_LORABEE_RADIO_POWER (14)
-#define MY_LORABEE_RADIO_FREQUENCY (865100000)
-#define MY_LORABEE_RADIO_SPREADING_FACTOR ("sf7")
-#define MY_LORABEE_RADIO_BANDWIDTH (125)
-
+#define MY_LORABEE_RADIO_POWER (10)
+#define MY_LORABEE_RADIO_FREQUENCY (868900000)
+#define MY_LORABEE_RADIO_SPREADING_FACTOR (MJD_LORABEE_SPREADING_FACTOR_SF7)
+#define MY_LORABEE_RADIO_BANDWIDTH (MJD_LORABEE_BANDWIDTH_125KHZ)
+#define MY_LORABEE_RADIO_CODING_RATE (MJD_LORABEE_CODING_RATE_4_8)
 
 /*
  * TASKS
@@ -62,7 +61,7 @@ void main_task(void *pvParameter) {
      *
      */
     mjd_led_config_t led_config =
-        { 0 };
+                { 0 };
     led_config.gpio_num = MY_LED_ON_DEVBOARD_GPIO_NUM;
     led_config.wiring_type = MY_LED_ON_DEVBOARD_WIRING_TYPE; // 1 GND MCU Huzzah32 | 2 VCC MCU Lolin32lite
     mjd_led_config(&led_config);
@@ -83,6 +82,7 @@ void main_task(void *pvParameter) {
     lorabee_config.radio_frequency = MY_LORABEE_RADIO_FREQUENCY;
     lorabee_config.radio_spreading_factor = MY_LORABEE_RADIO_SPREADING_FACTOR;
     lorabee_config.radio_bandwidth = MY_LORABEE_RADIO_BANDWIDTH;
+    lorabee_config.radio_coding_rate = MY_LORABEE_RADIO_CODING_RATE;
 
     f_retval = mjd_lorabee_init(&lorabee_config);
     if (f_retval != ESP_OK) {
@@ -99,7 +99,7 @@ void main_task(void *pvParameter) {
      */
 
     mjd_lorabee_version_info_t microtech_info =
-        { 0 };
+                { 0 };
     f_retval = mjd_lorabee_sys_get_version(&lorabee_config, &microtech_info);
     if (f_retval != ESP_OK) {
         // GOTO
@@ -111,14 +111,12 @@ void main_task(void *pvParameter) {
     ESP_LOGI(TAG, "    microtech_info.firmware_version %s", microtech_info.firmware_version);
     ESP_LOGI(TAG, "    microtech_info.firmware_date    %s", microtech_info.firmware_date);
 
-
-
     /**********
      * COMMAND: RADIO RX *
-     * TODO Implement a way to stop the for-loop manually (pushbutton? timer?)
+     * TODO Implement a way to stop the for-loop manually (pushbutton?)
      *
      */
-    const uint32_t NBR_OF_RX = 1000; // 10 50 100 1000 10000
+    const uint32_t NBR_OF_RX = 100000; // 10 50 100 1000 10000
     ESP_LOGI(TAG, "radio rx LOOP: NBR_OF_RX %u", NBR_OF_RX);
 
     mjd_log_memory_statistics();
@@ -131,6 +129,13 @@ void main_task(void *pvParameter) {
         ESP_LOGI(TAG, "");
         ESP_LOGI(TAG, "***radio rx LOOP ITEM #%u of %u***", i, NBR_OF_RX);
 
+        // COMMAND: SET LED *ON
+        f_retval = mjd_lorabee_sys_set_pindig(&lorabee_config, MJD_LORABEE_GPIO_NUM_0, MJD_LORABEE_GPIO_LEVEL_HIGH);
+        if (f_retval != ESP_OK) {
+            // GOTO
+            goto cleanup;
+        }
+
         f_retval = mjd_lorabee_radio_rx(&lorabee_config, (uint8_t *) radio_rx_result, &radio_rx_len);
         if (f_retval == ESP_FAIL) {
             // GOTO
@@ -141,14 +146,18 @@ void main_task(void *pvParameter) {
         ESP_LOGI(TAG, "    radio_rx_result: HEXDUMP");
         ESP_LOG_BUFFER_HEXDUMP(TAG, radio_rx_result, radio_rx_len, ESP_LOG_INFO);
 
-        // COMMAND "sys set pindig GPIO0 0": SET LED *ON, delay, SET LED *OFF
-        // TODO Remove the delay in Production.
-        f_retval = mjd_lorabee_sys_set_pindig(&lorabee_config, MJD_LORABEE_GPIO_NUM_0, MJD_LORABEE_GPIO_LEVEL_HIGH);
+        int32_t radio_signal_noise_ratio = 0;
+        f_retval = mjd_lorabee_radio_get_signal_noise_ratio(&lorabee_config, &radio_signal_noise_ratio);
         if (f_retval != ESP_OK) {
             // GOTO
             goto cleanup;
         }
-        vTaskDelay(RTOS_DELAY_100MILLISEC);
+        ESP_LOGI(TAG, "  SNR signal_noise_ratio (int32_t signed value): %i", radio_signal_noise_ratio);
+
+        // COMMAND delay: TODO Remove the delay in Production.
+        /////vTaskDelay(RTOS_DELAY_100MILLISEC);
+
+        // SET LED *OFF
         f_retval = mjd_lorabee_sys_set_pindig(&lorabee_config, MJD_LORABEE_GPIO_NUM_0, MJD_LORABEE_GPIO_LEVEL_LOW);
         if (f_retval != ESP_OK) {
             // GOTO

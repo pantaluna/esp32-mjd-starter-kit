@@ -105,12 +105,12 @@ static void _emit_event_configuration_changed() {
  *
  *  @param millisec delay in ms
  *
- *  @important For long delays (>= 1000 millisec) use vTaskDelay() instead of ets_delay_us() else the CPU Watchdog might be triggered.
- *  @important For small delays (< 1000 milliseconds) use ets_delay_us() instead of vTaskDelay(). The RTOS func is not accurate enough.
+ *  @important For long delays  (>= 500 millisec)    use vTaskDelay() instead of ets_delay_us() else the CPU Watchdog might be triggered.
+ *  @important For small delays (< 500 milliseconds) use ets_delay_us() instead of vTaskDelay(). The RTOS func is not accurate enough.
  *
  */
 static void _delay_millisec(uint32_t millisec) {
-    if (millisec >= 1000) {
+    if (millisec >= 500) {
         vTaskDelay(millisec / portTICK_PERIOD_MS);
     }
     else if (millisec > 0) {
@@ -1299,6 +1299,7 @@ esp_err_t mjd_scd30_cmd_stop_continuous_measurement(const mjd_scd30_config_t* pa
  Byte16: Humidity LMSB
  Byte17: Humidity LLSB
  Byte18: CRC
+ *
  *
  *********************************************************************************/
 esp_err_t mjd_scd30_cmd_read_measurement(const mjd_scd30_config_t* param_ptr_config, mjd_scd30_data_t* param_ptr_data)

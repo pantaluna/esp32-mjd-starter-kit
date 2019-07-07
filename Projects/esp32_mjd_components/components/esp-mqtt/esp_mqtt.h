@@ -32,10 +32,27 @@ typedef void (*esp_mqtt_message_callback_t)(const char *topic, uint8_t *payload,
 void esp_mqtt_init(esp_mqtt_status_callback_t scb, esp_mqtt_message_callback_t mcb, size_t buffer_size,
                    int command_timeout);
 
+#if defined(CONFIG_ESP_MQTT_TLS_ENABLE)
+/**
+ * Configure TLS connection.
+ *
+ * The specified CA certificate is not copied and must be available during the whole duration of the MQTT usage.
+ *
+ * Note: This method must be called before `esp_mqtt_start`.
+ *
+ * @param enable - Whether TLS should be used.
+ * @param verify - Whether the connection should be verified.
+ * @param ca_buf - The beginning of the CA certificate buffer.
+ * @param ca_len - The length of the CA certificate buffer.
+ * @return Whether TLS configuration was successful.
+ */
+bool esp_mqtt_tls(bool enable, bool verify, const uint8_t *ca_buf, size_t ca_len);
+#endif
+
 /**
  * Configure Last Will and Testament.
  *
- * Note: Must be called before esp_mqtt_start.
+ * Note: Must be called before `esp_mqtt_start`.
  *
  * @param topic - The LWT topic.
  * @param payload - The LWT payload.
@@ -57,8 +74,9 @@ void esp_mqtt_lwt(const char *topic, const char *payload, int qos, bool retained
  * @param client_id - The client id.
  * @param username - The client username.
  * @param password - The client password.
+ * @return Whether the operation was successful.
  */
-void esp_mqtt_start(const char *host, const char *port, const char *client_id, const char *username,
+bool esp_mqtt_start(const char *host, const char *port, const char *client_id, const char *username,
                     const char *password);
 
 /**

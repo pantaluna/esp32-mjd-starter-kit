@@ -165,7 +165,9 @@ static esp_err_t _run_calibration_command_asc_on() {
      */
     ESP_LOGI(TAG, "Setting ASC=On Activate continuous calculation of reference value for Automatic Self-Calibration");
     ESP_LOGI(TAG, "  - When activated for the first time a period of minimum *7* days is needed");
-    ESP_LOGI(TAG, "  so that the algorithm can find its initial parameter set for ASC!");
+    ESP_LOGI(TAG, "  so that the algorithm can find its initial parameter set for ASC.");
+    ESP_LOGI(TAG, "  - The continuous measurement mode must be triggered else ASC has no effect.");
+
 
     f_retval = mjd_scd30_cmd_set_automatic_self_calibration(&scd30_config, MJD_SCD30_ASC_AUTOMATIC_SELF_CALIBRATION_YES);
     if (f_retval != ESP_OK) {

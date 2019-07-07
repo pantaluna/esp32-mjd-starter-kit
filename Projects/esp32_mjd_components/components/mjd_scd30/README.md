@@ -148,13 +148,17 @@ Sensor Properties:
 
 
 
+The CO2 ppm formula depends on the atmospheric pressure. A pressure value can be specified when triggering an SCD30  read measurement. This value can be left to 0 (no influence) or you can specify the actual pressure value that is obtained from a a meteo sensor.
+
+
+
 ## Calibrating the sensor using this component
 
 The sensor comes pre-calibrated from the factory. ASC is disabled by default. Please be knowledgeable when starting the calibration commands ASC or FRC! 
 
 All calibration commands are supported by the component:
 
-- Enable the Automatic Self-Calibration (ASC).
+- Enable the Automatic Self-Calibration (ASC). The continuous read measurements are triggered as well (else ASC has no effect).
 - Disable the Automatic Self-Calibration (ASC). It is by default disabled.
 - Run a Forced ReCalibration (FRC) in fresh air. This means putting the project board outdoors and probably running the project on batteries; it is in this setup also handy that some output is displayed on the OLED Display. The firmware will first read CO2 measurements continuously until the values have stabilized (typically 3 minutes), and then it will set the FRC value to 400 ppm (the typical ppm value of fresh air on Earth).
 
@@ -171,25 +175,29 @@ The how-to's are described in the documentation of the example project ```esp32_
 
 
 ## IC/Module/ESP-IDF Component FAQ
+- Check **the data sheet ** for detailed information.
+- Check **the documented example projects and the sources of this component** for practical information.
 - Operating voltage: 3.3V - 5.5V.
-- Power consumption: average 19 mA, maximum 75 ma. These figures indicate that a project is not meant to be powered just on battery power.
-- CO2 measurement range: 0 – 40000 ppm.
+- CO2 measurement range: 400 – 10000 ppm.
 - The amount of CO2 is measured in parts-per-million (ppm). This is the relative proportion of carbon dioxide molecules in a volume of air.
-- The amount of CO2 in fresh air is typically 400 ppm, or 0.04%.
 - The device comes pre-calibrated from the factory. ASC and FRC are disabled by default.
+- The amount of CO2 in fresh air is typically 400 ppm, or 0.04%.
+- The hardware design makes it very **sensitive to electrostatic discharge (ESD)**. Please take the necessary precautions (I lost 2 SCD30 modules whilst developing this project).
+- The device has **no reverse voltage protection**. If you wire it up the wrong way then the NDIR unit keeps working (the yellowish light keeps coming up at regular intervals) but the I2C communication with the microcontroller will no longer work.
+- Power consumption: average 19 mA, maximum 75 ma. These figures indicate that a project is not meant to be powered just on battery power.
 - The sensor implements CRC Checksums for sending data and for receiving data. The mjd_scd30 component supports that.
 
-- Check **the data sheet ** for detailed information.
 
-- Check **the documented example projects and the sources of this component** for practical information.
-
-  
 
 ## Issues
 
-- **The SCD30 device actively uses I2C Clock Stretching**.  A stretch might occur before every ACK. The I2C timeout value of the sensor is documented as up to 12 milliseconds factory-default and up to 150 milliseconds when Automatic Self-Calibration (ASC) is enabled. These timeouts are extremely high and therefore the ESP32's I2C timeout property value had to be changed from the default of 0.4 milliseconds to 13.1 milliseconds (higher is not possible for an ESP32). It is advised to put the sensor on a separate I2C Master Bus so that it does not affect other I2C slaves when the I2C communication between the sensor or the ESP32 becomes unstable.
-- **The 1st and 2nd measurements** that are read after running the command "Trigger Continuous Measurements" are often wrong e.g. the CO2 ppm is either 0 or very low (well below 400ppm). These measurements are identified by the mjd_sc30 component and are ignored.  @note The temperature and humidity metrics are always correct).
+- **The SCD30 device actively uses I2C Clock Stretching**.  A stretch might occur before every ACK. The I2C timeout value of the sensor is documented as **up to 12 milliseconds factory-default** and **up to 150 milliseconds when Automatic Self-Calibration (ASC) is enabled**. These timeouts are extremely high and therefore the ESP32's I2C timeout property value had to be changed from the default of 0.4 milliseconds to 13.1 milliseconds (higher is not possible for an ESP32). It is advised to put the sensor on a separate I2C Master Bus, or use a multiplexer such as the SN74HC4051N, so that it does not affect other I2C slaves when the I2C communication between the sensor or the ESP32 becomes unstable.
+- **The 1st and 2nd measurement** after running the command "Trigger Continuous Measurements" are often wrong e.g. the CO2 ppm is either 0 or very low (well below 400ppm). These measurements are identified by the mjd_sc30 component and are ignored.  @note The temperature and humidity metrics are always correct.
 - The 1st CO2 ppm reading after running the command "**Soft Reset**" is always wrong; it is always 0.0 ppm. This measurement is identified by the mjd_sc30 component and is ignored.
+
+- **When the CO2 levels change suddenly** then the CO2 measurement is frequently 0.0 or lower than the supported minimum value of 400 ppm or higher than the supported maximum value of 10.000. These measurements are identified by the mjd_sc30 component and is ignored.
+
+* TODO Send a Soft Reset to the sensor if a command returns an error or an invalid value.
 
 
 

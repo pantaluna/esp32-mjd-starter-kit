@@ -49,7 +49,7 @@ Solder join the 2 pads of the SJ1 solder bridge at the backplate of the LoraBee 
 By default the board does no reset at all. The RN2843A's Reset Pin is wired via the solder bridge SJ1 to the Parallax XBee breakout pin "IO3" (it is the 4th pin on the RIGHT side of the Parallax board). The solder bridge SJ1 is open by default to safeguard your keys when you reset your microcontroller, so you can continue transmitting. But you can close the solder bridge SJ1 if you want the LoraBee to reset whenever you want; connect the LoRaBee RESET pin#17 to the Parallax XBee pin "IO3" to the MCU pin GPIO#14.
 
 ### Parallax XBee Pro Adapter Board
-- Pitch 2.0mm (not 2.54mm or 1.27mm)!
+- Pitch 2.0mm (not 2.54mm or 1.27mm).
 - Solder the 2 small XBee pin header strips to the board. @tip First plug the Lorabee Xbee board into the XBee pin headers (else the solder often falls into the female headers and the Lorabee board will not fit anymore...).
 - Solder the 2 breadboard pin header strips to the board.
 
@@ -137,7 +137,7 @@ https://www.semtech.com/products/wireless-rf/lora-transceivers/SX1276
 
 ## FAQ LORABEE Microchip RN2483A
 - 3.3V
-- Serial 57600 8N1.
+- Serial: 57600 8N1.
 - Use the Microchip Windows tool "LoraDevUtility" to get started with the LoraBee board.
 - Supported ISM Frequency Bands "EU863-870" 863.000-870.000 MHz (also "EU433" 433.050-434.790 MHz but then you need another antenna!).
 - The RN2483A module requires '\r\n' (CR+LF) at the end of an input line. The response also ends with '\r\n' (CR+LF).

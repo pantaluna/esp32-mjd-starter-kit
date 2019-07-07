@@ -146,6 +146,28 @@ esp_err_t mjd_ledrgb_init(mjd_ledrgb_config_t* ptr_param_config) {
      *
      * TODO mem_block_num. 1. Maybe larger number required for larger LED strips?
      * TODO mem_block_num. 2. Tune the number of blocks (max 8) depending on the actual number of RMT Channels used (=number of LED strips connected).
+     *   DIVIDER examples for ABP clock freq of 80Mhz:
+     *                                  --DIVIDER---
+     *      80 Mhz: esp_clk_apb_freq() /        1  = 80000000 ticks/second  ERROR [@problem min=2]
+     *      40 Mhz: esp_clk_apb_freq() /        2  = 40000000 ticks/second  OK
+     *      10 Mhz: esp_clk_apb_freq() /        8  = 10000000 ticks/second  OK
+     *       5 Mhz: esp_clk_apb_freq() /       16  =  5000000 ticks/second  OK
+     *       1 Mhz: esp_clk_apb_freq() /       80  =  1000000 ticks/second  OK
+     *     100 Khz: esp_clk_apb_freq() /      800  =   100000 ticks/second  OK
+     *      10 Khz: esp_clk_apb_freq() /     8000  =    10000 ticks/second  OK
+     *    1.25 Khz: esp_clk_apb_freq() /    64000  =     1250 ticks/second  OK
+     *       1 Khz: esp_clk_apb_freq() /    80000  =     1000 ticks/second  ERROR [@problem max=65536]
+     *     100 Hz : esp_clk_apb_freq() /   800000  =      100 ticks/second  ERROR [@problem max=65536]
+     *      10 Hz : esp_clk_apb_freq() /  8000000  =       10 ticks/second  ERROR [@problem max=65536]
+     *       1 Hz : esp_clk_apb_freq() / 80000000  =        1 ticks/second  ERROR [@problem max=65536]
+     *
+     *       Kolban:
+     *       - The base clock runs by default at 80MHz. That means it ticks 80,000,000 times a second or 80,000 times a millisecond
+     *         or 80 times a microsecond or 0.08 times a nano second.
+     *         Flipping this around, our granularity of interval is 1/80,000,000 is 0.0000000125 seconds or 0.0000125 milliseconds
+     *         or 0.0125 microseconds or 12.5 nanoseconds. This is fast.
+     *       - About the clock divider value. If the base clock is 80MHz then a divisor of 80 gives us 1MHz.
+     *
      */
     rmt_config_t rmt_cfg =
         { 0 };

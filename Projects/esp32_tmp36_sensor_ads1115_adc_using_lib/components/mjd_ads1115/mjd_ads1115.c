@@ -1308,8 +1308,7 @@ esp_err_t mjd_ads1115_init(mjd_ads1115_config_t* param_ptr_config) {
      */
     if (param_ptr_config->manage_i2c_driver == true) {
         // Config
-        i2c_config_t i2c_conf =
-            { 0 };
+        i2c_config_t i2c_conf = { 0 };
         i2c_conf.mode = I2C_MODE_MASTER;
         i2c_conf.scl_io_num = param_ptr_config->i2c_scl_gpio_num;
         i2c_conf.sda_io_num = param_ptr_config->i2c_sda_gpio_num;
@@ -1540,7 +1539,7 @@ esp_err_t mjd_ads1115_cmd_get_single_conversion(mjd_ads1115_config_t* param_ptr_
         ESP_LOGD(TAG, "%s(). Computed wait delay (ms): %u", __FUNCTION__, delay);
         _delay_millisec(delay);
     } else {
-        // WAIT for the ALERT READY Pin value go LOW -XOR- timeout from esptimer
+        // WAIT for the ALERT READY Pin value go LOW -XOR- timeout from an esp timer
         bool has_timed_out = false;
         const double TIMEOUT_SECONDS = 2; // FAIL when pin is not LOW after 2 seconds
         double timer_counter_value_seconds = 0;

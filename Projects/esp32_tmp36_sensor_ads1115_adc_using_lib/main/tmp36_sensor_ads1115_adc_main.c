@@ -90,7 +90,7 @@ void peripheral_task(void *pvParameter) {
     float min_degrees_celsius = FLT_MAX;
     float max_degrees_celsius = FLT_MIN;
     mjd_log_time();
-    const uint32_t NBR_OF_RUNS = 1000;
+    const uint32_t NBR_OF_RUNS = 10000;
     ESP_LOGI(TAG, "TMP36 Measurements via the ADS1115 ADC");
     ESP_LOGI(TAG, "LOOP: NBR_OF_RUNS %u", NBR_OF_RUNS);
     for (uint32_t j = 1; j <= NBR_OF_RUNS; ++j) {

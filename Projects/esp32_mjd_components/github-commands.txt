@@ -23,7 +23,7 @@ git push --set-upstream origin master
 
 git remote show origin
 
-git tag --annotate v0.80 --message "First tag"
+git tag --annotate v0.80 --message "First version"
 git push origin --tags
 
 git describe --tags --dirt
@@ -37,13 +37,14 @@ SOP Upload source updates to GitHub
 ```
 DIR_REPO_NAME=esp32_mjd_components
 cd  /c/myiot/esp/${DIR_REPO_NAME}
+pwd
 git add .
 git commit -m "Updated"
 
 git config credential.helper store
 git push --set-upstream origin master
 
-git tag --annotate v1.7 --message "New component mjd_scd30 for the Sensirion SCD30 CO2 and RH/T sensor module. New component mjd_ssd1306 for 128x32 128x64 OLED displays with SSD1306 IC"
+git tag --annotate v1.9 --message "Add component mjd_jsnsr04t: JSN-SR04T-2.0 Waterproof Ultrasonic Sensor Module"
 git push origin --tags
 
 git describe --tags --dirt

@@ -3,7 +3,7 @@ This is a component for the ESP-IDF software framework of the ESP32 hardware fro
 
 This component mjd_tmp36 is developed for **the TMP36 Analog Temperature Sensor** from Analog Devices.
 
-This component mjd_tmp36 converts the raw voltage reading of the sensor (read by an ADC) to the ambient temperature in Degrees Celsius.
+This component mjd_tmp36 converts the raw voltage reading of the sensor (read by the ADC) to the ambient temperature in Degrees Celsius.
 
 More information about the device:
 - Adafruit Learning: TMP36 Temperature Sensor <https://learn.adafruit.com/tmp36-temperature-sensor/overview>
@@ -19,13 +19,19 @@ More information about the device:
 
 [ Go to the _doc folder for photo's.]
 
-- Adafruit TMP36 Analog Gas Sensor.
+- Adafruit TMP36 Analog Temperature Sensor.
 
 
 
 ## Wiring Instructions
 
 The specific wiring instructions are documented in the  ESP-IDF example project(s).
+
+```
+- Connect a 0.1uF ceramic capacitor between the TMP36's pins VCC and GND. It should be as close as possible to the VCC pin of the sensor.
+- Connect a +-2.2uF tantalum capacitor between the TMP36's pins VCC and GND when the
+device is operated in the presence of high frequency radiated or conducted noise.
+```
 
 
 
@@ -67,7 +73,6 @@ PIN#  PIN NAME	  Description
 - Do not read the output at very high frequencies else the unit might overheat and influence the readings.
 - Less than 50 µA quiescent current
 - The TMP36 is functionally compatible with the LM50.
-- Noise: add a 0.1 µF ceramic bypass capacitor between the pins VCC and GND.
 - For long wires (> 1 meter): add a 750 Ohm resistor on the VOUT output pin.
 - Check **the data sheet ** for detailed information.
 - Check **the example projects** for practical information.

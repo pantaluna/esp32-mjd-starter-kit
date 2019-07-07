@@ -1,17 +1,17 @@
-# ESP-IDF MJD SSD1306 Component
+# ESP-IDF MJD SSD1306 OLED Component
 
 This is a component for the ESP-IDF software framework of the ESP32 hardware from Espressif.
 
-This component is developed for **the popular 128x32 and 128x64 OLED displays which are based on the SSD1306 OLED Driver IC**.
+This component is developed for **the popular OLED 128x32 and OLED 128x64 displays which are based on the SSD1306 OLED Driver IC**. The **data protocol is I2C** (not SPI).
 
 **The main purpose is to make it easy to display short debug text messages and status text information on the OLED screen.**
 
-The font is Courier Regular 12px and each line is 16px high. You can write up to 2 lines on a 128x32 display and up to 4 lines on a 128x64 display.
+You can write up to 2 lines on a 128x32 display and up to 4 lines on a 128x64 display.
 
 The API supports:
 
 - 128x32 and 128x64 OLED monochrome displays based on the SSD1306 IC.
-- Writing a string to a specific line on the display (the screen is cleared when writing the line#1). You can write up to 2 lines to a 128x32 OLED display. You can write up to 4 lines to a 128x64 OLED display.
+- Writing a string to a specific line on the display (the screen is cleared when writing the line#1). You can write **up to 2 lines of 13 characters to a 128x32 OLED display**. You can write **up to 4 lines of 13 characters to a 128x64 OLED display**.
 - Clearing the screen.
 
 If you need more functionality then feel free to use the U8G2 component directly.
@@ -22,8 +22,7 @@ If you need more functionality then feel free to use the U8G2 component directly
 
 Go to the examples and learn how the component is used.
 
-```esp32_ssd1306_oled_using_lib``` This project demonstrates the component mjd_ssd1306 to show text on a an OLED display.
-
+- ```esp32_ssd1306_oled_using_lib``` This project, for the popular 128x32 and 128x64 OLED displays which are based on the SSD1306 OLED Driver IC, demonstrates the component mjd_ssd1306 to show text on an OLED display.
 
 
 
@@ -32,10 +31,10 @@ Go to the examples and learn how the component is used.
 [ Goto the _doc folder for photo's.]
 
 - Adafruit Monochrome 128x32 I2C OLED graphic display.
-- 0.91 Inch 128x32 I2C Blue OLED Display Module SSD1306 DC 3.3V 5V.
-- White color 128X64 OLED Display Module For Arduino 0.96 inch I2C.
+- OLED Display Module 0.91 Inch 128x32 Blue I2C SSD1306 DC 3.3V 5V.
+- OLED Display Module 0.96 Inch 128x64 Blue I2C SSD1306 For Arduino.
 
-@important Choose a variant of these products that supports the I2C protocol. Those typically have at least 2 pins labeled SCL and SDA.
+@important Choose a variant of these products that supports the I2C protocol. They typically have 4 breakout pins.
 
 
 
@@ -113,6 +112,8 @@ PIN# PIN NAME Description
 
 
 ## Issues
+
+None.
 
 
 

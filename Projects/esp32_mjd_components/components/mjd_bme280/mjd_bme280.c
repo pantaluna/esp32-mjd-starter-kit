@@ -25,7 +25,7 @@ static uint32_t bme280_current_i2c_port;
 
 /*  \Brief : The delay routine
  *  \param : delay in ms
- *  @important ESP32 The FreeRTOS func does NOT WORK for short delays < 1s: TaskDelay(millisec / portTICK_PERIOD_MS);
+ *  @important ESP32 The FreeRTOS func does NOT WORK for short delays < 0.5s: TaskDelay(millisec / portTICK_PERIOD_MS);
  */
 void BME280_delay_millisec(uint32_t millisec) {
     ets_delay_us(millisec * 1000);
@@ -40,19 +40,19 @@ void BME280_delay_millisec(uint32_t millisec) {
  *   \param len : The nbr of bytes of data to be read
  *
  *       * Data on the bus should be like
-         * |------------+---------------------|
-         * | I2C action | Data                |
-         * |------------+---------------------|
-         * | Start      | -                   |
-         * | Write      | (reg_addr)          |
-         * | Stop       | -                   |
-         * | Start      | -                   |
-         * | Read       | (reg_data[0])       |
-         * | Read       | (....)              |
-         * | Read       | (reg_data[len - 1]) |
-         * | Stop       | -                   |
-         * |------------+---------------------|
-         *
+ * |------------+---------------------|
+ * | I2C action | Data                |
+ * |------------+---------------------|
+ * | Start      | -                   |
+ * | Write      | (reg_addr)          |
+ * | Stop       | -                   |
+ * | Start      | -                   |
+ * | Read       | (reg_data[0])       |
+ * | Read       | (....)              |
+ * | Read       | (reg_data[len - 1]) |
+ * | Stop       | -                   |
+ * |------------+---------------------|
+ *
  * Please take the below function as your reference to read the data using I2C communication
  *   "f_retval = I2C_WRITE_READ_STRING(DEV_ID, ARRAY, ARRAY, 1, CNT)"
  *      f_retval is an return value of I2C write function
@@ -90,11 +90,10 @@ int8_t BME280_I2C_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint
 
     //DEVTEMP DEBUG Insert this after the read code
     /*printf("RD: reg 0x%X len %d:", reg_addr, len);
-    for(uint16_t idx = 0; idx < len; idx++)
-        printf(" 0x%X", reg_data[idx]);
-    printf("\n");*/
+     for(uint16_t idx = 0; idx < len; idx++)
+     printf(" 0x%X", reg_data[idx]);
+     printf("\n");*/
     //DEVTEMP DEBUG END
-
     return (int8_t) f_retval;
 }
 
@@ -106,18 +105,18 @@ int8_t BME280_I2C_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint
  *   \param len : The nbr of bytes of data to be written
  *
  *   *
-     * Data on the bus should be like
-     * |------------+---------------------|
-     * | I2C action | Data                |
-     * |------------+---------------------|
-     * | Start      | -                   |
-     * | Write      | (reg_addr)          |
-     * | Write      | (reg_data[0])       |
-     * | Write      | (....)              |
-     * | Write      | (reg_data[len - 1]) |
-     * | Stop       | -                   |
-     * |------------+---------------------|
-     *
+ * Data on the bus should be like
+ * |------------+---------------------|
+ * | I2C action | Data                |
+ * |------------+---------------------|
+ * | Start      | -                   |
+ * | Write      | (reg_addr)          |
+ * | Write      | (reg_data[0])       |
+ * | Write      | (....)              |
+ * | Write      | (reg_data[len - 1]) |
+ * | Stop       | -                   |
+ * |------------+---------------------|
+ *
  * Please take the below function as your reference for write the data using I2C communication
  *   "f_retval = I2C_WRITE_STRING(DEV_ADDR, ARRAY, CNT+1)"
  *       f_retval is an return value of I2C read function
@@ -150,11 +149,10 @@ int8_t BME280_I2C_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uin
 
     //DEVTEMP DEBUG Insert this before the write code
     /*printf("WR: 0x%X len %d", reg_addr, len);
-    for(uint16_t idx = 0; idx < len; idx++)
-    printf(" 0x%X", reg_data[idx]);
-    printf("\n");*/
+     for(uint16_t idx = 0; idx < len; idx++)
+     printf(" 0x%X", reg_data[idx]);
+     printf("\n");*/
     //DEVTEMP DEBUG END
-
     return (int8_t) f_retval;
 }
 
@@ -179,7 +177,8 @@ esp_err_t mjd_bme280_init(mjd_bme280_config_t* config) {
      */
     if (config->manage_i2c_driver == true) {
         // Config
-        i2c_config_t i2c_conf = { 0 };
+        i2c_config_t i2c_conf =
+            { 0 };
         i2c_conf.mode = I2C_MODE_MASTER;
         i2c_conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
         i2c_conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
@@ -258,6 +257,21 @@ esp_err_t mjd_bme280_deinit(mjd_bme280_config_t* ptr_param_config) {
         f_retval = i2c_driver_delete(ptr_param_config->i2c_port_num);
         if (f_retval != ESP_OK) {
             ESP_LOGE(TAG, "ABORT. i2c_driver_delete() error (%i)", f_retval);
+            // LABEL
+            goto cleanup;
+        }
+        // @purpose Save power consumption.
+        //   1. Reset an gpio to default state (select gpio function, enable pullup and disable input and output).
+        //   2. It also configures the IOMUX for this pin to the GPIO function, and disconnects any other peripheral output configured via GPIO Matrix.
+        f_retval = gpio_reset_pin(ptr_param_config->i2c_scl_gpio_num);
+        if (f_retval != ESP_OK) {
+            ESP_LOGE(TAG, "ABORT. Cannot gpio_reset_pin(SCL) | error (%i)", f_retval);
+            // LABEL
+            goto cleanup;
+        }
+        f_retval = gpio_reset_pin(ptr_param_config->i2c_sda_gpio_num);
+        if (f_retval != ESP_OK) {
+            ESP_LOGE(TAG, "ABORT. Cannot gpio_reset_pin(SDA) | error (%i)", f_retval);
             // LABEL
             goto cleanup;
         }
@@ -414,14 +428,14 @@ esp_err_t mjd_bme280_read_forced(mjd_bme280_config_t* ptr_param_config, mjd_bme2
      */
     /*ESP_LOGD(TAG, "do bme280_get_sensor_mode()");
 
-    com_rslt = bme280_get_sensor_mode(&sensor_mode, ptr_bme280_device);
-    if (com_rslt != BME280_OK) {
-        ESP_LOGE(TAG, "ABORT. bme280_get_sensor_mode() failed - err %i", com_rslt);
-        f_retval = ESP_FAIL;
-        // LABEL
-        goto cleanup;
-    }
-    ESP_LOGD(TAG, "  sensor_mode: 0x%hhx (d %hhu) [EXPECT 0x01 BME280_FORCED_MODE]", sensor_mode, sensor_mode);*/
+     com_rslt = bme280_get_sensor_mode(&sensor_mode, ptr_bme280_device);
+     if (com_rslt != BME280_OK) {
+     ESP_LOGE(TAG, "ABORT. bme280_get_sensor_mode() failed - err %i", com_rslt);
+     f_retval = ESP_FAIL;
+     // LABEL
+     goto cleanup;
+     }
+     ESP_LOGD(TAG, "  sensor_mode: 0x%hhx (d %hhu) [EXPECT 0x01 BME280_FORCED_MODE]", sensor_mode, sensor_mode);*/
 
     /*
      * DEBUG Standby settings are NOT relevant in BME280_FORCED_MODE :)
@@ -434,7 +448,8 @@ esp_err_t mjd_bme280_read_forced(mjd_bme280_config_t* ptr_param_config, mjd_bme2
      */
     ESP_LOGD(TAG, "do bme280_get_sensor_data()");
 
-    struct bme280_data compensated_data = { 0 }; // @important = { 0 }
+    struct bme280_data compensated_data =
+        { 0 }; // @important = { 0 }
 
     com_rslt = bme280_get_sensor_data(BME280_ALL, &compensated_data, ptr_bme280_device);
     if (com_rslt != BME280_OK) {
@@ -455,14 +470,14 @@ esp_err_t mjd_bme280_read_forced(mjd_bme280_config_t* ptr_param_config, mjd_bme2
      */
     /*ESP_LOGD(TAG, "do bme280_get_sensor_mode()");
 
-    com_rslt = bme280_get_sensor_mode(&sensor_mode, ptr_bme280_device);
-    if (com_rslt != BME280_OK) {
-        ESP_LOGE(TAG, "ABORT. bme280_get_sensor_mode() failed - err %i", com_rslt);
-        f_retval = ESP_FAIL;
-        // LABEL
-        goto cleanup;
-    }
-    ESP_LOGD(TAG, "  sensor_mode: 0x%hhx (d %hhu) [EXPECT 0x00 BME280_SLEEP_MODE]", sensor_mode, sensor_mode);*/
+     com_rslt = bme280_get_sensor_mode(&sensor_mode, ptr_bme280_device);
+     if (com_rslt != BME280_OK) {
+     ESP_LOGE(TAG, "ABORT. bme280_get_sensor_mode() failed - err %i", com_rslt);
+     f_retval = ESP_FAIL;
+     // LABEL
+     goto cleanup;
+     }
+     ESP_LOGD(TAG, "  sensor_mode: 0x%hhx (d %hhu) [EXPECT 0x00 BME280_SLEEP_MODE]", sensor_mode, sensor_mode);*/
 
     // LABEL
     cleanup: ;
